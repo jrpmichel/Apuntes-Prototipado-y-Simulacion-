@@ -1,0 +1,720 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Semana 4. Modelado de Fenómenos Físicos — Prototipado y Simulación</title>
+<meta name="description" content="Semana 4. Modelado de Fenómenos Físicos: objetivo, temario y código ejecutable.">
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-cpW21h6RZv/phavutF+AuVYrr+dA8xD9zs6FwLpaCePvcCWnZ8IU9UNlXhpKUAJI" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-vZTG03m+2yp6N6BNi5iM4rW4oIwk5DfcNdFfxkk9ZWpDriOkXX8voJBFrAO7MpVl" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-GvrOXuhMATgEsSwCs4smul74iXGOixntILdUW9XmUC6+HX0sLNAK3q71HotJqlAn" crossorigin="anonymous">
+<link rel="stylesheet" href="../../assets/css/style.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="topbar-brand" href="../../index.html">
+      <img src="../../assets/img/logo-lasalle.png" alt="Universidad La Salle Bajío">
+      Prototipado y Simulación
+    </a>
+    <nav>
+      <a href="../../index.html#semanas">Semanas</a>
+      <a href="../../README.md">Repositorio</a>
+    </nav>
+  </div>
+</div>
+
+<header class="week-header">
+  <div class="wrap">
+    <div class="breadcrumb"><a href="../../index.html">Inicio</a> &rsaquo; Semana 04</div>
+    <p class="num">Semana 04</p>
+    <h1>Modelado de Fenómenos Físicos</h1>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <div class="callout">
+      <h3>Objetivo de la cátedra</h3>
+      <p>Formular, discretizar e implementar computacionalmente los modelos
+matemáticos que gobiernan los fenómenos físicos más frecuentes en los
+proyectos doctorales del grupo: difusión, transporte, ondas y
+convección, representados por sus ecuaciones diferenciales parciales
+(EDPs) canónicas, con especial atención a las condiciones iniciales y
+de frontera y a la interpretación física de cada término.</p>
+    </div>
+    <div class="callout proposito">
+      <h3>Propósito del tema</h3>
+      <p>En la Semana&nbsp;3 se estableció la base matemática de la discretización:
+cómo construir diferencias finitas, cuándo un esquema es estable y
+qué significa el número de condición de una matriz. Esta semana aplica
+esas herramientas a problemas físicos reales: los fenómenos que
+gobiernan cada proyecto doctoral son descritos por EDPs, y la capacidad
+de formular correctamente esas EDPs —incluyendo sus condiciones de
+frontera— es la diferencia entre un modelo defendible ante un comité
+de tesis y una simulación cuyo resultado no puede justificarse.</p>
+    </div>
+    
+    <div class="callout resultado">
+      <h3>Resultado de aprendizaje esperado</h3>
+      <p>Al finalizar la sesión, el estudiante será capaz de: (i)&nbsp;identificar la
+familia (parabólica, hiperbólica, elíptica) de una EDP a partir de sus
+coeficientes y deducir el tipo de condiciones de frontera adecuadas;
+(ii)&nbsp;formular y discretizar la ecuación de difusión en 1D y 2D con
+esquemas explícitos e implícitos; (iii)&nbsp;implementar la ecuación de
+transporte (onda) con esquema upwind y comparar cuantitativamente con
+Lax-Wendroff; (iv)&nbsp;analizar el equilibrio convección-difusión mediante
+el número de Péclet y seleccionar el esquema apropiado; y
+(v)&nbsp;establecer correctamente condiciones de frontera de tipo Dirichlet,
+Neumann y Robin en un problema computacional propio.</p>
+    </div>
+    <h2 class="section-heading" style="margin-top:36px">Temario</h2>
+    <ul class="temario"><li>Ecuación de difusión (calor, masa, humedad).</li><li>Transferencia de calor: conducción transitoria y estacionaria.</li><li>Ecuación de onda: propagación hiperbólica.</li><li>Modelos de transporte: convección y convección-difusión.</li><li>Condiciones iniciales y de frontera: Dirichlet, Neumann, Robin.</li><li>Interpretación física de los términos de una EDP.</li><li>Número de Péclet y criterio CFL en la selección del esquema.</li></ul>
+    <h2 class="section-heading" style="margin-top:44px">Figuras de la semana</h2>
+    <p class="section-intro">5 imagen(es) referenciadas en los apuntes de esta semana.
+      Colócalas en <code>assets/img/semana-04/</code> con el nombre exacto indicado debajo
+      de cada recuadro; mientras no estén, se muestra un marcador en su lugar.</p>
+    <div class="gallery">
+    <figure>
+      <img src="../../assets/img/semana-04/fig_s4_cond_frontera.png" alt="fig_s4_cond_frontera.png" data-fallback-name="fig_s4_cond_frontera.png" loading="lazy">
+      <figcaption>fig_s4_cond_frontera.png</figcaption>
+    </figure><figure>
+      <img src="../../assets/img/semana-04/fig_s4_ej1_difusion_OPGW.png" alt="fig_s4_ej1_difusion_OPGW.png" data-fallback-name="fig_s4_ej1_difusion_OPGW.png" loading="lazy">
+      <figcaption>fig_s4_ej1_difusion_OPGW.png</figcaption>
+    </figure><figure>
+      <img src="../../assets/img/semana-04/fig_s4_ej2_onda_trafico.png" alt="fig_s4_ej2_onda_trafico.png" data-fallback-name="fig_s4_ej2_onda_trafico.png" loading="lazy">
+      <figcaption>fig_s4_ej2_onda_trafico.png</figcaption>
+    </figure><figure>
+      <img src="../../assets/img/semana-04/fig_s4_ej3_difusion2D_losa.png" alt="fig_s4_ej3_difusion2D_losa.png" data-fallback-name="fig_s4_ej3_difusion2D_losa.png" loading="lazy">
+      <figcaption>fig_s4_ej3_difusion2D_losa.png</figcaption>
+    </figure><figure>
+      <img src="../../assets/img/semana-04/fig_s4_ej4_convdif_bomba.png" alt="fig_s4_ej4_convdif_bomba.png" data-fallback-name="fig_s4_ej4_convdif_bomba.png" loading="lazy">
+      <figcaption>fig_s4_ej4_convdif_bomba.png</figcaption>
+    </figure>
+  </div>
+    <h2 class="section-heading" style="margin-top:44px">Código de la semana (ejecutable)</h2>
+    <div class="pyodide-banner">
+      &#9432; El código corre por completo en tu navegador (Python vía WebAssembly, sin servidor). La
+      primera vez que pulses <strong>Ejecutar</strong> en esta página se descarga el runtime — tarda unos
+      segundos. Puedes editar el código antes de correrlo.
+    </div>
+    <div class="code-cell">
+  <div class="code-cell-header">
+    <span class="code-cell-title">Código 1</span>
+    <span class="code-cell-caption">Semana 4 – Código 1: Ecuación de difusión 1D transitoria (FTCS). Cable OPGW bajo corriente de cortocircuito. Ejecutar en Google Colab.</span>
+    <button class="run-btn" type="button">&#9654; Ejecutar</button>
+  </div>
+  <textarea class="code-input" spellcheck="false" rows="14">&quot;&quot;&quot;
+Semana 4 - Ejemplo 1: Ecuacion de difusion de calor 1D transitoria
+Aplicacion: Distribucion de temperatura en seccion transversal del cable OPGW
+bajo corriente de cortocircuito (Mendez Gutierrez / Jurado Perez)
+
+Fisica: rho*cp * dT/dt = k * d2T/dx2 + Q(t)
+Esquema numerico: diferencias finitas explicitas (FTCS)
+&quot;&quot;&quot;
+
+# ============================================================
+# BLOQUE 1: Importacion de librerias
+# Numpy: calculos numericos eficientes con arreglos
+# Matplotlib: generacion de graficas de calidad publicacion
+# ============================================================
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.gridspec as gridspec
+
+# ============================================================
+# BLOQUE 2: Parametros fisicos del cable OPGW
+# Todos los valores con sus unidades comentadas
+# Modifica estos valores para analizar diferentes escenarios
+# ============================================================
+rho = 3200.0         # [kg/m3]   Densidad efectiva de la seccion compuesta
+cp  = 800.0          # [J/kg/K]  Calor especifico efectivo
+k   = 160.0          # [W/m/K]   Conductividad termica efectiva (dominada por Al)
+
+# Geometria: semidiametro del cable (dominio 1D por simetria)
+L   = 0.006          # [m]       Radio exterior del cable OPGW (~12.7 mm diametro)
+
+# Corriente de cortocircuito
+I_cc     = 31500.0   # [A]       Corriente de cortocircuito
+R_lineal = 0.0537e-3 # [Ohm/m]  Resistencia lineal del cable
+A_secc   = 87.7e-6   # [m2]     Area transversal del conductor
+
+# Densidad volumetrica de calor Joule: Q = I^2 * R&#x27; / A
+Q_vol = (I_cc**2 * R_lineal) / A_secc  # [W/m3]
+
+t_total = 0.3        # [s]  Duracion del cortocircuito
+T0      = 25.0       # [C]  Temperatura inicial uniforme
+T_amb   = 25.0       # [C]  Temperatura en la frontera exterior
+
+# ============================================================
+# BLOQUE 3: Parametros de la malla numerica
+# Calculamos automaticamente el paso de tiempo maximo
+# que garantiza la estabilidad del esquema FTCS
+# ============================================================
+N  = 60              # Numero de nodos espaciales
+dx = L / (N - 1)     # Paso espacial [m]
+
+# Difusividad termica: alpha = k / (rho * cp)  [m2/s]
+alpha = k / (rho * cp)
+
+# Criterio de estabilidad de von Neumann para FTCS:
+# El numero de Fourier Fo = alpha*dt/dx2 DEBE ser &lt;= 0.5
+# dt_max es el valor limite; usamos el 80% como margen
+dt_max = dx**2 / (2.0 * alpha)  # dt maximo permitido
+dt     = 0.8 * dt_max           # dt usado (con margen de seguridad)
+Nt     = int(t_total / dt) + 1  # Numero de pasos de tiempo
+
+Fo = alpha * dt / dx**2  # Numero de Fourier (debe ser &lt; 0.5)
+print(f&quot;Numero de Fourier Fo = {Fo:.4f}  (debe ser &lt; 0.5)&quot;)
+print(f&quot;Numero de pasos: {Nt}&quot;)
+
+# ============================================================
+# BLOQUE 4: Inicializacion del campo de temperatura
+# T es el arreglo de temperaturas en todos los nodos
+# ============================================================
+x = np.linspace(0, L, N)  # Coordenadas espaciales [m]
+T = np.full(N, T0)          # Campo inicial: T0 en todos los nodos
+
+# Guardamos perfiles en tiempos especificos para graficar
+tiempos_guardar = [0.0, 0.05, 0.1, 0.2, 0.3]
+perfiles = {0.0: T.copy()}
+T_centro = []  # Temperatura en x=0 (centro del cable) vs tiempo
+t_vector = []
+
+# ============================================================
+# BLOQUE 5: Bucle de integracion temporal (FTCS explicito)
+# Este es el &quot;motor&quot; de la simulacion.
+# Avanza la temperatura desde t=0 hasta t=t_total.
+# ============================================================
+t = 0.0
+for n in range(Nt):
+T_new = T.copy()  # Hacemos una copia para no mezclar t_n y t_{n+1}
+
+# --- Nodos interiores: esquema FTCS ---
+# Equivale a: T_new = T + Fo*(T derecha - 2*T centro + T izquierda)
+#                       + calor generado en dt
+T_new[1:-1] = (T[1:-1]
++ Fo * (T[2:] - 2.0*T[1:-1] + T[:-2])
++ dt * Q_vol / (rho * cp))
+
+# --- Condicion de frontera izquierda: simetria (Neumann) ---
+# dT/dx = 0 en x=0 se implementa como T[0] = T[1]
+T_new[0] = T_new[1]
+
+# --- Condicion de frontera derecha: temperatura fija (Dirichlet) ---
+# La superficie exterior del cable se mantiene a T_amb
+T_new[-1] = T_amb
+
+T = T_new.copy()  # Actualizar el campo
+t += dt           # Avanzar el tiempo
+
+# Registrar datos para las graficas
+t_vector.append(t)
+T_centro.append(T[0])  # Temperatura en el centro
+
+for t_g in tiempos_guardar:
+if abs(t - t_g) &lt; dt/2.0 and t_g not in perfiles:
+perfiles[t_g] = T.copy()
+
+perfiles[t_total] = T.copy()
+
+# ============================================================
+# BLOQUE 6: Generacion de la figura de resultados
+# Dos paneles: perfiles T(x) y la historia T_centro(t)
+# ============================================================
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(13, 5))
+
+# Panel izquierdo: perfiles de temperatura en distintos tiempos
+colores = plt.cm.plasma(np.linspace(0.15, 0.85, len(perfiles)))
+for idx, (t_g, T_g) in enumerate(sorted(perfiles.items())):
+ax1.plot(x * 1e3, T_g, color=colores[idx], lw=2.0,
+label=f&#x27;t = {t_g:.2f} s&#x27;)
+ax1.axhline(T_amb, color=&#x27;steelblue&#x27;, lw=1.2, ls=&#x27;--&#x27;, alpha=0.7,
+label=f&#x27;T_amb = {T_amb} C&#x27;)
+ax1.set_xlabel(&#x27;Posicion x [mm]&#x27;)
+ax1.set_ylabel(&#x27;Temperatura T [C]&#x27;)
+ax1.set_title(&#x27;Perfiles de temperatura\n(seccion transversal OPGW)&#x27;)
+ax1.legend(fontsize=9)
+ax1.grid(True, alpha=0.3, ls=&#x27;--&#x27;)
+
+# Panel derecho: historia termica en el centro del cable
+ax2.plot(t_vector, T_centro, color=&#x27;#CC0000&#x27;, lw=2.0,
+label=&#x27;T(x=0, t) — centro del cable&#x27;)
+ax2.axhline(90, color=&#x27;darkorange&#x27;, lw=1.5, ls=&#x27;--&#x27;,
+label=&#x27;Limite fibra optica (90 C)&#x27;)
+ax2.axhline(200, color=&#x27;red&#x27;, lw=1.5, ls=&#x27;:&#x27;,
+label=&#x27;Limite acrilico buffer (200 C)&#x27;)
+ax2.set_xlabel(&#x27;Tiempo t [s]&#x27;)
+ax2.set_ylabel(&#x27;Temperatura T [C]&#x27;)
+ax2.set_title(&#x27;Historia termica (centro del cable OPGW)&#x27;)
+ax2.legend(fontsize=9)
+ax2.grid(True, alpha=0.3, ls=&#x27;--&#x27;)
+
+plt.tight_layout()
+plt.savefig(&#x27;fig_s4_ej1_difusion_OPGW.png&#x27;, dpi=300, bbox_inches=&#x27;tight&#x27;)
+plt.show()
+print(&quot;Figura guardada como fig_s4_ej1_difusion_OPGW.png&quot;)</textarea>
+  <div class="code-output-wrap" hidden>
+    <div class="code-output-console"></div>
+    <div class="code-output-figures"></div>
+  </div>
+  <div class="code-status"></div>
+</div>
+<div class="code-cell">
+  <div class="code-cell-header">
+    <span class="code-cell-title">Código 2</span>
+    <span class="code-cell-caption">Semana 4 – Código 2: Ecuación de transporte 1D — comparación upwind vs Lax-Wendroff. Tráfico vehicular monitoreado por UAV. Ejecutar en Google Colab.</span>
+    <button class="run-btn" type="button">&#9654; Ejecutar</button>
+  </div>
+  <textarea class="code-input" spellcheck="false" rows="14">&quot;&quot;&quot;
+Semana 4 - Ejemplo 2: Ecuacion de onda (transporte) 1D
+Aplicacion: Propagacion de densidad vehicular en un corredor urbano
+monitoreado por UAV con flujo optico (Garcia Ojeda)
+
+Modelo LWR: d_rho/dt + c * d_rho/dx = 0
+Comparamos: upwind (1er orden) vs Lax-Wendroff (2do orden)
+&quot;&quot;&quot;
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+# ============================================================
+# BLOQUE 1: Parametros del modelo de trafico (LWR)
+# Modifica c para diferentes condiciones de trafico
+# ============================================================
+rho_max = 100.0  # [veh/km]  Densidad de atasco (trafico detenido)
+v_libre = 60.0   # [km/h]    Velocidad de flujo libre (carretera vacia)
+c       = v_libre / 2.0  # [km/h]  Velocidad de onda (linearizacion)
+
+# Dominio espacial: corredor de 2 km observado por el UAV
+L  = 2.0          # [km]   Longitud del corredor
+Nx = 200          # Numero de celdas espaciales
+dx = L / Nx       # Paso espacial [km]
+x_c = np.linspace(dx/2, L - dx/2, Nx)  # Centros de celdas
+
+t_total = 0.08    # [h] = 4.8 minutos
+
+# ============================================================
+# BLOQUE 2: Paso de tiempo — criterio CFL
+# El numero de Courant nu = c*dt/dx DEBE ser &lt;= 1
+# Si nu &gt; 1, el esquema upwind es INESTABLE (explota)
+# ============================================================
+CFL = 0.9             # Numero de Courant objetivo (&lt; 1)
+dt  = CFL * dx / c    # Paso de tiempo que satisface el CFL
+Nt  = int(t_total / dt) + 1
+nu  = c * dt / dx     # Numero de Courant efectivo
+
+print(f&quot;Numero de Courant nu = {nu:.4f}  (debe ser &lt;= 1)&quot;)
+
+# ============================================================
+# BLOQUE 3: Condicion inicial — pulso gaussiano de densidad
+# Simula un grupo de vehiculos acumulados en un semaforo
+# ============================================================
+x0_semaforo = 0.3    # [km]  Posicion del semaforo
+sigma_pulso = 0.12   # [km]  Anchura de la acumulacion
+rho_fondo   = 20.0   # [veh/km]  Densidad de fondo en el corredor
+A_pulso     = 50.0   # [veh/km]  Sobredensidad por el semaforo
+
+rho0 = rho_fondo + A_pulso * np.exp(-((x_c - x0_semaforo)**2) / (2*sigma_pulso**2))
+
+# Solucion exacta: traslacion pura rho(x,t) = rho0(x - c*t)
+def exacta(x_c, t):
+x_shift = x_c - c * t
+return rho_fondo + A_pulso * np.exp(-((x_shift - x0_semaforo)**2) / (2*sigma_pulso**2))
+
+# ============================================================
+# BLOQUE 4: Integracion temporal — dos esquemas simultaneos
+# Se integran en paralelo para poder comparar despues
+# ============================================================
+rho_up = rho0.copy()  # Densidad con esquema upwind
+rho_lw = rho0.copy()  # Densidad con esquema Lax-Wendroff
+
+tiempos_g = np.linspace(0, t_total, 5)
+perfiles_up = {0.0: rho_up.copy()}
+perfiles_lw = {0.0: rho_lw.copy()}
+perfiles_ex = {0.0: exacta(x_c, 0.0)}
+
+t = 0.0
+for n in range(Nt):
+
+# --- Esquema UPWIND (primer orden): usa el nodo de la izquierda ---
+# Para c &gt; 0: la informacion viaja de izquierda a derecha
+# Por eso se usa la diferencia hacia ATRAS: (rho[i] - rho[i-1])/dx
+rho_up_new = rho_up.copy()
+rho_up_new[1:] = rho_up[1:] - nu * (rho_up[1:] - rho_up[:-1])
+rho_up_new[0]  = rho_up_new[-1]  # Frontera periodica
+rho_up = rho_up_new.copy()
+
+# --- Esquema LAX-WENDROFF (segundo orden): usa 3 nodos ---
+# Combina diferencia centrada (alta precision) con
+# una correccion de curvatura (reduce la difusion numerica)
+rho_lw_new = rho_lw.copy()
+rho_lw_new[1:-1] = (rho_lw[1:-1]
+- (nu/2.0) * (rho_lw[2:] - rho_lw[:-2])
++ (nu**2/2.0) * (rho_lw[2:] - 2.0*rho_lw[1:-1] + rho_lw[:-2]))
+rho_lw_new[0]  = rho_lw_new[-1]
+rho_lw_new[-1] = rho_lw_new[0]
+rho_lw = rho_lw_new.copy()
+
+t += dt
+for t_g in tiempos_g[1:]:
+if abs(t - t_g) &lt; dt/2.0 and t_g not in perfiles_up:
+perfiles_up[t_g] = rho_up.copy()
+perfiles_lw[t_g] = rho_lw.copy()
+perfiles_ex[t_g] = exacta(x_c, t)
+
+# ============================================================
+# BLOQUE 5: Generacion de la figura comparativa
+# ============================================================
+fig, axes = plt.subplots(1, 2, figsize=(13, 5))
+colores = plt.cm.viridis(np.linspace(0.1, 0.9, len(perfiles_up)))
+
+for ax, perfs, titulo in zip(axes,
+[perfiles_up, perfiles_lw],
+[&#x27;Upwind (1er orden)&#x27;, &#x27;Lax-Wendroff (2do orden)&#x27;]):
+for idx, t_g in enumerate(sorted(perfs.keys())):
+ax.plot(x_c, perfs[t_g], color=colores[idx], lw=1.8,
+label=f&#x27;t = {t_g*60:.1f} min&#x27;)
+ax.plot(x_c, perfiles_ex[t_g], &#x27;--&#x27;, color=colores[idx], lw=0.9, alpha=0.5)
+ax.set_xlabel(&#x27;Posicion x [km]&#x27;)
+ax.set_ylabel(&#x27;Densidad rho [veh/km]&#x27;)
+ax.set_title(titulo + &#x27;\n(-- -- solucion exacta)&#x27;)
+ax.legend(fontsize=8.5)
+ax.set_xlim([0, L])
+ax.grid(True, alpha=0.25, ls=&#x27;--&#x27;)
+
+plt.tight_layout()
+plt.savefig(&#x27;fig_s4_ej2_onda_trafico.png&#x27;, dpi=300, bbox_inches=&#x27;tight&#x27;)
+plt.show()
+print(&quot;Figura guardada.&quot;)</textarea>
+  <div class="code-output-wrap" hidden>
+    <div class="code-output-console"></div>
+    <div class="code-output-figures"></div>
+  </div>
+  <div class="code-status"></div>
+</div>
+<div class="code-cell">
+  <div class="code-cell-header">
+    <span class="code-cell-title">Código 3</span>
+    <span class="code-cell-caption">Semana 4 – Código 3: Ecuación de Poisson 2D (sistema lineal disperso). Losa de concreto con calor de hidratación. Ejecutar en Google Colab.</span>
+    <button class="run-btn" type="button">&#9654; Ejecutar</button>
+  </div>
+  <textarea class="code-input" spellcheck="false" rows="14">&quot;&quot;&quot;
+Semana 4 - Ejemplo 3: Ecuacion de Poisson 2D (estado estacionario)
+Aplicacion: Distribucion de temperatura en losa de concreto
+con calor de hidratacion (Lerma Lomeli / Lerma Martinez)
+
+Ecuacion: d2T/dx2 + d2T/dy2 = -Q(x,y)/k
+Metodo: diferencias finitas centradas + scipy sparse solver
+&quot;&quot;&quot;
+
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.sparse import lil_matrix
+from scipy.sparse.linalg import spsolve
+
+# ============================================================
+# BLOQUE 1: Geometria de la losa y parametros fisicos
+# Modifica Nx y Ny para obtener mayor resolucion
+# ============================================================
+Lx = 4.0   # [m]  Longitud de la losa en x
+Ly = 3.0   # [m]  Ancho de la losa en y
+Nx = 40    # Nodos en x (incrementar para mayor precision)
+Ny = 30    # Nodos en y
+
+dx = Lx / (Nx - 1)
+dy = Ly / (Ny - 1)
+x_vec = np.linspace(0, Lx, Nx)
+y_vec = np.linspace(0, Ly, Ny)
+X, Y  = np.meshgrid(x_vec, y_vec)  # Malla 2D
+
+N_total = Nx * Ny  # Numero total de nodos
+print(f&quot;Sistema de {N_total} ecuaciones y {N_total} incognitas&quot;)
+
+# ============================================================
+# BLOQUE 2: Funcion fuente (calor de hidratacion gaussiana)
+# Q_max: intensidad maxima del calor de hidratacion [C/m2]
+# sigma_f: radio de influencia de la fuente [m]
+# ============================================================
+x0_f    = Lx / 2.0   # Centro de la losa en x
+y0_f    = Ly / 2.0   # Centro de la losa en y
+sigma_f = 0.8        # Dispersión de la fuente [m]
+Q_max   = 80.0       # Intensidad maxima [C/m2] (normalizado, k=1)
+
+# Evaluamos la fuente en todos los nodos de la malla
+F = Q_max * np.exp(-(((X-x0_f)/sigma_f)**2 + ((Y-y0_f)/sigma_f)**2))
+
+# ============================================================
+# BLOQUE 3: Funcion de conversion indice 2D -&gt; indice 1D
+# Necesaria para mapear el nodo (i,j) a una fila del sistema
+# ============================================================
+def idx(i, j):
+&quot;&quot;&quot;Convierte (fila_y=i, columna_x=j) a indice 1D.&quot;&quot;&quot;
+return i * Nx + j
+
+# ============================================================
+# BLOQUE 4: Ensamblaje del sistema lineal A*T = b
+# Usamos matrices dispersas (lil_matrix) porque la mayoria
+# de los coeficientes son cero: solo 5 por fila
+# ============================================================
+A_mat = lil_matrix((N_total, N_total))  # Matriz dispersa
+b_vec = np.zeros(N_total)               # Vector lado derecho
+
+for i in range(Ny):    # Recorre filas (direccion y)
+for j in range(Nx):    # Recorre columnas (direccion x)
+n = idx(i, j)
+
+# --- Nodos de frontera: condicion de Dirichlet ---
+if i == 0 or i == Ny-1 or j == 0 or j == Nx-1:
+# Temperatura prescrita segun posicion del borde
+if   i == 0:      T_bc = 20.0                       # borde inferior
+elif i == Ny-1:   T_bc = 25.0                       # borde superior
+else:             T_bc = 20.0 + 5.0*(i/(Ny-1))     # bordes laterales
+A_mat[n, n] = 1.0
+b_vec[n]    = T_bc
+
+else:
+# --- Nodos interiores: stencil de 5 puntos ---
+# (T_derecha - 2*T_centro + T_izquierda) / dx^2
+# + (T_arriba - 2*T_centro + T_abajo)   / dy^2
+# = -Q(i,j)
+A_mat[n, n]             = -2.0/dx**2 - 2.0/dy**2  # diagonal
+A_mat[n, idx(i, j+1)]  =  1.0/dx**2  # vecino derecho
+A_mat[n, idx(i, j-1)]  =  1.0/dx**2  # vecino izquierdo
+A_mat[n, idx(i+1, j)]  =  1.0/dy**2  # vecino arriba
+A_mat[n, idx(i-1, j)]  =  1.0/dy**2  # vecino abajo
+b_vec[n] = -F[i, j]    # termino fuente (con signo negativo)
+
+# Convertir a formato CSR (mas eficiente para la resolucion)
+A_csr = A_mat.tocsr()
+
+# ============================================================
+# BLOQUE 5: Resolucion del sistema lineal
+# spsolve usa eliminacion directa eficiente para matrices dispersas
+# ============================================================
+T_vec = spsolve(A_csr, b_vec)     # Resuelve A*T = b
+T_campo = T_vec.reshape(Ny, Nx)   # Convierte a campo 2D
+
+print(f&quot;Temperatura maxima: {T_campo.max():.2f} C&quot;)
+print(f&quot;Temperatura minima: {T_campo.min():.2f} C&quot;)
+print(f&quot;Incremento por hidratacion: {T_campo.max() - 25:.2f} C&quot;)
+
+# ============================================================
+# BLOQUE 6: Visualizacion del campo de temperatura
+# ============================================================
+fig, axes = plt.subplots(1, 2, figsize=(13, 5))
+
+# Panel izquierdo: mapa de calor (contourf) con isolineas
+cf = axes[0].contourf(X, Y, T_campo, levels=25, cmap=&#x27;inferno&#x27;)
+cs = axes[0].contour(X, Y, T_campo, levels=10,
+colors=&#x27;white&#x27;, linewidths=0.6, alpha=0.5)
+axes[0].clabel(cs, fmt=&#x27;%.0f C&#x27;, fontsize=7)
+plt.colorbar(cf, ax=axes[0]).set_label(&#x27;Temperatura T [C]&#x27;)
+axes[0].set_xlabel(&#x27;x [m]&#x27;)
+axes[0].set_ylabel(&#x27;y [m]&#x27;)
+axes[0].set_title(&#x27;Campo de temperatura T(x,y) — Losa de concreto&#x27;)
+axes[0].set_aspect(&#x27;equal&#x27;)
+
+# Panel derecho: perfil T(x) en el eje central y = Ly/2
+eje_central = Ny // 2
+T_lineal = 20.0 + 5.0 * (eje_central/(Ny-1)) * np.ones(Nx)  # sin fuente
+axes[1].plot(x_vec, T_campo[eje_central, :], &#x27;r-&#x27;, lw=2.0,
+label=f&#x27;Con calor de hidratacion&#x27;)
+axes[1].plot(x_vec, T_lineal, &#x27;b--&#x27;, lw=1.5,
+label=&#x27;Sin fuente (solo CC)&#x27;)
+axes[1].fill_between(x_vec, T_campo[eje_central,:], T_lineal,
+alpha=0.15, color=&#x27;red&#x27;)
+axes[1].set_xlabel(&#x27;x [m]&#x27;)
+axes[1].set_ylabel(&#x27;Temperatura T [C]&#x27;)
+axes[1].set_title(f&#x27;Perfil en eje central (y = {y_vec[eje_central]:.1f} m)&#x27;)
+axes[1].legend()
+axes[1].grid(True, alpha=0.3, ls=&#x27;--&#x27;)
+
+plt.tight_layout()
+plt.savefig(&#x27;fig_s4_ej3_losa.png&#x27;, dpi=300, bbox_inches=&#x27;tight&#x27;)
+plt.show()
+print(&quot;Figura guardada.&quot;)</textarea>
+  <div class="code-output-wrap" hidden>
+    <div class="code-output-console"></div>
+    <div class="code-output-figures"></div>
+  </div>
+  <div class="code-status"></div>
+</div>
+<div class="code-cell">
+  <div class="code-cell-header">
+    <span class="code-cell-title">Código 4</span>
+    <span class="code-cell-caption">Semana 4 – Código 4: Ecuación de convección-difusión 1D. Análisis del número de Péclet. Bomba centrífuga. Ejecutar en Google Colab.</span>
+    <button class="run-btn" type="button">&#9654; Ejecutar</button>
+  </div>
+  <textarea class="code-input" spellcheck="false" rows="14">&quot;&quot;&quot;
+Semana 4 - Ejemplo 4: Ecuacion de conveccion-difusion 1D
+Aplicacion: Transporte de marcador en bomba centrifuga (Zavala Morales)
+
+dc/dt + u * dc/dx = D * d2c/dx2
+Se comparan tres regimenes: Pe bajo (difusion), Pe medio, Pe alto (conveccion)
+&quot;&quot;&quot;
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+# ============================================================
+# BLOQUE 1: Parametros del dominio y la velocidad del fluido
+# ============================================================
+L      = 0.5      # [m]   Longitud del canal (seccion de la bomba)
+Nx     = 200      # Numero de nodos espaciales
+dx     = L / (Nx - 1)
+x      = np.linspace(0, L, Nx)
+
+u_conv  = 2.0     # [m/s]  Velocidad de conveccion del fluido
+t_total = 0.15    # [s]    Tiempo total de simulacion
+
+# ============================================================
+# BLOQUE 2: Funcion de simulacion para un D dado
+# Recibe el coeficiente de difusion y devuelve la evolucion
+# ============================================================
+def simular(D, etiqueta):
+&quot;&quot;&quot;
+Simula la conveccion-difusion 1D para un D dado.
+Esquema: upwind para conveccion + centrado para difusion.
+&quot;&quot;&quot;
+Pe = u_conv * L / D    # Numero de Peclet
+print(f&quot;{etiqueta}: Pe = {Pe:.1f}, D = {D:.5f} m2/s&quot;)
+
+# Paso de tiempo: limite mas restrictivo entre CFL y Fourier
+dt_cfl    = dx / u_conv          # Limite convectivo (CFL)
+dt_difus  = dx**2 / (2.0 * D)   # Limite difusivo (Fourier)
+dt        = 0.4 * min(dt_cfl, dt_difus)  # Margen de seguridad
+Nt        = int(t_total / dt) + 1
+
+# Condicion inicial: pulso gaussiano de concentracion
+x0_iny = 0.04   # [m]  Posicion de inyeccion
+sigma  = 0.025  # [m]  Anchura del pulso
+c = np.exp(-((x - x0_iny)**2) / (2*sigma**2))
+
+# Integracion temporal
+tiempos_g = np.linspace(0, t_total, 5)
+perfiles  = [c.copy()]
+t_vec     = [0.0]
+t = 0.0
+
+for _ in range(Nt):
+c_new = c.copy()
+
+# Termino convectivo: upwind (diferencia hacia atras, u &gt; 0)
+# Representa que el fluido &quot;trae&quot; la concentracion desde la izquierda
+conv = u_conv * (c[1:-1] - c[:-2]) / dx
+
+# Termino difusivo: diferencia centrada de segundo orden
+# Representa que el gradiente de concentracion genera flujo de masa
+diff = D * (c[2:] - 2.0*c[1:-1] + c[:-2]) / dx**2
+
+c_new[1:-1] = c[1:-1] + dt * (-conv + diff)
+
+# Condiciones de frontera: gradiente nulo (Neumann) en ambos extremos
+c_new[0]  = c_new[1]
+c_new[-1] = c_new[-2]
+c_new     = np.maximum(c_new, 0.0)  # concentracion &gt;= 0
+
+c = c_new.copy()
+t += dt
+
+for t_g in tiempos_g[1:]:
+if abs(t - t_g) &lt; dt/2.0 and t_g not in t_vec:
+perfiles.append(c.copy())
+t_vec.append(t)
+
+return x, np.array(t_vec), perfiles, Pe
+
+# ============================================================
+# BLOQUE 3: Simulacion para tres valores de D
+# Pe = u*L/D: D grande -&gt; Pe pequeno (difusion dominante)
+# ============================================================
+D_1 = u_conv * L / 2.0    # Pe = 2   (difusion muy activa)
+D_2 = u_conv * L / 20.0   # Pe = 20  (regimen mixto)
+D_3 = u_conv * L / 200.0  # Pe = 200 (conveccion dominante)
+
+_, t_1, p_1, Pe_1 = simular(D_1, &quot;Pe bajo&quot;)
+_, t_2, p_2, Pe_2 = simular(D_2, &quot;Pe medio&quot;)
+_, t_3, p_3, Pe_3 = simular(D_3, &quot;Pe alto&quot;)
+
+# ============================================================
+# BLOQUE 4: Comparacion de los tres regimenes al tiempo final
+# ============================================================
+fig, ax = plt.subplots(figsize=(10, 5))
+
+ax.plot(x * 100, p_1[-1], color=&#x27;teal&#x27;,        lw=2.2,
+label=f&#x27;Pe = {Pe_1:.0f} — difusion dominante&#x27;)
+ax.plot(x * 100, p_2[-1], color=&#x27;darkorange&#x27;,  lw=2.2,
+label=f&#x27;Pe = {Pe_2:.0f} — regimen mixto&#x27;)
+ax.plot(x * 100, p_3[-1], color=&#x27;#CC0000&#x27;,     lw=2.2,
+label=f&#x27;Pe = {Pe_3:.0f} — conveccion dominante&#x27;)
+
+ax.set_xlabel(&#x27;Posicion x [cm]&#x27;)
+ax.set_ylabel(&#x27;Concentracion c [a.u.]&#x27;)
+ax.set_title(&#x27;Conveccion-Difusion: perfiles al tiempo final\n&#x27;
+f&#x27;(t = {t_total*1e3:.0f} ms, u = {u_conv} m/s)&#x27;)
+ax.legend(fontsize=10)
+ax.set_xlim([0, L * 100])
+ax.grid(True, alpha=0.3, ls=&#x27;--&#x27;)
+
+plt.tight_layout()
+plt.savefig(&#x27;fig_s4_ej4_convdif_bomba.png&#x27;, dpi=300, bbox_inches=&#x27;tight&#x27;)
+plt.show()
+print(&quot;Figura guardada.&quot;)
+# Para ver la evolucion temporal de un solo regimen,
+# descomenta el siguiente bloque y modifica &#x27;perfiles&#x27; y &#x27;t_vec&#x27;:
+# for idx, (t_g, perfil) in enumerate(zip(t_2, p_2)):
+#     plt.plot(x*100, perfil, label=f&#x27;t = {t_g*1e3:.1f} ms&#x27;)</textarea>
+  <div class="code-output-wrap" hidden>
+    <div class="code-output-console"></div>
+    <div class="code-output-figures"></div>
+  </div>
+  <div class="code-status"></div>
+</div>
+
+    <div class="pendiente-box">
+      <h3>Contenido completo de la semana</h3>
+      <p>Esta página trae el objetivo de cátedra, el temario, el resultado de aprendizaje esperado y todo
+        el código Python de esta semana, ya ejecutable. El desarrollo teórico completo (ecuaciones,
+        demostraciones, tablas de resultados y discusión) vive por ahora en el PDF/<code>.tex</code> del
+        curso — pégalo aquí como HTML cuando tengas tiempo, o pide que se convierta esa parte también.</p>
+    </div>
+
+    <div class="week-nav">
+      <a href="../semana-03/index.html">&larr; Semana 03</a>
+      <span class="to-index"><a href="../../index.html">&uarr; Volver al índice del curso</a></span>
+      <a href="../semana-05/index.html">Semana 05 &rarr;</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div>Doctorado en Ingeniería y Tecnología Aplicada &middot; Universidad La Salle Bajío</div>
+    <div>Dr. Jorge Ramón Parra Michel &middot; Prototipado y Simulación</div>
+  </div>
+</footer>
+
+<script src="../../assets/js/main.js"></script>
+<script src="../../assets/js/pyodide-runner.js"></script>
+
+<script>
+window.addEventListener("load", function () {
+  if (window.renderMathInElement) {
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left: "$$", right: "$$", display: true},
+        {left: "$", right: "$", display: false}
+      ],
+      throwOnError: false
+    });
+  }
+});
+</script>
+
+</body>
+</html>

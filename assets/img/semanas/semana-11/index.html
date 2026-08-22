@@ -1,0 +1,477 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Semana 11. Validación Experimental y Metrología Computacional — Prototipado y Simulación</title>
+<meta name="description" content="Semana 11. Validación Experimental y Metrología Computacional: objetivo, temario y código ejecutable.">
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-cpW21h6RZv/phavutF+AuVYrr+dA8xD9zs6FwLpaCePvcCWnZ8IU9UNlXhpKUAJI" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-vZTG03m+2yp6N6BNi5iM4rW4oIwk5DfcNdFfxkk9ZWpDriOkXX8voJBFrAO7MpVl" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-GvrOXuhMATgEsSwCs4smul74iXGOixntILdUW9XmUC6+HX0sLNAK3q71HotJqlAn" crossorigin="anonymous">
+<link rel="stylesheet" href="../../assets/css/style.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="topbar-brand" href="../../index.html">
+      <img src="../../assets/img/logo-lasalle.png" alt="Universidad La Salle Bajío">
+      Prototipado y Simulación
+    </a>
+    <nav>
+      <a href="../../index.html#semanas">Semanas</a>
+      <a href="../../README.md">Repositorio</a>
+    </nav>
+  </div>
+</div>
+
+<header class="week-header">
+  <div class="wrap">
+    <div class="breadcrumb"><a href="../../index.html">Inicio</a> &rsaquo; Semana 11</div>
+    <p class="num">Semana 11</p>
+    <h1>Validación Experimental y Metrología Computacional</h1>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <div class="callout">
+      <h3>Objetivo de la cátedra</h3>
+      <p>Estructurar e implementar protocolos de
+validación experimental para modelos numéricos bajo el estándar
+ASME&nbsp;V&amp;V&nbsp;20, desacoplando el error de discretización ($u_{num}$), la
+incertidumbre propagada de los parámetros de entrada ($u_{input}$) y la
+incertidumbre metrológica del experimento ($u_D$), con el fin de aislar y
+cuantificar el error de forma del modelo ($\delta_{model}$). El doctorando
+distinguirá con precisión entre verificación, validación y calibración, y
+aplicará métricas cuantitativas de comparación —incluida la métrica de
+área sobre funciones de distribución acumulada— para aceptar o refutar
+un modelo con criterios normativos.</p>
+    </div>
+    
+    
+    <div class="callout resultado">
+      <h3>Resultado de aprendizaje esperado</h3>
+      <p>El investigador en formación
+diseñará una matriz de validación para su propio proyecto doctoral:
+calculará el GCI de su discretización, propagará las sensibilidades de sus
+parámetros de entrada, cuantificará la incertidumbre de su instrumentación
+y emitirá un diagnóstico cuantitativo de aceptación o refutación del
+modelo, implementando el flujo completo en Python.</p>
+    </div>
+    <h2 class="section-heading" style="margin-top:36px">Temario</h2>
+    <ul class="temario"><li>Taxonomía epistemológica: verificación, validación y calibración; el riesgo del sobreajuste.</li><li>Marco formal ASME&nbsp;V&amp;V&nbsp;20: error de comparación $E$ e incertidumbre de validación $u_{val}$.</li><li>Cuantificación del error numérico: extrapolación de Richardson y <em>Grid Convergence Index</em> (GCI).</li><li>Propagación de la incertidumbre de entrada por series de Taylor (ISO-GUM) y sensibilidad local.</li><li>Metrología experimental: combinación de errores sistemáticos y aleatorios; réplicas y repetibilidad.</li><li>Métricas para respuestas continuas y estocásticas: métrica de área de Oberkampf y Roy sobre CDFs.</li><li>Jerarquía piramidal de validación y trazabilidad en publicaciones de alto impacto.</li></ul>
+    <h2 class="section-heading" style="margin-top:44px">Figuras de la semana</h2>
+    <p class="section-intro">3 imagen(es) referenciadas en los apuntes de esta semana.
+      Colócalas en <code>assets/img/semana-11/</code> con el nombre exacto indicado debajo
+      de cada recuadro; mientras no estén, se muestra un marcador en su lugar.</p>
+    <div class="gallery">
+    <figure>
+      <img src="../../assets/img/semana-11/S11_gci_convergencia.png" alt="S11_gci_convergencia.png" data-fallback-name="S11_gci_convergencia.png" loading="lazy">
+      <figcaption>S11_gci_convergencia.png</figcaption>
+    </figure><figure>
+      <img src="../../assets/img/semana-11/S11_metrica_cdf.png" alt="S11_metrica_cdf.png" data-fallback-name="S11_metrica_cdf.png" loading="lazy">
+      <figcaption>S11_metrica_cdf.png</figcaption>
+    </figure><figure>
+      <img src="../../assets/img/semana-11/S11_validacion_continua.png" alt="S11_validacion_continua.png" data-fallback-name="S11_validacion_continua.png" loading="lazy">
+      <figcaption>S11_validacion_continua.png</figcaption>
+    </figure>
+  </div>
+    <h2 class="section-heading" style="margin-top:44px">Código de la semana (ejecutable)</h2>
+    <div class="pyodide-banner">
+      &#9432; El código corre por completo en tu navegador (Python vía WebAssembly, sin servidor). La
+      primera vez que pulses <strong>Ejecutar</strong> en esta página se descarga el runtime — tarda unos
+      segundos. Puedes editar el código antes de correrlo.
+    </div>
+    <div class="code-cell">
+  <div class="code-cell-header">
+    <span class="code-cell-title">Semana11_validacion_vv20.py</span>
+    <span class="code-cell-caption">Protocolo completo del Ejemplo 1: verificación por GCI (Ec. \ref{eq:s11_gci}), propagación de sensibilidad (Ec. \ref{eq:s11_u_input}), metrología de réplicas (Ec. \ref{eq:s11_u_D}) y diagnóstico punto a punto (Ec. \ref{eq:s11_regla_decision}).</span>
+    <button class="run-btn" type="button">&#9654; Ejecutar</button>
+  </div>
+  <textarea class="code-input" spellcheck="false" rows="14"># ============================================================================
+# Semana11_validacion_vv20.py
+# Curso: Prototipado y Simulacion (DITA) -- Universidad La Salle Bajio
+# Semana 11: Validacion Experimental y Metrologia Computacional
+#
+# Framework ASME V&amp;V 20 aplicado a un modelo termico transitorio de
+# calentamiento de un conductor (familia de proyectos: cable OPGW bajo
+# corriente de falla). El modelo computacional S omite la perdida
+# radiativa (deficiencia de modelo delta_model deliberada); el
+# &quot;experimento&quot; D se sintetiza integrando la fisica completa y
+# contaminando con sesgo sistematico y ruido aleatorio de termopar.
+#
+# Componentes calculados:
+#   u_num   : GCI por extrapolacion de Richardson (3 pasos de tiempo)
+#   u_input : propagacion GUM de primer orden de u_h (coef. conveccion)
+#   u_D     : combinacion de sesgo sistematico y repetibilidad (n replicas)
+#   u_val   : combinacion en cuadratura (ASME V&amp;V 20)
+#
+# Reproducibilidad: numpy.random.default_rng(semilla fija)
+# Salidas: Figuras/S11_validacion_continua.png
+#          Figuras/S11_gci_convergencia.png
+# ============================================================================
+
+import os
+import numpy as np
+import matplotlib
+matplotlib.use(&#x27;Agg&#x27;)
+import matplotlib.pyplot as plt
+from scipy.integrate import solve_ivp
+
+os.makedirs(&#x27;Figuras&#x27;, exist_ok=True)
+rng = np.random.default_rng(2026)
+
+# ----------------------------------------------------------------------------
+# 1. PARAMETROS FISICOS DEL SISTEMA
+# ----------------------------------------------------------------------------
+P_joule = 25.0     # [W]      potencia disipada por efecto Joule
+h_conv  = 12.0     # [W/m2K]  coeficiente de conveccion (parametro incierto)
+u_h     = 1.0      # [W/m2K]  incertidumbre estandar de h (correlacion empirica)
+A_sup   = 0.05     # [m2]     area superficial del tramo de conductor
+mc      = 180.0    # [J/K]    capacitancia termica (m*c)
+T_amb   = 300.0    # [K]      temperatura ambiente
+eps_rad = 0.8      # [-]      emisividad (fisica omitida por el modelo S)
+sigma_SB = 5.670e-8  # [W/m2K4] constante de Stefan-Boltzmann
+
+t_final = 900.0    # [s]      horizonte de comparacion
+n_pts   = 15       # puntos de comparacion experimento-modelo
+t_comp  = np.linspace(60.0, t_final, n_pts)
+
+# ----------------------------------------------------------------------------
+# 2. MODELO COMPUTACIONAL S (sin radiacion) RESUELTO POR EULER EXPLICITO
+# ----------------------------------------------------------------------------
+def solve_model_euler(dt, h_val, t_eval):
+    &quot;&quot;&quot;Integra dT/dt = (P - h A (T - Tamb)) / mc con Euler explicito y
+    devuelve T interpolada en t_eval. La solucion numerica (no la
+    analitica) es la que se verifica: su error de discretizacion es u_num.&quot;&quot;&quot;
+    n_steps = int(np.ceil(t_final / dt)) + 1
+    t = np.linspace(0.0, dt * (n_steps - 1), n_steps)
+    T = np.empty(n_steps)
+    T[0] = T_amb
+    for k in range(n_steps - 1):
+        dTdt = (P_joule - h_val * A_sup * (T[k] - T_amb)) / mc
+        T[k + 1] = T[k] + dt * dTdt
+    return np.interp(t_eval, t, T)
+
+# ----------------------------------------------------------------------------
+# 3. VERIFICACION: GCI CON TRES PASOS DE TIEMPO (Richardson)
+# ----------------------------------------------------------------------------
+r_ref = 2.0                       # razon de refinamiento
+dt3, dt2, dt1 = 8.0, 4.0, 2.0     # grueso, medio, fino
+t_ref = 600.0                     # instante de referencia para el GCI
+S3 = solve_model_euler(dt3, h_conv, np.array([t_ref]))[0]
+S2 = solve_model_euler(dt2, h_conv, np.array([t_ref]))[0]
+S1 = solve_model_euler(dt1, h_conv, np.array([t_ref]))[0]
+
+p_obs = np.log(abs(S3 - S2) / abs(S2 - S1)) / np.log(r_ref)
+Fs = 1.25                          # factor de seguridad (Roache)
+GCI_fine = Fs * abs(S1 - S2) / (r_ref**p_obs - 1.0)   # [K] expandido
+u_num_scalar = GCI_fine / 1.15     # GCI ~ intervalo uniforme -&gt; estandar
+u_num = u_num_scalar * np.ones_like(t_comp)
+
+# Solucion analitica exacta del modelo (solo para la grafica de convergencia)
+tau = mc / (h_conv * A_sup)
+T_exact_ref = T_amb + (P_joule / (h_conv * A_sup)) * (1.0 - np.exp(-t_ref / tau))
+
+# ----------------------------------------------------------------------------
+# 4. PREDICCION S EN LA MALLA FINA Y SENSIBILIDAD u_input
+# ----------------------------------------------------------------------------
+S_model = solve_model_euler(dt1, h_conv, t_comp)
+
+# Sensibilidad local dS/dh por diferencias centradas (recorriendo el solver)
+delta_h = 0.05 * h_conv
+S_hp = solve_model_euler(dt1, h_conv + delta_h, t_comp)
+S_hm = solve_model_euler(dt1, h_conv - delta_h, t_comp)
+dS_dh = (S_hp - S_hm) / (2.0 * delta_h)
+u_input = np.abs(dS_dh) * u_h
+
+# ----------------------------------------------------------------------------
+# 5. EXPERIMENTO SINTETICO D (fisica completa + metrologia de termopar)
+# ----------------------------------------------------------------------------
+def rhs_true(t, T):
+    q_conv = h_conv * A_sup * (T[0] - T_amb)
+    q_rad = eps_rad * sigma_SB * A_sup * (T[0]**4 - T_amb**4)
+    return [(P_joule - q_conv - q_rad) / mc]
+
+sol = solve_ivp(rhs_true, [0.0, t_final], [T_amb], t_eval=t_comp,
+                rtol=1e-10, atol=1e-10)
+T_true = sol.y[0]
+
+b_real = 1.2       # [K] sesgo sistematico realizado (termopar descalibrado)
+u_b    = 1.0       # [K] incertidumbre estandar del sesgo (certificado)
+s_rep  = 0.8       # [K] desviacion estandar de una lectura individual
+n_rep  = 5         # replicas por punto de comparacion
+
+lecturas = (T_true[:, None] + b_real
+            + rng.normal(0.0, s_rep, size=(n_pts, n_rep)))
+D_exp = lecturas.mean(axis=1)
+s_muestral = lecturas.std(axis=1, ddof=1)
+u_D = np.sqrt(u_b**2 + s_muestral**2 / n_rep)
+
+# ----------------------------------------------------------------------------
+# 6. ASME V&amp;V 20: ERROR DE COMPARACION Y BANDA DE VALIDACION
+# ----------------------------------------------------------------------------
+E = S_model - D_exp
+u_val = np.sqrt(u_num**2 + u_input**2 + u_D**2)
+k_cov = 2.0
+is_valid = np.abs(E) &lt;= k_cov * u_val
+
+# ----------------------------------------------------------------------------
+# 7. REPORTE DE TERMINAL
+# ----------------------------------------------------------------------------
+print(&#x27;=&#x27; * 78)
+print(&#x27;  REPORTE DE VALIDACION ASME V&amp;V 20 -- MODELO TERMICO TRANSITORIO&#x27;)
+print(&#x27;=&#x27; * 78)
+print(&#x27;Verificacion (GCI, Euler explicito, t_ref = %.0f s):&#x27; % t_ref)
+print(&#x27;  S(dt=%.0f)=%.4f K  S(dt=%.0f)=%.4f K  S(dt=%.0f)=%.4f K&#x27;
+      % (dt3, S3, dt2, S2, dt1, S1))
+print(&#x27;  Orden observado p = %.3f (teorico Euler: 1)&#x27; % p_obs)
+print(&#x27;  GCI_fino = %.4f K  -&gt;  u_num = %.4f K&#x27; % (GCI_fine, u_num_scalar))
+print(&#x27;  |S_fino - T_exacta| = %.4f K (verificacion contra solucion cerrada)&#x27;
+      % abs(S1 - T_exact_ref))
+print(&#x27;-&#x27; * 78)
+print(&#x27;Sensibilidad de entrada: max|dS/dh| = %.3f K/(W/m2K); &#x27;
+      &#x27;max u_input = %.3f K&#x27; % (np.max(np.abs(dS_dh)), np.max(u_input)))
+print(&#x27;Metrologia: u_b = %.2f K; s promedio = %.2f K; &#x27;
+      &#x27;u_D en [%.2f, %.2f] K&#x27; % (u_b, s_muestral.mean(),
+                                 u_D.min(), u_D.max()))
+print(&#x27;-&#x27; * 78)
+hdr = &#x27;%-8s%-10s%-10s%-10s%-9s%-22s&#x27; % (&#x27;t [s]&#x27;, &#x27;S [K]&#x27;, &#x27;D [K]&#x27;,
+                                        &#x27;E [K]&#x27;, &#x27;2u_val&#x27;, &#x27;Diagnostico&#x27;)
+print(hdr)
+print(&#x27;-&#x27; * 78)
+for i in range(n_pts):
+    status = &#x27;no refutado&#x27; if is_valid[i] else &#x27;DEFICIENCIA DE MODELO&#x27;
+    print(&#x27;%-8.0f%-10.2f%-10.2f%-+10.2f%-9.2f%-22s&#x27;
+          % (t_comp[i], S_model[i], D_exp[i], E[i],
+             k_cov * u_val[i], status))
+n_fail = int(np.sum(~is_valid))
+print(&#x27;-&#x27; * 78)
+print(&#x27;Puntos con |E| &gt; 2 u_val: %d de %d &#x27;
+      &#x27;(primera deteccion en t = %.0f s)&#x27;
+      % (n_fail, n_pts, t_comp[~is_valid][0] if n_fail else -1))
+
+# ----------------------------------------------------------------------------
+# 8. FIGURA 1: VALIDACION CONTINUA
+# ----------------------------------------------------------------------------
+fig, ax = plt.subplots(figsize=(9.5, 6.0), dpi=300)
+ax.errorbar(t_comp, D_exp, yerr=k_cov * u_D, fmt=&#x27;o&#x27;, color=&#x27;k&#x27;,
+            mfc=&#x27;white&#x27;, ecolor=&#x27;gray&#x27;, elinewidth=1.3, capsize=4,
+            label=r&#x27;Experimento $D \pm 2u_D$ (n=%d replicas)&#x27; % n_rep, zorder=4)
+ax.plot(t_comp, S_model, &#x27;b-&#x27;, lw=2, label=r&#x27;Modelo computacional $S$&#x27;)
+ax.fill_between(t_comp, S_model - k_cov * u_val, S_model + k_cov * u_val,
+                color=&#x27;tab:blue&#x27;, alpha=0.15,
+                label=r&#x27;Banda de validacion $S \pm 2u_{val}$&#x27;)
+ax.scatter(t_comp[~is_valid], D_exp[~is_valid], color=&#x27;red&#x27;, s=70,
+           zorder=5, label=r&#x27;$|E| &gt; 2u_{val}$: deficiencia de modelo&#x27;)
+ax.set_xlabel(&#x27;Tiempo [s]&#x27;, fontsize=12)
+ax.set_ylabel(&#x27;Temperatura [K]&#x27;, fontsize=12)
+ax.set_title(&#x27;Validacion ASME V&amp;V 20: modelo convectivo vs. sistema &#x27;
+             &#x27;convectivo-radiativo&#x27;, fontsize=12.5)
+ax.grid(True, ls=&#x27;--&#x27;, alpha=0.45)
+ax.legend(loc=&#x27;lower right&#x27;, fontsize=10, frameon=True)
+fig.tight_layout()
+fig.savefig(&#x27;Figuras/S11_validacion_continua.png&#x27;)
+plt.close(fig)
+
+# ----------------------------------------------------------------------------
+# 9. FIGURA 2: ESTUDIO DE CONVERGENCIA (GCI)
+# ----------------------------------------------------------------------------
+dts = np.array([16.0, 8.0, 4.0, 2.0, 1.0, 0.5])
+errs = np.array([abs(solve_model_euler(d, h_conv,
+                 np.array([t_ref]))[0] - T_exact_ref) for d in dts])
+
+fig, ax = plt.subplots(figsize=(7.5, 5.2), dpi=300)
+ax.loglog(dts, errs, &#x27;o-&#x27;, color=&#x27;tab:blue&#x27;, lw=1.8,
+          label=&#x27;Error de discretizacion (Euler)&#x27;)
+ref = errs[0] * (dts / dts[0])**1.0
+ax.loglog(dts, ref, &#x27;k--&#x27;, lw=1.2, label=r&#x27;Pendiente de referencia $p=1$&#x27;)
+ax.axhline(u_num_scalar, color=&#x27;tab:red&#x27;, ls=&#x27;:&#x27;, lw=1.5,
+           label=r&#x27;$u_{num}$ estimada por GCI&#x27;)
+ax.set_xlabel(r&#x27;Paso de tiempo $\Delta t$ [s]&#x27;, fontsize=12)
+ax.set_ylabel(r&#x27;$|T_{\Delta t} - T_{exacta}|$ en $t = 600$ s [K]&#x27;, fontsize=12)
+ax.set_title(&#x27;Verificacion: convergencia de malla temporal y GCI&#x27;,
+             fontsize=12.5)
+ax.grid(True, which=&#x27;both&#x27;, ls=&#x27;--&#x27;, alpha=0.45)
+ax.legend(fontsize=10)
+fig.tight_layout()
+fig.savefig(&#x27;Figuras/S11_gci_convergencia.png&#x27;)
+plt.close(fig)
+# plt.show()
+print(&#x27;\nFiguras escritas en Figuras/.&#x27;)
+</textarea>
+  <div class="code-output-wrap" hidden>
+    <div class="code-output-console"></div>
+    <div class="code-output-figures"></div>
+  </div>
+  <div class="code-status"></div>
+</div>
+<div class="code-cell">
+  <div class="code-cell-header">
+    <span class="code-cell-title">Semana11_metrica_area.py</span>
+    <span class="code-cell-caption">Métrica de área de Oberkampf y Roy del Ejemplo 2 (Ec. \ref{eq:s11_area_metric}): ensamble Monte Carlo del modelo contra CDF empírica experimental.</span>
+    <button class="run-btn" type="button">&#9654; Ejecutar</button>
+  </div>
+  <textarea class="code-input" spellcheck="false" rows="14"># ============================================================================
+# Semana11_metrica_area.py
+# Curso: Prototipado y Simulacion (DITA) -- Universidad La Salle Bajio
+# Semana 11: Validacion Experimental y Metrologia Computacional
+#
+# Metrica de area de Oberkampf &amp; Roy evaluada sobre funciones de
+# distribucion acumulada (CDF): ensamble Monte Carlo del modelo contra
+# replicas experimentales. Caso: carga hidraulica H de una bomba
+# centrifuga en su punto de operacion nominal (familia de proyectos:
+# banco de pruebas de bombas centrifugas).
+#
+# Modelo:      H(Q) = a - b Q^2, con a y b inciertos (hoja de datos +
+#              ajuste de curva caracteristica).
+# Experimento: n replicas de H medidas con transductor de presion;
+#              el sistema real presenta perdidas adicionales no
+#              modeladas (deficiencia de modelo).
+#
+# Salida: Figuras/S11_metrica_cdf.png
+# Reproducibilidad: numpy.random.default_rng(semilla fija)
+# ============================================================================
+
+import os
+import numpy as np
+import matplotlib
+matplotlib.use(&#x27;Agg&#x27;)
+import matplotlib.pyplot as plt
+
+os.makedirs(&#x27;Figuras&#x27;, exist_ok=True)
+rng = np.random.default_rng(1164)
+
+# ----------------------------------------------------------------------------
+# 1. ENSAMBLE MONTE CARLO DEL MODELO (propagacion de u_input)
+# ----------------------------------------------------------------------------
+Q_op = 0.090          # [m3/s] caudal nominal de operacion
+M = 20000             # muestras Monte Carlo
+
+a_mu, a_u = 32.0, 0.60    # [m]        ordenada de la curva caracteristica
+b_mu, b_u = 1250.0, 80.0  # [m s2/m6]  coeficiente cuadratico
+
+a_s = rng.normal(a_mu, a_u, M)
+b_s = rng.normal(b_mu, b_u, M)
+H_sim = a_s - b_s * Q_op**2
+
+# ----------------------------------------------------------------------------
+# 2. REPLICAS EXPERIMENTALES (fisica real con perdidas no modeladas)
+# ----------------------------------------------------------------------------
+n_exp = 40
+H_true_mu = 21.35     # [m] media real: perdidas adicionales de succion
+s_exp = 0.55          # [m] repetibilidad del transductor + proceso
+H_exp = rng.normal(H_true_mu, s_exp, n_exp)
+
+# ----------------------------------------------------------------------------
+# 3. CDFs EMPIRICAS Y METRICA DE AREA
+# ----------------------------------------------------------------------------
+def ecdf(sample, grid):
+    &quot;&quot;&quot;CDF empirica evaluada sobre &#x27;grid&#x27;.&quot;&quot;&quot;
+    sample_sorted = np.sort(sample)
+    return np.searchsorted(sample_sorted, grid, side=&#x27;right&#x27;) / len(sample)
+
+y_lo = min(H_sim.min(), H_exp.min()) - 0.5
+y_hi = max(H_sim.max(), H_exp.max()) + 0.5
+y_grid = np.linspace(y_lo, y_hi, 6000)
+
+F_S = ecdf(H_sim, y_grid)
+F_D = ecdf(H_exp, y_grid)
+
+d_area = np.trapezoid(np.abs(F_S - F_D), y_grid)   # [m], unidades de H
+
+# Estadisticos de referencia para el reporte
+E_medias = H_sim.mean() - H_exp.mean()
+u_input_H = H_sim.std(ddof=1)              # dispersion inducida por entradas
+u_D_H = H_exp.std(ddof=1) / np.sqrt(n_exp) # incertidumbre de la media exp.
+
+print(&#x27;=&#x27; * 72)
+print(&#x27;  METRICA DE AREA (OBERKAMPF &amp; ROY) -- CARGA DE BOMBA CENTRIFUGA&#x27;)
+print(&#x27;=&#x27; * 72)
+print(&#x27;Modelo (MC, M=%d):  media = %.3f m;  desv = %.3f m&#x27;
+      % (M, H_sim.mean(), u_input_H))
+print(&#x27;Experimento (n=%d): media = %.3f m;  desv = %.3f m&#x27;
+      % (n_exp, H_exp.mean(), H_exp.std(ddof=1)))
+print(&#x27;Error de comparacion de medias E = %.3f m&#x27; % E_medias)
+print(&#x27;Metrica de area d_area = %.3f m&#x27; % d_area)
+print(&#x27;Fraccion de d_area respecto a la media experimental: %.2f por ciento&#x27;
+      % (100.0 * d_area / H_exp.mean()))
+
+# ----------------------------------------------------------------------------
+# 4. FIGURA: CDFs Y AREA ENCERRADA
+# ----------------------------------------------------------------------------
+fig, ax = plt.subplots(figsize=(9.0, 5.8), dpi=300)
+ax.fill_betweenx(F_S, y_grid, y_grid, color=&#x27;none&#x27;)  # noop para orden de capas
+ax.fill_between(y_grid, F_S, F_D, color=&#x27;gold&#x27;, alpha=0.55,
+                label=r&#x27;Area $= d_{area} = %.2f$ m&#x27; % d_area)
+ax.plot(y_grid, F_S, color=&#x27;tab:blue&#x27;, lw=2,
+        label=r&#x27;$F_S(y)$: ensamble Monte Carlo del modelo (M=%d)&#x27; % M)
+ax.step(np.sort(H_exp), np.arange(1, n_exp + 1) / n_exp, where=&#x27;post&#x27;,
+        color=&#x27;k&#x27;, lw=1.6,
+        label=r&#x27;$F_D(y)$: CDF empirica experimental (n=%d)&#x27; % n_exp)
+ax.set_xlabel(&#x27;Carga hidraulica H [m]&#x27;, fontsize=12)
+ax.set_ylabel(&#x27;Probabilidad acumulada&#x27;, fontsize=12)
+ax.set_title(&#x27;Metrica de area sobre CDFs: desajuste estocastico &#x27;
+             &#x27;modelo-experimento&#x27;, fontsize=12.5)
+ax.set_ylim(-0.02, 1.02)
+ax.grid(True, ls=&#x27;--&#x27;, alpha=0.45)
+ax.legend(loc=&#x27;upper left&#x27;, fontsize=10, frameon=True)
+fig.tight_layout()
+fig.savefig(&#x27;Figuras/S11_metrica_cdf.png&#x27;)
+plt.close(fig)
+# plt.show()
+print(&#x27;\nFigura escrita en Figuras/S11_metrica_cdf.png&#x27;)
+</textarea>
+  <div class="code-output-wrap" hidden>
+    <div class="code-output-console"></div>
+    <div class="code-output-figures"></div>
+  </div>
+  <div class="code-status"></div>
+</div>
+
+    <div class="pendiente-box">
+      <h3>Contenido completo de la semana</h3>
+      <p>Esta página trae el objetivo de cátedra, el temario, el resultado de aprendizaje esperado y todo
+        el código Python de esta semana, ya ejecutable. El desarrollo teórico completo (ecuaciones,
+        demostraciones, tablas de resultados y discusión) vive por ahora en el PDF/<code>.tex</code> del
+        curso — pégalo aquí como HTML cuando tengas tiempo, o pide que se convierta esa parte también.</p>
+    </div>
+
+    <div class="week-nav">
+      <a href="../semana-09-10/index.html">&larr; Semana 09–10</a>
+      <span class="to-index"><a href="../../index.html">&uarr; Volver al índice del curso</a></span>
+      <a href="../semana-12-13/index.html">Semana 12–13 &rarr;</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div>Doctorado en Ingeniería y Tecnología Aplicada &middot; Universidad La Salle Bajío</div>
+    <div>Dr. Jorge Ramón Parra Michel &middot; Prototipado y Simulación</div>
+  </div>
+</footer>
+
+<script src="../../assets/js/main.js"></script>
+<script src="../../assets/js/pyodide-runner.js"></script>
+
+<script>
+window.addEventListener("load", function () {
+  if (window.renderMathInElement) {
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left: "$$", right: "$$", display: true},
+        {left: "$", right: "$", display: false}
+      ],
+      throwOnError: false
+    });
+  }
+});
+</script>
+
+</body>
+</html>

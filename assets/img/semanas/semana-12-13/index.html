@@ -1,0 +1,1263 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Semana 12 y 13. Fotogrametría y Escaneo 3D — Prototipado y Simulación</title>
+<meta name="description" content="Semana 12 y 13. Fotogrametría y Escaneo 3D: objetivo, temario y código ejecutable.">
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-cpW21h6RZv/phavutF+AuVYrr+dA8xD9zs6FwLpaCePvcCWnZ8IU9UNlXhpKUAJI" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-vZTG03m+2yp6N6BNi5iM4rW4oIwk5DfcNdFfxkk9ZWpDriOkXX8voJBFrAO7MpVl" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-GvrOXuhMATgEsSwCs4smul74iXGOixntILdUW9XmUC6+HX0sLNAK3q71HotJqlAn" crossorigin="anonymous">
+<link rel="stylesheet" href="../../assets/css/style.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="topbar-brand" href="../../index.html">
+      <img src="../../assets/img/logo-lasalle.png" alt="Universidad La Salle Bajío">
+      Prototipado y Simulación
+    </a>
+    <nav>
+      <a href="../../index.html#semanas">Semanas</a>
+      <a href="../../README.md">Repositorio</a>
+    </nav>
+  </div>
+</div>
+
+<header class="week-header">
+  <div class="wrap">
+    <div class="breadcrumb"><a href="../../index.html">Inicio</a> &rsaquo; Semana 12–13</div>
+    <p class="num">Semana 12–13</p>
+    <h1>Fotogrametría y Escaneo 3D</h1>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <div class="callout">
+      <h3>Objetivo de la cátedra</h3>
+      <p>Integrar la reconstrucción tridimensional
+óptica como puente metrológicamente trazable entre el sistema físico y su
+modelo de simulación. El doctorando formulará el problema de fotogrametría
+multivista desde el modelo proyectivo de cámara hasta el ajuste de haces,
+establecerá el presupuesto de resolución e incertidumbre de una sesión de
+captura <em>antes</em> de ejecutarla, procesará la nube de puntos resultante
+hasta obtener una malla triangular estanca y auditada topológicamente, y
+determinará bajo qué condiciones esa malla es admisible como dominio de
+cálculo para análisis por elementos finitos. La reconstrucción se tratará,
+en todo momento, como una medición con incertidumbre declarada y no como
+una operación de visualización.</p>
+    </div>
+    
+    
+    <div class="callout resultado">
+      <h3>Resultado de aprendizaje esperado</h3>
+      <p>El investigador en formación
+ejecutará un escaneo fotogramétrico completo de una pieza física, entregará la
+nube densa y la malla triangular en formato STL, y acompañará ambas con un
+presupuesto de incertidumbre que declare la resolución lateral esperada, la
+incertidumbre de profundidad, el factor de escala y su incertidumbre, y la
+desviación verificada contra cotas medidas con instrumento calibrado. La
+entrega se juzgará con los mismos criterios normativos introducidos en la
+Semana&nbsp;11.</p>
+    </div>
+    <h2 class="section-heading" style="margin-top:36px">Temario</h2>
+    <ul class="temario"><li>Introducción a la fotogrametría: modelo <em>pinhole</em>, distorsión
+de lente y geometría epipolar.</li><li>Reconstrucción 3D: <em>Structure from Motion</em>, ajuste de haces,
+<em>Multi-View Stereo</em> y ambigüedad de similitud.</li><li>Nubes de puntos: muestreo, ruido, valores atípicos, filtrado
+estadístico, submuestreo y estimación de normales.</li><li>Mallas tridimensionales: reconstrucción implícita de superficies,
+auditoría topológica, suavizado y decimación.</li><li>Escaneo 3D: protocolo operativo con Meshroom 2023.3.0 (AliceVision),
+escalamiento metrológico y criterios de aceptación.</li><li>Preparación geométrica para simulación: de la malla de escaneo al
+dominio de cálculo admisible en FEM.</li><li>Aplicaciones en ingeniería: geometría <em>as-built</em>, verificación
+dimensional y alimentación de gemelos digitales.</li></ul>
+    <h2 class="section-heading" style="margin-top:44px">Figuras de la semana</h2>
+    <p class="section-intro">17 imagen(es) referenciadas en los apuntes de esta semana.
+      Colócalas en <code>assets/img/semana-12-13/</code> con el nombre exacto indicado debajo
+      de cada recuadro; mientras no estén, se muestra un marcador en su lugar.</p>
+    <div class="gallery">
+    <figure>
+      <img src="../../assets/img/semana-12-13/S12_nube_a_malla.png" alt="S12_nube_a_malla.png" data-fallback-name="S12_nube_a_malla.png" loading="lazy">
+      <figcaption>S12_nube_a_malla.png</figcaption>
+    </figure><figure>
+      <img src="../../assets/img/semana-12-13/S12_planificacion_captura.png" alt="S12_planificacion_captura.png" data-fallback-name="S12_planificacion_captura.png" loading="lazy">
+      <figcaption>S12_planificacion_captura.png</figcaption>
+    </figure><figure>
+      <img src="../../assets/img/semana-12-13/S12_sfm_sintetico.png" alt="S12_sfm_sintetico.png" data-fallback-name="S12_sfm_sintetico.png" loading="lazy">
+      <figcaption>S12_sfm_sintetico.png</figcaption>
+    </figure><figure>
+      <img src="../../assets/img/semana-12-13/fig_ICP_esquema.png" alt="fig_ICP_esquema.png" data-fallback-name="fig_ICP_esquema.png" loading="lazy">
+      <figcaption>fig_ICP_esquema.png</figcaption>
+    </figure><figure>
+      <img src="../../assets/img/semana-12-13/fig_defectos_malla.png" alt="fig_defectos_malla.png" data-fallback-name="fig_defectos_malla.png" loading="lazy">
+      <figcaption>fig_defectos_malla.png</figcaption>
+    </figure><figure>
+      <img src="../../assets/img/semana-12-13/fig_poisson_depth.png" alt="fig_poisson_depth.png" data-fallback-name="fig_poisson_depth.png" loading="lazy">
+      <figcaption>fig_poisson_depth.png</figcaption>
+    </figure><figure>
+      <img src="../../assets/img/semana-12-13/fig_triangulacion.png" alt="fig_triangulacion.png" data-fallback-name="fig_triangulacion.png" loading="lazy">
+      <figcaption>fig_triangulacion.png</figcaption>
+    </figure><figure>
+      <img src="../../assets/img/semana-12-13/s12_meshroom_descarga.png" alt="s12_meshroom_descarga.png" data-fallback-name="s12_meshroom_descarga.png" loading="lazy">
+      <figcaption>s12_meshroom_descarga.png</figcaption>
+    </figure><figure>
+      <img src="../../assets/img/semana-12-13/fig_SOR_filtrado.png" alt="fig_SOR_filtrado.png" data-fallback-name="fig_SOR_filtrado.png" loading="lazy">
+      <figcaption>fig_SOR_filtrado.png</figcaption>
+    </figure><figure>
+      <img src="../../assets/img/semana-12-13/fig_distorsion_lente.png" alt="fig_distorsion_lente.png" data-fallback-name="fig_distorsion_lente.png" loading="lazy">
+      <figcaption>fig_distorsion_lente.png</figcaption>
+    </figure><figure>
+      <img src="../../assets/img/semana-12-13/fig_meshroom_pipeline_captura.png" alt="fig_meshroom_pipeline_captura.png" data-fallback-name="fig_meshroom_pipeline_captura.png" loading="lazy">
+      <figcaption>fig_meshroom_pipeline_captura.png</figcaption>
+    </figure><figure>
+      <img src="../../assets/img/semana-12-13/fig_normales_PCA.png" alt="fig_normales_PCA.png" data-fallback-name="fig_normales_PCA.png" loading="lazy">
+      <figcaption>fig_normales_PCA.png</figcaption>
+    </figure><figure>
+      <img src="../../assets/img/semana-12-13/fig_nube_aceptable_vs_defectuosa.png" alt="fig_nube_aceptable_vs_defectuosa.png" data-fallback-name="fig_nube_aceptable_vs_defectuosa.png" loading="lazy">
+      <figcaption>fig_nube_aceptable_vs_defectuosa.png</figcaption>
+    </figure><figure>
+      <img src="../../assets/img/semana-12-13/fig_pinhole.png" alt="fig_pinhole.png" data-fallback-name="fig_pinhole.png" loading="lazy">
+      <figcaption>fig_pinhole.png</figcaption>
+    </figure><figure>
+      <img src="../../assets/img/semana-12-13/fig_pipeline_SfML.png" alt="fig_pipeline_SfML.png" data-fallback-name="fig_pipeline_SfML.png" loading="lazy">
+      <figcaption>fig_pipeline_SfML.png</figcaption>
+    </figure><figure>
+      <img src="../../assets/img/semana-12-13/fig_spaceclaim_flujo.png" alt="fig_spaceclaim_flujo.png" data-fallback-name="fig_spaceclaim_flujo.png" loading="lazy">
+      <figcaption>fig_spaceclaim_flujo.png</figcaption>
+    </figure><figure>
+      <img src="../../assets/img/semana-12-13/fig_trayectoria_foto.png" alt="fig_trayectoria_foto.png" data-fallback-name="fig_trayectoria_foto.png" loading="lazy">
+      <figcaption>fig_trayectoria_foto.png</figcaption>
+    </figure>
+  </div>
+    <h2 class="section-heading" style="margin-top:44px">Código de la semana (ejecutable)</h2>
+    <div class="pyodide-banner">
+      &#9432; El código corre por completo en tu navegador (Python vía WebAssembly, sin servidor). La
+      primera vez que pulses <strong>Ejecutar</strong> en esta página se descarga el runtime — tarda unos
+      segundos. Puedes editar el código antes de correrlo.
+    </div>
+    <div class="code-cell">
+  <div class="code-cell-header">
+    <span class="code-cell-title">Semana12_planificacion_captura.py</span>
+    <span class="code-cell-caption">Presupuesto óptico del Ejemplo 1: resolución lateral (Ec. \ref{eq:s12_gsd}), incertidumbre de profundidad (Ec. \ref{eq:s12_sigmaz}), modelo de degradación del emparejamiento (Ec. \ref{eq:s12_degradacion}) y restricción de solapamiento (Ec. \ref{eq:s12_trayectoria}).</span>
+    <button class="run-btn" type="button">&#9654; Ejecutar</button>
+  </div>
+  <textarea class="code-input" spellcheck="false" rows="14"># -*- coding: utf-8 -*-
+&quot;&quot;&quot;
+Semana 12 - Prototipado y Simulacion (DITA, Universidad La Salle Bajio)
+Codigo 1. Presupuesto optico de una sesion fotogrametrica.
+
+Calcula, para una configuracion camara-objeto declarada:
+  (1) GSD  = p * Z / f                      (resolucion lateral en el objeto)
+  (2) sZ   = Z^2 * sd / (fpx * B)           (incertidumbre de profundidad por
+                                             triangulacion, par convergente)
+  (3) B    = 2 * Z * sin(da/2)              (base efectiva en captura orbital)
+  (4) o    = 1 - B / W,  W = 2*Z*tan(FOV/2) (solapamiento entre estaciones)
+  (5) N    = 360/da * n_anillos             (numero de imagenes)
+
+El modelo de matching degrada la precision de correspondencia con la
+separacion angular (distorsion perspectiva del parche). Se adopta el modelo
+fenomenologico declarado:
+      sd(da) = sd0 * [ 1 + (da/da_c)^2 ]
+con da_c calibrable por el usuario (valor por defecto 20 deg, coherente con
+el rango util reportado para descriptores tipo DSP-SIFT). La competencia
+entre (2) -que mejora con da- y este termino -que empeora con da- produce
+un optimo interior que el script localiza numericamente.
+
+Salida: Figuras/S12_planificacion_captura.png (300 dpi) y resumen en consola.
+Backend Agg: ejecutable en Google Colab sin display.
+&quot;&quot;&quot;
+
+import os
+import numpy as np
+import matplotlib
+matplotlib.use(&#x27;Agg&#x27;)
+import matplotlib.pyplot as plt
+from scipy.optimize import minimize_scalar
+
+os.makedirs(&#x27;Figuras&#x27;, exist_ok=True)
+rng = np.random.default_rng(12)
+
+# ----------------------------------------------------------------------
+# 1. Configuracion nominal declarada (APS-C 24 MP + objetivo de 35 mm)
+# ----------------------------------------------------------------------
+W_SENS = 22.3          # ancho del sensor [mm]
+NPX_H = 6000           # pixeles en la dimension ancha
+P_PIX = W_SENS / NPX_H  # pitch de pixel [mm]
+F_MM = 35.0            # distancia focal [mm]
+Z_NOM = 600.0          # distancia de trabajo nominal objeto-camara [mm]
+SD0 = 0.30             # ruido de correspondencia a angulo nulo [px]
+DA_C = 20.0            # angulo caracteristico de degradacion del matching [deg]
+N_ANILLOS = 2          # anillos de captura (0 deg y +30 deg)
+
+F_PX = F_MM / P_PIX                     # focal en pixeles
+FOV = 2.0 * np.arctan(W_SENS / (2.0 * F_MM))   # campo de vision horizontal [rad]
+
+
+def gsd(z, f_mm=F_MM, p=P_PIX):
+    &quot;&quot;&quot;Ground sampling distance [mm/px] a distancia z [mm].&quot;&quot;&quot;
+    return p * z / f_mm
+
+
+def base_orbital(z, da_deg):
+    &quot;&quot;&quot;Base estereo efectiva [mm] entre dos estaciones separadas da_deg.&quot;&quot;&quot;
+    return 2.0 * z * np.sin(np.deg2rad(da_deg) / 2.0)
+
+
+def sigma_d(da_deg, sd0=SD0, da_c=DA_C):
+    &quot;&quot;&quot;Ruido de correspondencia [px] en funcion de la separacion angular.&quot;&quot;&quot;
+    return sd0 * (1.0 + (da_deg / da_c) ** 2)
+
+
+def sigma_z(da_deg, z=Z_NOM, degradacion=True):
+    &quot;&quot;&quot;Incertidumbre estandar de profundidad [mm] de un par convergente.&quot;&quot;&quot;
+    b = base_orbital(z, da_deg)
+    sd = sigma_d(da_deg) if degradacion else SD0
+    return (z ** 2) * sd / (F_PX * b)
+
+
+def solapamiento(da_deg, z=Z_NOM):
+    &quot;&quot;&quot;Fraccion de solapamiento entre estaciones consecutivas (0-1).&quot;&quot;&quot;
+    w = 2.0 * z * np.tan(FOV / 2.0)      # huella lateral del encuadre [mm]
+    return 1.0 - base_orbital(z, da_deg) / w
+
+
+def n_imagenes(da_deg, n_anillos=N_ANILLOS):
+    return np.ceil(360.0 / da_deg) * n_anillos
+
+
+# ----------------------------------------------------------------------
+# 2. Optimo de separacion angular
+# ----------------------------------------------------------------------
+res = minimize_scalar(sigma_z, bounds=(2.0, 80.0), method=&#x27;bounded&#x27;)
+DA_OPT = float(res.x)
+SZ_OPT = float(res.fun)
+
+GSD_NOM = gsd(Z_NOM)
+SZ_15 = float(sigma_z(15.0))
+SZ_15_ideal = float(sigma_z(15.0, degradacion=False))
+OVL_OPT = float(solapamiento(DA_OPT))
+N_OPT = float(n_imagenes(DA_OPT))
+
+# separacion angular maxima admisible por criterio de solapamiento &gt;= 0.60
+da_grid = np.linspace(2.0, 80.0, 4000)
+ovl = solapamiento(da_grid)
+DA_OVL60 = float(da_grid[np.argmin(np.abs(ovl - 0.60))])
+DA_OVL80 = float(da_grid[np.argmin(np.abs(ovl - 0.80))])
+
+# relacion de aspecto del presupuesto: profundidad frente a lateral
+RATIO = SZ_OPT / GSD_NOM
+
+print(&#x27;=&#x27; * 68)
+print(&#x27;PRESUPUESTO OPTICO DE LA SESION FOTOGRAMETRICA&#x27;)
+print(&#x27;=&#x27; * 68)
+print(&#x27;Pitch de pixel                p     = {:.4f} mm&#x27;.format(P_PIX))
+print(&#x27;Focal en pixeles              f_px  = {:.0f} px&#x27;.format(F_PX))
+print(&#x27;Campo de vision horizontal    FOV   = {:.1f} deg&#x27;
+      .format(np.rad2deg(FOV)))
+print(&#x27;GSD a Z = {:.0f} mm             GSD   = {:.4f} mm/px ({:.1f} um)&#x27;
+      .format(Z_NOM, GSD_NOM, GSD_NOM * 1000))
+print(&#x27;-&#x27; * 68)
+print(&#x27;Separacion angular optima     da*   = {:.1f} deg&#x27;.format(DA_OPT))
+print(&#x27;Incertidumbre de profundidad  sZ*   = {:.4f} mm ({:.1f} um)&#x27;
+      .format(SZ_OPT, SZ_OPT * 1000))
+print(&#x27;Relacion sZ*/GSD                    = {:.2f}&#x27;.format(RATIO))
+print(&#x27;Solapamiento en da*                 = {:.3f}&#x27;.format(OVL_OPT))
+print(&#x27;Imagenes requeridas en da*    N     = {:.0f} ({} anillos)&#x27;
+      .format(N_OPT, N_ANILLOS))
+print(&#x27;-&#x27; * 68)
+print(&#x27;sZ a da = 15 deg (con degradacion)  = {:.4f} mm&#x27;.format(SZ_15))
+print(&#x27;sZ a da = 15 deg (sin degradacion)  = {:.4f} mm&#x27;.format(SZ_15_ideal))
+print(&#x27;da con solapamiento = 0.80          = {:.1f} deg&#x27;.format(DA_OVL80))
+print(&#x27;da con solapamiento = 0.60          = {:.1f} deg&#x27;.format(DA_OVL60))
+print(&#x27;-&#x27; * 68)
+# Optimo restringido: el solapamiento minimo del pipeline SfM domina el diseno
+SZ_OVL60 = float(sigma_z(DA_OVL60))
+SZ_OVL80 = float(sigma_z(DA_OVL80))
+PENAL60 = 100.0 * (SZ_OVL60 / SZ_OPT - 1.0)
+PENAL80 = 100.0 * (SZ_OVL80 / SZ_OPT - 1.0)
+print(&#x27;OPTIMO RESTRINGIDO (la restriccion activa es el solapamiento)&#x27;)
+print(&#x27;  o &gt;= 0.60 -&gt; da = {:.1f} deg, sZ = {:.1f} um, N = {:.0f}, &#x27;
+      &#x27;penalizacion = {:.1f} por ciento&#x27;
+      .format(DA_OVL60, SZ_OVL60 * 1000, n_imagenes(DA_OVL60), PENAL60))
+print(&#x27;  o &gt;= 0.80 -&gt; da = {:.1f} deg, sZ = {:.1f} um, N = {:.0f}, &#x27;
+      &#x27;penalizacion = {:.1f} por ciento&#x27;
+      .format(DA_OVL80, SZ_OVL80 * 1000, n_imagenes(DA_OVL80), PENAL80))
+print(&#x27;=&#x27; * 68)
+
+# ----------------------------------------------------------------------
+# 3. Figura de tres paneles
+# ----------------------------------------------------------------------
+AZUL = &#x27;#003366&#x27;
+ROJO = &#x27;#B22222&#x27;
+VERDE = &#x27;#2E7D32&#x27;
+NARANJA = &#x27;#E07B00&#x27;
+
+fig, ax = plt.subplots(1, 3, figsize=(15.0, 4.4))
+
+# --- (a) GSD frente a distancia de trabajo -----------------------------
+z_grid = np.linspace(200.0, 1500.0, 500)
+for f_i, est in zip([24.0, 35.0, 50.0], [&#x27;-.&#x27;, &#x27;-&#x27;, &#x27;--&#x27;]):
+    ax[0].plot(z_grid, gsd(z_grid, f_mm=f_i) * 1000.0, est, lw=1.8,
+               color=AZUL if f_i == 35.0 else &#x27;gray&#x27;,
+               label=&#x27;f = {:.0f} mm&#x27;.format(f_i))
+ax[0].axhline(100.0, color=ROJO, lw=1.2, ls=&#x27;:&#x27;)
+ax[0].text(215, 106, &#x27;criterio GSD = 100 um&#x27;, color=ROJO, fontsize=8)
+ax[0].plot([Z_NOM], [GSD_NOM * 1000.0], &#x27;o&#x27;, ms=7, color=ROJO, zorder=5)
+ax[0].annotate(&#x27;config. nominal\n{:.0f} um&#x27;.format(GSD_NOM * 1000.0),
+               xy=(Z_NOM, GSD_NOM * 1000.0), xytext=(760, 40),
+               fontsize=8, color=ROJO,
+               arrowprops=dict(arrowstyle=&#x27;-&gt;&#x27;, color=ROJO, lw=0.9))
+ax[0].set_xlabel(&#x27;Distancia de trabajo $Z$ [mm]&#x27;)
+ax[0].set_ylabel(&#x27;GSD [$\\mu$m/px]&#x27;)
+ax[0].set_title(&#x27;(a) Resolucion lateral&#x27;, fontsize=10, loc=&#x27;left&#x27;)
+ax[0].legend(fontsize=8, frameon=False)
+ax[0].grid(alpha=0.3)
+
+# --- (b) Incertidumbre de profundidad frente a separacion angular ------
+sz_deg = sigma_z(da_grid) * 1000.0
+sz_ide = sigma_z(da_grid, degradacion=False) * 1000.0
+ax[1].plot(da_grid, sz_ide, &#x27;--&#x27;, color=&#x27;gray&#x27;, lw=1.5,
+           label=&#x27;geometria pura $\\sigma_d=\\sigma_{d0}$&#x27;)
+ax[1].plot(da_grid, sz_deg, &#x27;-&#x27;, color=AZUL, lw=2.0,
+           label=&#x27;con degradacion de matching&#x27;)
+ax[1].plot([DA_OPT], [SZ_OPT * 1000.0], &#x27;o&#x27;, ms=8, color=ROJO, zorder=5)
+ax[1].annotate(&#x27;$\\Delta\\alpha^{{*}}$ = {:.1f}$^\\circ$\n$\\sigma_Z$ = {:.0f} $\\mu$m&#x27;
+               .format(DA_OPT, SZ_OPT * 1000.0),
+               xy=(DA_OPT, SZ_OPT * 1000.0), xytext=(DA_OPT + 12, SZ_OPT * 1000 + 95),
+               fontsize=8.5, color=ROJO,
+               arrowprops=dict(arrowstyle=&#x27;-&gt;&#x27;, color=ROJO, lw=0.9))
+ax[1].axvspan(DA_OVL60, 80.0, color=NARANJA, alpha=0.12)
+Y1MAX = float(np.nanmax(sz_deg[da_grid &lt; 70]))
+ax[1].text(DA_OVL60 + 1.0, 0.58 * Y1MAX,
+           &#x27;solapamiento &lt; 0.60\n(SfM inestable)&#x27;, fontsize=7.5,
+           color=NARANJA)
+ax[1].set_xlim(2, 70)
+ax[1].set_ylim(0, Y1MAX)
+ax[1].set_xlabel(&#x27;Separacion angular $\\Delta\\alpha$ [$^\\circ$]&#x27;)
+ax[1].set_ylabel(&#x27;$\\sigma_Z$ [$\\mu$m]&#x27;)
+ax[1].set_title(&#x27;(b) Presupuesto de profundidad&#x27;, fontsize=10, loc=&#x27;left&#x27;)
+ax[1].legend(fontsize=7.5, frameon=False, loc=&#x27;upper right&#x27;)
+ax[1].grid(alpha=0.3)
+
+# --- (c) Solapamiento y numero de imagenes -----------------------------
+ax[2].plot(da_grid, ovl, &#x27;-&#x27;, color=VERDE, lw=2.0)
+ax[2].axhline(0.60, color=ROJO, lw=1.1, ls=&#x27;:&#x27;)
+ax[2].axhline(0.80, color=NARANJA, lw=1.1, ls=&#x27;:&#x27;)
+ax[2].text(38, 0.625, &#x27;minimo admisible 0.60&#x27;, color=ROJO, fontsize=7.5)
+ax[2].text(38, 0.825, &#x27;recomendado 0.80&#x27;, color=NARANJA, fontsize=7.5)
+ax[2].axvline(DA_OPT, color=AZUL, lw=1.2, ls=&#x27;--&#x27;)
+ax[2].set_xlim(2, 70)
+ax[2].set_ylim(0, 1.0)
+ax[2].set_xlabel(&#x27;Separacion angular $\\Delta\\alpha$ [$^\\circ$]&#x27;)
+ax[2].set_ylabel(&#x27;Solapamiento $o$ [-]&#x27;, color=VERDE)
+ax[2].tick_params(axis=&#x27;y&#x27;, labelcolor=VERDE)
+ax[2].grid(alpha=0.3)
+
+ax2b = ax[2].twinx()
+ax2b.plot(da_grid, n_imagenes(da_grid), &#x27;-&#x27;, color=AZUL, lw=1.6, alpha=0.85)
+ax2b.set_ylabel(&#x27;$N$ imagenes ({} anillos)&#x27;.format(N_ANILLOS), color=AZUL)
+ax2b.tick_params(axis=&#x27;y&#x27;, labelcolor=AZUL)
+ax2b.set_yscale(&#x27;log&#x27;)
+ax[2].set_title(&#x27;(c) Solapamiento y volumen de datos&#x27;, fontsize=10, loc=&#x27;left&#x27;)
+
+fig.tight_layout()
+fig.savefig(&#x27;Figuras/S12_planificacion_captura.png&#x27;, dpi=300,
+            bbox_inches=&#x27;tight&#x27;)
+# plt.show()
+print(&#x27;Figura guardada: Figuras/S12_planificacion_captura.png&#x27;)
+</textarea>
+  <div class="code-output-wrap" hidden>
+    <div class="code-output-console"></div>
+    <div class="code-output-figures"></div>
+  </div>
+  <div class="code-status"></div>
+</div>
+<div class="code-cell">
+  <div class="code-cell-header">
+    <span class="code-cell-title">Semana12_sfm_sintetico.py</span>
+    <span class="code-cell-caption">Experimento sintético del Ejemplo 2: triangulación DLT multivista (Ec. \ref{eq:s12_dlt}), alineamiento de similitud de Umeyama (Ec. \ref{eq:s12_similitud}) y propagación de la escala métrica (Ec. \ref{eq:s12_uescala}).</span>
+    <button class="run-btn" type="button">&#9654; Ejecutar</button>
+  </div>
+  <textarea class="code-input" spellcheck="false" rows="14"># -*- coding: utf-8 -*-
+&quot;&quot;&quot;
+Semana 12 - Prototipado y Simulacion (DITA, Universidad La Salle Bajio)
+Codigo 2. Experimento sintetico de Structure from Motion.
+
+Objetivo: cuantificar, sobre un banco sintetico con verdad de terreno exacta,
+las dos propiedades del pipeline SfM que condicionan su uso metrologico.
+
+  (A) Escalamiento del error de triangulacion con el numero de vistas.
+      Se proyecta una pieza sintetica sobre N camaras dispuestas en dos
+      anillos orbitales, se contamina la deteccion con ruido gaussiano de
+      s_px [px], se triangula por DLT multivista (SVD) y se compara contra
+      la verdad de terreno tras alineamiento de Umeyama. El escalamiento
+      empirico se ajusta a  RMS ~ N^(-q)  y se contrasta con q = 1/2.
+
+  (B) Propagacion de la escala metrica. La reconstruccion SfM queda definida
+      salvo una similitud (7 gdl). La escala se fija con una barra calibrada
+      de longitud L. Si cada extremo de la barra tiene incertidumbre 3D
+      isotropa u_p, la escala hereda
+              u_s / s = sqrt(2) * u_p / L,
+      es decir, el error relativo del modelo completo es inversamente
+      proporcional a la longitud de la barra. Se verifica por Monte Carlo.
+
+Salida: Figuras/S12_sfm_sintetico.png (300 dpi) y resumen en consola.
+Backend Agg: ejecutable en Google Colab sin display.
+&quot;&quot;&quot;
+
+import os
+import numpy as np
+import matplotlib
+matplotlib.use(&#x27;Agg&#x27;)
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D  # noqa: F401
+from matplotlib.ticker import NullFormatter, NullLocator
+
+os.makedirs(&#x27;Figuras&#x27;, exist_ok=True)
+rng = np.random.default_rng(2024)
+
+# ----------------------------------------------------------------------
+# 1. Camara: mismos intrinsecos del Codigo 1 (APS-C 24 MP, f = 35 mm)
+# ----------------------------------------------------------------------
+NPX_H, NPX_V = 6000, 4000
+F_PX = 9417.0
+CX, CY = NPX_H / 2.0, NPX_V / 2.0
+K = np.array([[F_PX, 0.0, CX],
+              [0.0, F_PX, CY],
+              [0.0, 0.0, 1.0]])
+S_PX = 0.30        # ruido de deteccion de features [px]
+R_ORB = 600.0      # radio orbital [mm]
+ELEV = [0.0, 30.0]  # anillos de captura [deg]
+
+
+# ----------------------------------------------------------------------
+# 2. Pieza sintetica: buje cilindrico sobre brida circular
+# ----------------------------------------------------------------------
+def pieza_sintetica(n=4000):
+    &quot;&quot;&quot;Devuelve (puntos [n,3] en mm, normales unitarias [n,3]).&quot;&quot;&quot;
+    r_buje, h_buje = 25.0, 80.0
+    r_brida, t_brida = 55.0, 12.0
+    n1 = int(0.45 * n)   # lateral del buje
+    n2 = int(0.30 * n)   # canto y cara superior de la brida
+    n3 = n - n1 - n2     # tapa del buje
+
+    th = rng.uniform(0, 2 * np.pi, n1)
+    z = rng.uniform(t_brida, t_brida + h_buje, n1)
+    p1 = np.c_[r_buje * np.cos(th), r_buje * np.sin(th), z]
+    nn1 = np.c_[np.cos(th), np.sin(th), np.zeros(n1)]
+
+    th = rng.uniform(0, 2 * np.pi, n2)
+    rad = np.sqrt(rng.uniform(r_buje ** 2, r_brida ** 2, n2))
+    p2 = np.c_[rad * np.cos(th), rad * np.sin(th),
+               np.full(n2, t_brida)]
+    nn2 = np.tile(np.array([0.0, 0.0, 1.0]), (n2, 1))
+
+    th = rng.uniform(0, 2 * np.pi, n3)
+    rad = r_buje * np.sqrt(rng.uniform(0, 1, n3))
+    p3 = np.c_[rad * np.cos(th), rad * np.sin(th),
+               np.full(n3, t_brida + h_buje)]
+    nn3 = np.tile(np.array([0.0, 0.0, 1.0]), (n3, 1))
+
+    P = np.vstack([p1, p2, p3])
+    Nrm = np.vstack([nn1, nn2, nn3])
+    P[:, 2] -= (t_brida + h_buje) / 2.0        # centrar en Z
+    return P, Nrm / np.linalg.norm(Nrm, axis=1, keepdims=True)
+
+
+def poses_orbitales(n_cam, radio=R_ORB, elevaciones=ELEV):
+    &quot;&quot;&quot;Genera matrices [R|t] mirando al origen desde anillos orbitales.&quot;&quot;&quot;
+    poses, centros = [], []
+    por_anillo = int(np.ceil(n_cam / len(elevaciones)))
+    for el in elevaciones:
+        for k in range(por_anillo):
+            az = 2 * np.pi * k / por_anillo
+            e = np.deg2rad(el)
+            C = radio * np.array([np.cos(e) * np.cos(az),
+                                  np.cos(e) * np.sin(az),
+                                  np.sin(e)])
+            zc = -C / np.linalg.norm(C)                    # eje optico
+            up = np.array([0.0, 0.0, 1.0])
+            if abs(np.dot(zc, up)) &gt; 0.98:
+                up = np.array([0.0, 1.0, 0.0])
+            xc = np.cross(up, zc)
+            xc /= np.linalg.norm(xc)
+            yc = np.cross(zc, xc)
+            R = np.vstack([xc, yc, zc])
+            poses.append((R, -R @ C))
+            centros.append(C)
+    return poses[:n_cam], np.array(centros[:n_cam])
+
+
+def proyectar(P, R, t):
+    Pc = (R @ P.T).T + t
+    uv = (K @ Pc.T).T
+    return uv[:, :2] / uv[:, 2:3], Pc[:, 2]
+
+
+def triangular_dlt(obs, Ps):
+    &quot;&quot;&quot;obs: lista de (u,v); Ps: lista de matrices 3x4. Devuelve X en mm.&quot;&quot;&quot;
+    A = []
+    for (u, v), Pm in zip(obs, Ps):
+        A.append(u * Pm[2] - Pm[0])
+        A.append(v * Pm[2] - Pm[1])
+    _, _, Vt = np.linalg.svd(np.array(A))
+    X = Vt[-1]
+    return X[:3] / X[3]
+
+
+def umeyama(X, Y):
+    &quot;&quot;&quot;Similitud (s,R,t) que lleva X sobre Y en minimos cuadrados.&quot;&quot;&quot;
+    mx, my = X.mean(0), Y.mean(0)
+    Xc, Yc = X - mx, Y - my
+    S = (Yc.T @ Xc) / len(X)
+    U, D, Vt = np.linalg.svd(S)
+    d = np.sign(np.linalg.det(U @ Vt))
+    W = np.diag([1.0, 1.0, d])
+    R = U @ W @ Vt
+    s = np.trace(np.diag(D) @ W) / (Xc ** 2).sum(1).mean()
+    return s, R, my - s * (R @ mx)
+
+
+def reconstruir(P_gt, Nrm, n_cam, s_px=S_PX, min_vistas=3):
+    &quot;&quot;&quot;Devuelve (X_rec, idx_validos, rms_reproyeccion).&quot;&quot;&quot;
+    poses, _ = poses_orbitales(n_cam)
+    Pmats = [K @ np.hstack([R, t.reshape(3, 1)]) for R, t in poses]
+    obs = {i: [] for i in range(len(P_gt))}
+    res_rep = []
+    for j, (R, t) in enumerate(poses):
+        C = -R.T @ t
+        uv, zc = proyectar(P_gt, R, t)
+        vis = ((Nrm * (C - P_gt)).sum(1) &gt; 0) &amp; (zc &gt; 0)
+        vis &amp;= (uv[:, 0] &gt; 0) &amp; (uv[:, 0] &lt; NPX_H)
+        vis &amp;= (uv[:, 1] &gt; 0) &amp; (uv[:, 1] &lt; NPX_V)
+        ruido = rng.normal(0.0, s_px, size=uv.shape)
+        for i in np.flatnonzero(vis):
+            obs[i].append((uv[i] + ruido[i], j))
+    X, idx = [], []
+    for i, lst in obs.items():
+        if len(lst) &gt;= min_vistas:
+            X.append(triangular_dlt([o[0] for o in lst],
+                                    [Pmats[o[1]] for o in lst]))
+            idx.append(i)
+            for uvo, j in lst:
+                R, t = poses[j]
+                uvp, _ = proyectar(X[-1][None, :], R, t)
+                res_rep.extend((uvp[0] - uvo).tolist())
+    return np.array(X), np.array(idx), float(np.sqrt(np.mean(
+        np.array(res_rep) ** 2)))
+
+
+# ----------------------------------------------------------------------
+# 3. (A) Error de triangulacion frente al numero de vistas
+# ----------------------------------------------------------------------
+P_gt, N_gt = pieza_sintetica(4000)
+N_LIST = [6, 8, 12, 16, 24, 36, 48]
+rms_3d, rms_rep, n_pts, cob = [], [], [], []
+
+for n_cam in N_LIST:
+    Xr, idx, rrep = reconstruir(P_gt, N_gt, n_cam)
+    s, R, t = umeyama(Xr, P_gt[idx])
+    Xa = s * (R @ Xr.T).T + t
+    d = np.linalg.norm(Xa - P_gt[idx], axis=1)
+    rms_3d.append(float(np.sqrt(np.mean(d ** 2))))
+    rms_rep.append(rrep)
+    n_pts.append(len(idx))
+    cob.append(100.0 * len(idx) / len(P_gt))
+
+rms_3d = np.array(rms_3d)
+coef = np.polyfit(np.log(N_LIST), np.log(rms_3d), 1)
+Q_EMP = -coef[0]
+
+# Reconstruccion de referencia con 24 camaras (punto de diseno del curso)
+X24, idx24, rrep24 = reconstruir(P_gt, N_gt, 24)
+s24, R24, t24 = umeyama(X24, P_gt[idx24])
+X24a = s24 * (R24 @ X24.T).T + t24
+d24 = np.linalg.norm(X24a - P_gt[idx24], axis=1)
+U_P = float(np.sqrt(np.mean(d24 ** 2)))     # incertidumbre 3D por punto [mm]
+
+print(&#x27;=&#x27; * 70)
+print(&#x27;(A) TRIANGULACION MULTIVISTA&#x27;)
+print(&#x27;=&#x27; * 70)
+print(&#x27;{:&gt;6} {:&gt;10} {:&gt;12} {:&gt;14} {:&gt;14}&#x27;
+      .format(&#x27;N cam&#x27;, &#x27;pts&#x27;, &#x27;cobertura&#x27;, &#x27;RMS 3D [mm]&#x27;, &#x27;RMS rep [px/c]&#x27;))
+for n_cam, npt, c, r3, rr in zip(N_LIST, n_pts, cob, rms_3d, rms_rep):
+    print(&#x27;{:&gt;6d} {:&gt;10d} {:&gt;11.1f}% {:&gt;14.4f} {:&gt;14.3f}&#x27;
+          .format(n_cam, npt, c, r3, rr))
+print(&#x27;-&#x27; * 70)
+print(&#x27;Exponente empirico  RMS ~ N^(-q):  q = {:.3f}  (teorico 0.5)&#x27;
+      .format(Q_EMP))
+print(&#x27;Punto de diseno N = 24: RMS 3D = {:.4f} mm, &#x27;
+      &#x27;residual de reproyeccion = {:.3f} px/coord&#x27;.format(U_P, rrep24))
+print(&#x27;Relacion RMS 3D / GSD(600 mm, 63.7 um) = {:.2f}&#x27;.format(U_P / 0.0637))
+
+# ----------------------------------------------------------------------
+# 4. (B) Escala metrica: Monte Carlo sobre la barra de calibracion
+# ----------------------------------------------------------------------
+L_LIST = np.array([25.0, 50.0, 75.0, 100.0, 150.0, 200.0, 300.0, 500.0])
+N_MC = 4000
+err_s = []
+for L in L_LIST:
+    # dos targets separados L, cada extremo con incertidumbre 3D isotropa U_P
+    e1 = rng.normal(0.0, U_P / np.sqrt(3.0), size=(N_MC, 3))
+    e2 = rng.normal(0.0, U_P / np.sqrt(3.0), size=(N_MC, 3))
+    p1 = np.zeros((N_MC, 3)) + e1
+    p2 = np.tile([L, 0.0, 0.0], (N_MC, 1)) + e2
+    L_med = np.linalg.norm(p2 - p1, axis=1)
+    err_s.append(float(np.std(L_med / L)))       # u_s/s adimensional
+err_s = np.array(err_s)
+err_teo = np.sqrt(2.0) * (U_P / np.sqrt(3.0)) / L_LIST
+
+L_REF = 150.0
+i_ref = int(np.argmin(np.abs(L_LIST - L_REF)))
+DIM_NOM = 110.0        # cota nominal de la pieza [mm]
+print(&#x27;=&#x27; * 70)
+print(&#x27;(B) ESCALA METRICA A PARTIR DE BARRA CALIBRADA&#x27;)
+print(&#x27;=&#x27; * 70)
+print(&#x27;{:&gt;10} {:&gt;16} {:&gt;18} {:&gt;18}&#x27;
+      .format(&#x27;L [mm]&#x27;, &#x27;u_s/s [ppm]&#x27;, &#x27;u_s/s MC [ppm]&#x27;,
+              &#x27;error en 110 mm [um]&#x27;))
+for L, em, et in zip(L_LIST, err_s, err_teo):
+    print(&#x27;{:&gt;10.0f} {:&gt;16.0f} {:&gt;18.0f} {:&gt;18.1f}&#x27;
+          .format(L, et * 1e6, em * 1e6, em * DIM_NOM * 1000))
+print(&#x27;-&#x27; * 70)
+print(&#x27;Barra de {:.0f} mm -&gt; u_s/s = {:.0f} ppm; sobre una cota de {:.0f} mm &#x27;
+      &#x27;aporta {:.1f} um&#x27;.format(L_LIST[i_ref], err_s[i_ref] * 1e6, DIM_NOM,
+                                err_s[i_ref] * DIM_NOM * 1000))
+print(&#x27;=&#x27; * 70)
+
+# ----------------------------------------------------------------------
+# 5. Figura de tres paneles
+# ----------------------------------------------------------------------
+AZUL = &#x27;#003366&#x27;
+ROJO = &#x27;#B22222&#x27;
+VERDE = &#x27;#2E7D32&#x27;
+
+fig = plt.figure(figsize=(15.0, 4.5))
+
+ax0 = fig.add_subplot(1, 3, 1, projection=&#x27;3d&#x27;)
+sub = rng.choice(len(P_gt), 1200, replace=False)
+ax0.scatter(P_gt[sub, 0], P_gt[sub, 1], P_gt[sub, 2], s=1.5,
+            c=P_gt[sub, 2], cmap=&#x27;viridis&#x27;, alpha=0.85)
+_, C24 = poses_orbitales(24)
+ax0.scatter(C24[:, 0], C24[:, 1], C24[:, 2], marker=&#x27;^&#x27;, s=26,
+            color=ROJO, depthshade=False, label=&#x27;estaciones (N = 24)&#x27;)
+for C in C24:
+    ax0.plot([C[0], 0], [C[1], 0], [C[2], 0], color=ROJO, lw=0.35, alpha=0.35)
+ax0.set_xlabel(&#x27;X [mm]&#x27;, fontsize=8)
+ax0.set_ylabel(&#x27;Y [mm]&#x27;, fontsize=8)
+ax0.set_zlabel(&#x27;Z [mm]&#x27;, fontsize=8)
+ax0.tick_params(labelsize=7)
+ax0.set_title(&#x27;(a) Banco sintetico: pieza y red de estaciones&#x27;,
+              fontsize=10, loc=&#x27;left&#x27;)
+ax0.legend(fontsize=7.5, loc=&#x27;upper right&#x27;, frameon=False)
+ax0.view_init(elev=20, azim=40)
+
+ax1 = fig.add_subplot(1, 3, 2)
+ax1.loglog(N_LIST, rms_3d * 1000, &#x27;o-&#x27;, color=AZUL, lw=1.9, ms=6,
+           label=&#x27;RMS 3D simulado&#x27;)
+ref = rms_3d[0] * (np.array(N_LIST, dtype=float) / N_LIST[0]) ** (-0.5)
+ax1.loglog(N_LIST, ref * 1000, &#x27;--&#x27;, color=&#x27;gray&#x27;, lw=1.4,
+           label=&#x27;referencia $N^{-1/2}$&#x27;)
+ax1.loglog([24], [U_P * 1000], &#x27;s&#x27;, ms=9, mfc=&#x27;none&#x27;, mec=ROJO, mew=1.8)
+ax1.annotate(&#x27;punto de diseno\nN = 24: {:.0f} $\\mu$m&#x27;.format(U_P * 1000),
+             xy=(24, U_P * 1000), xytext=(25, rms_3d[0] * 1000 * 0.95),
+             fontsize=8, color=ROJO,
+             arrowprops=dict(arrowstyle=&#x27;-&gt;&#x27;, color=ROJO, lw=0.9))
+ax1.set_xlabel(&#x27;Numero de estaciones $N$&#x27;)
+ax1.set_ylabel(&#x27;RMS del error 3D [$\\mu$m]&#x27;)
+ax1.set_title(&#x27;(b) Escalamiento del error de triangulacion ($q$ = {:.2f})&#x27;
+              .format(Q_EMP), fontsize=10, loc=&#x27;left&#x27;)
+ax1.xaxis.set_minor_locator(NullLocator())
+ax1.xaxis.set_minor_formatter(NullFormatter())
+ax1.set_xticks(N_LIST)
+ax1.set_xticklabels([str(v) for v in N_LIST])
+ax1.legend(fontsize=8, frameon=False)
+ax1.grid(alpha=0.3, which=&#x27;both&#x27;)
+
+ax2 = fig.add_subplot(1, 3, 3)
+ax2.loglog(L_LIST, err_s * 1e6, &#x27;o&#x27;, color=VERDE, ms=6,
+           label=&#x27;Monte Carlo ({:d} realizaciones)&#x27;.format(N_MC))
+ax2.loglog(L_LIST, err_teo * 1e6, &#x27;-&#x27;, color=AZUL, lw=1.8,
+           label=&#x27;$\\sqrt{2}\\,u_p/L$&#x27;)
+ax2.axhline(1000, color=ROJO, ls=&#x27;:&#x27;, lw=1.2)
+ax2.set_ylim(10, 2500)
+ax2.text(26, 1150, &#x27;criterio $10^{3}$ ppm (0.1 por ciento)&#x27;,
+         color=ROJO, fontsize=7.5)
+ax2.set_xlabel(&#x27;Longitud de la barra de escala $L$ [mm]&#x27;)
+ax2.set_ylabel(&#x27;$u_s/s$ [ppm]&#x27;)
+ax2.set_title(&#x27;(c) Herencia de la escala metrica&#x27;, fontsize=10, loc=&#x27;left&#x27;)
+ax2.legend(fontsize=8, frameon=False)
+ax2.grid(alpha=0.3, which=&#x27;both&#x27;)
+
+fig.tight_layout()
+fig.savefig(&#x27;Figuras/S12_sfm_sintetico.png&#x27;, dpi=300, bbox_inches=&#x27;tight&#x27;)
+# plt.show()
+print(&#x27;Figura guardada: Figuras/S12_sfm_sintetico.png&#x27;)
+</textarea>
+  <div class="code-output-wrap" hidden>
+    <div class="code-output-console"></div>
+    <div class="code-output-figures"></div>
+  </div>
+  <div class="code-status"></div>
+</div>
+<div class="code-cell">
+  <div class="code-cell-header">
+    <span class="code-cell-title">Semana12_nube_a_malla.py</span>
+    <span class="code-cell-caption">Pipeline completo del Ejemplo 3: filtrado robusto (Ec. \ref{eq:s12_sor_robusto}), normales por PCA (Ec. \ref{eq:s12_pca}), reconstrucción implícita (Ec. \ref{eq:s12_imls}), auditoría de Euler–Poincaré (Ec. \ref{eq:s12_euler}), suavizado de Taubin (Ec. \ref{eq:s12_taubin}) y exportación a STL binario.</span>
+    <button class="run-btn" type="button">&#9654; Ejecutar</button>
+  </div>
+  <textarea class="code-input" spellcheck="false" rows="14"># -*- coding: utf-8 -*-
+&quot;&quot;&quot;
+Semana 12 - Prototipado y Simulacion (DITA, Universidad La Salle Bajio)
+Codigo 3. De la nube de puntos a la malla STL apta para simulacion.
+
+Pipeline completo, auditable y con verdad de terreno analitica:
+
+  1. Solido de referencia definido por una funcion de distancia con signo
+     (SDF): brida circular + buje cilindrico con barreno pasante.
+  2. Muestreo superficial y contaminacion controlada: ruido gaussiano normal
+     de desviacion s_n y una fraccion f_out de outliers volumetricos.
+  3. Filtrado estadistico de outliers (SOR): distancia media a los k vecinos
+     mas proximos; se descarta el punto si  d_i &gt; mu_d + n_sigma * sigma_d.
+     Se reportan precision y exhaustividad frente al etiquetado real.
+  4. Submuestreo por voxeles (rejilla de arista a_v) y estimacion de normales
+     por analisis de componentes principales de la matriz de covarianza local
+     (el autovector del autovalor minimo es la normal).
+  5. Orientacion global de normales por propagacion de signo sobre el arbol
+     de expansion minima del grafo kNN, con peso  w_ij = 1 - |n_i . n_j|.
+  6. Reconstruccion implicita: campo escalar por minimos cuadrados moviles
+     sobre planos tangentes locales, evaluado unicamente en la cascara de
+     radio r_max en torno a la nube. El interior y el exterior se etiquetan
+     por componentes conexas, evitando la cascara falsa caracteristica de
+     Poisson sin recorte. Extraccion de la isosuperficie cero por Marching
+     Cubes.
+  7. Auditoria topologica: V, E, F, caracteristica de Euler, genero, aristas
+     de frontera, aristas no-manifold, caras degeneradas, estanqueidad.
+  8. Suavizado de Taubin (lambda / mu) que preserva volumen, decimacion por
+     agrupamiento de vertices y exportacion a STL binario sin dependencias.
+  9. Verificacion dimensional contra el SDF analitico: RMS, P95 y maximo de
+     la desviacion, y error volumetrico.
+
+Requisitos: numpy, scipy, scikit-image, matplotlib. Sin dependencias de GPU.
+Salida: Figuras/S12_nube_a_malla.png (300 dpi), Figuras/S12_pieza_final.stl.
+Backend Agg: ejecutable en Google Colab sin display.
+&quot;&quot;&quot;
+
+import os
+import struct
+import numpy as np
+import matplotlib
+matplotlib.use(&#x27;Agg&#x27;)
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d.art3d import Poly3DCollection
+from scipy.spatial import cKDTree
+from scipy.sparse import coo_matrix
+from scipy.sparse.csgraph import (minimum_spanning_tree,
+                                  breadth_first_order,
+                                  connected_components)
+from scipy import ndimage
+from skimage import measure
+
+os.makedirs(&#x27;Figuras&#x27;, exist_ok=True)
+rng = np.random.default_rng(1204)
+
+# ----------------------------------------------------------------------
+# Parametros del experimento (declarados)
+# ----------------------------------------------------------------------
+R_BRIDA, T_BRIDA = 55.0, 12.0     # radio y espesor de la brida [mm]
+R_BUJE, H_BUJE = 25.0, 80.0       # radio y altura del buje [mm]
+R_HOLE = 10.0                     # radio del barreno pasante [mm]
+N_PTS = 120000                    # puntos muestreados en la superficie
+S_N = 0.10                        # ruido normal, desviacion estandar [mm]
+F_OUT = 0.02                      # fraccion de outliers
+K_SOR, NSIG_SOR, IT_SOR = 20, 3.0, 2   # filtro estadistico robusto
+A_VOX = 0.60                      # arista del voxel [mm]
+K_NRM = 25                        # vecinos para PCA de normales
+H_GRID = 0.70                     # paso de la rejilla implicita [mm]
+R_MAX = 2.20                      # radio de la cascara de evaluacion [mm]
+LAM_T, MU_T, IT_T = 0.50, -0.53, 3   # Taubin
+A_CLUS = 0.90                     # arista de agrupamiento para decimacion
+
+
+# ----------------------------------------------------------------------
+# 1. Verdad de terreno: SDF analitica del solido
+# ----------------------------------------------------------------------
+def sdf_cilindro(P, r, z0, z1):
+    &quot;&quot;&quot;SDF exacta de un cilindro recto con tapas, eje Z.&quot;&quot;&quot;
+    zc, hz = 0.5 * (z0 + z1), 0.5 * (z1 - z0)
+    dxy = np.hypot(P[..., 0], P[..., 1]) - r
+    dz = np.abs(P[..., 2] - zc) - hz
+    fuera = np.sqrt(np.maximum(dxy, 0.0) ** 2 + np.maximum(dz, 0.0) ** 2)
+    return np.minimum(np.maximum(dxy, dz), 0.0) + fuera
+
+
+def sdf_pieza(P):
+    &quot;&quot;&quot;Union de brida y buje, menos el barreno pasante. Centrada en Z.&quot;&quot;&quot;
+    P = np.asarray(P, dtype=float)
+    z_off = (T_BRIDA + H_BUJE) / 2.0
+    Q = P.copy()
+    Q[..., 2] = Q[..., 2] + z_off
+    d_bri = sdf_cilindro(Q, R_BRIDA, 0.0, T_BRIDA)
+    d_buj = sdf_cilindro(Q, R_BUJE, T_BRIDA, T_BRIDA + H_BUJE)
+    d_hol = sdf_cilindro(Q, R_HOLE, -1.0, T_BRIDA + H_BUJE + 1.0)
+    return np.maximum(np.minimum(d_bri, d_buj), -d_hol)
+
+
+VOL_GT = (np.pi * R_BRIDA ** 2 * T_BRIDA
+          + np.pi * R_BUJE ** 2 * H_BUJE
+          - np.pi * R_HOLE ** 2 * (T_BRIDA + H_BUJE))
+
+
+def malla_de_sdf(func, lo, hi, paso):
+    &quot;&quot;&quot;Isosuperficie cero de un campo escalar por Marching Cubes.&quot;&quot;&quot;
+    ejes = [np.arange(lo[i], hi[i] + paso, paso) for i in range(3)]
+    G = np.stack(np.meshgrid(*ejes, indexing=&#x27;ij&#x27;), axis=-1)
+    F = func(G)
+    v, f, _, _ = measure.marching_cubes(F, level=0.0,
+                                        spacing=(paso, paso, paso))
+    v = v + np.array(lo)
+    return v, f
+
+
+def componente_mayor(V, F):
+    &quot;&quot;&quot;Conserva la pieza conexa de mayor numero de vertices.&quot;&quot;&quot;
+    e = np.vstack([F[:, [0, 1]], F[:, [1, 2]], F[:, [2, 0]]])
+    A = coo_matrix((np.ones(len(e)), (e[:, 0], e[:, 1])),
+                   shape=(len(V),) * 2)
+    n_c, et = connected_components(A, directed=False)
+    keep = np.argmax(np.bincount(et))
+    mv = et == keep
+    remap = -np.ones(len(V), dtype=np.int64)
+    remap[mv] = np.arange(mv.sum())
+    mf = mv[F].all(1)
+    return V[mv], remap[F[mf]], n_c
+
+
+def orientar_hacia_afuera(V, F):
+    &quot;&quot;&quot;Fuerza volumen positivo por el teorema de la divergencia.&quot;&quot;&quot;
+    tri = V[F]
+    vol = np.einsum(&#x27;ij,ij-&gt;i&#x27;, np.cross(tri[:, 0], tri[:, 1]),
+                    tri[:, 2]).sum() / 6.0
+    return F if vol &gt; 0 else F[:, ::-1]
+
+
+# --- muestreo superficial ponderado por area de las caras ---------------
+V_GT, F_GT = malla_de_sdf(sdf_pieza, (-62, -62, -55), (62, 62, 55), 0.45)
+tri = V_GT[F_GT]
+nrm_f = np.cross(tri[:, 1] - tri[:, 0], tri[:, 2] - tri[:, 0])
+area = 0.5 * np.linalg.norm(nrm_f, axis=1)
+val = area &gt; 1e-9                       # descartar caras degeneradas
+F_GT, tri, nrm_f, area = F_GT[val], tri[val], nrm_f[val], area[val]
+nrm_f = nrm_f / np.linalg.norm(nrm_f, axis=1, keepdims=True)
+prob = area / area.sum()
+sel = rng.choice(len(F_GT), N_PTS, p=prob)
+u, v_ = rng.random(N_PTS), rng.random(N_PTS)
+fix = u + v_ &gt; 1.0
+u[fix], v_[fix] = 1.0 - u[fix], 1.0 - v_[fix]
+P_surf = (tri[sel, 0] + u[:, None] * (tri[sel, 1] - tri[sel, 0])
+          + v_[:, None] * (tri[sel, 2] - tri[sel, 0]))
+N_surf = nrm_f[sel]
+
+# --- contaminacion: ruido normal + outliers volumetricos ---------------
+n_out = int(F_OUT * N_PTS)
+P_ruido = P_surf + (rng.normal(0.0, S_N, N_PTS))[:, None] * N_surf
+lo_b, hi_b = P_surf.min(0) - 8.0, P_surf.max(0) + 8.0
+P_out = rng.uniform(lo_b, hi_b, size=(n_out, 3))
+P_all = np.vstack([P_ruido, P_out])
+es_outlier = np.zeros(len(P_all), dtype=bool)
+es_outlier[N_PTS:] = True
+orden = rng.permutation(len(P_all))
+P_all, es_outlier = P_all[orden], es_outlier[orden]
+
+print(&#x27;=&#x27; * 72)
+print(&#x27;PIPELINE NUBE -&gt; MALLA -&gt; STL&#x27;)
+print(&#x27;=&#x27; * 72)
+print(&#x27;Nube cruda: {:d} puntos ({:d} outliers, {:.1f} por ciento); &#x27;
+      &#x27;ruido normal s_n = {:.2f} mm&#x27;
+      .format(len(P_all), n_out, 100.0 * n_out / len(P_all), S_N))
+
+# ----------------------------------------------------------------------
+# 2. Filtrado estadistico de outliers (SOR)
+# ----------------------------------------------------------------------
+mant = np.ones(len(P_all), dtype=bool)
+for _ in range(IT_SOR):
+    kd = cKDTree(P_all[mant])
+    d_knn, _ = kd.query(P_all[mant], k=K_SOR + 1)
+    d_med = d_knn[:, 1:].mean(1)
+    med = np.median(d_med)
+    mad = 1.4826 * np.median(np.abs(d_med - med))   # escala robusta
+    umbral = med + NSIG_SOR * mad
+    sub_ok = d_med &lt;= umbral
+    idx_act = np.flatnonzero(mant)
+    mant[idx_act[~sub_ok]] = False
+TP = int(np.sum(es_outlier &amp; ~mant))
+FP = int(np.sum(~es_outlier &amp; ~mant))
+FN = int(np.sum(es_outlier &amp; mant))
+PREC = 100.0 * TP / max(TP + FP, 1)
+REC = 100.0 * TP / max(TP + FN, 1)
+P_f = P_all[mant]
+print(&#x27;SOR robusto (k = {:d}, n_sigma = {:.1f}, {:d} pasadas): umbral final &#x27;
+      &#x27;d = {:.4f} mm; elimina {:d} puntos&#x27;
+      .format(K_SOR, NSIG_SOR, IT_SOR, umbral, int(np.sum(~mant))))
+print(&#x27;     exhaustividad sobre outliers = {:.1f} por ciento; &#x27;
+      &#x27;precision = {:.1f} por ciento; supervivientes = {:d}&#x27;
+      .format(REC, PREC, len(P_f)))
+
+# ----------------------------------------------------------------------
+# 3. Submuestreo por voxeles
+# ----------------------------------------------------------------------
+idx_v = np.floor((P_f - P_f.min(0)) / A_VOX).astype(np.int64)
+clave = (idx_v[:, 0] * 100003 + idx_v[:, 1]) * 100003 + idx_v[:, 2]
+orden = np.argsort(clave, kind=&#x27;stable&#x27;)
+clave_o, P_o = clave[orden], P_f[orden]
+corte = np.flatnonzero(np.diff(clave_o)) + 1
+grupos = np.split(np.arange(len(P_o)), corte)
+P_v = np.array([P_o[g].mean(0) for g in grupos])
+print(&#x27;Voxel grid (a_v = {:.2f} mm): {:d} -&gt; {:d} puntos &#x27;
+      &#x27;(factor {:.2f})&#x27;.format(A_VOX, len(P_f), len(P_v),
+                               len(P_v) / len(P_f)))
+
+# ----------------------------------------------------------------------
+# 4. Normales por PCA local
+# ----------------------------------------------------------------------
+kd_v = cKDTree(P_v)
+_, nb = kd_v.query(P_v, k=K_NRM)
+Q = P_v[nb] - P_v[nb].mean(1, keepdims=True)
+C = np.einsum(&#x27;nki,nkj-&gt;nij&#x27;, Q, Q) / K_NRM
+w, U = np.linalg.eigh(C)
+N_v = U[:, :, 0]
+curv = w[:, 0] / np.maximum(w.sum(1), 1e-12)     # variacion de superficie
+
+# ----------------------------------------------------------------------
+# 5. Orientacion global por MST del grafo kNN
+# ----------------------------------------------------------------------
+K_G = 12
+_, nb_g = kd_v.query(P_v, k=K_G)
+fil = np.repeat(np.arange(len(P_v)), K_G - 1)
+col = nb_g[:, 1:].ravel()
+peso = 1.0 - np.abs(np.einsum(&#x27;ij,ij-&gt;i&#x27;, N_v[fil], N_v[col]))
+G = coo_matrix((peso + 1e-6, (fil, col)), shape=(len(P_v),) * 2)
+T = minimum_spanning_tree(G)
+T = T + T.T
+semilla = int(np.argmax(P_v[:, 2]))
+if N_v[semilla, 2] &lt; 0:
+    N_v[semilla] *= -1.0
+orden_bfs, padres = breadth_first_order(T, semilla, directed=False)
+for i in orden_bfs[1:]:
+    p = padres[i]
+    if p &gt;= 0 and np.dot(N_v[i], N_v[p]) &lt; 0:
+        N_v[i] *= -1.0
+coher = float(np.mean(np.einsum(&#x27;ij,ij-&gt;i&#x27;, N_v[fil], N_v[col]) &gt; 0))
+print(&#x27;Normales: PCA con k = {:d}; coherencia de orientacion en el grafo &#x27;
+      &#x27;kNN = {:.1f} por ciento&#x27;.format(K_NRM, 100.0 * coher))
+
+# ----------------------------------------------------------------------
+# 6. Campo implicito y Marching Cubes
+# ----------------------------------------------------------------------
+lo = P_v.min(0) - 3.0
+hi = P_v.max(0) + 3.0
+ejes = [np.arange(lo[i], hi[i] + H_GRID, H_GRID) for i in range(3)]
+forma = tuple(len(e) for e in ejes)
+G3 = np.stack(np.meshgrid(*ejes, indexing=&#x27;ij&#x27;), axis=-1).reshape(-1, 3)
+
+d1, _ = kd_v.query(G3, k=1)
+cerca = d1 &lt;= R_MAX
+K_IM = 12
+_, nb_im = kd_v.query(G3[cerca], k=K_IM)
+dif = G3[cerca][:, None, :] - P_v[nb_im]
+dist = np.linalg.norm(dif, axis=2)
+w_im = np.exp(-(dist / (0.6 * R_MAX)) ** 2)
+proy = np.einsum(&#x27;nkj,nkj-&gt;nk&#x27;, dif, N_v[nb_im])
+f_shell = (w_im * proy).sum(1) / np.maximum(w_im.sum(1), 1e-12)
+
+F3 = np.full(len(G3), np.nan)
+F3[cerca] = f_shell
+F3 = F3.reshape(forma)
+
+lejos = np.isnan(F3)
+lab, nlab = ndimage.label(lejos)
+borde = set(np.unique(np.concatenate([
+    lab[0].ravel(), lab[-1].ravel(), lab[:, 0].ravel(), lab[:, -1].ravel(),
+    lab[:, :, 0].ravel(), lab[:, :, -1].ravel()])))
+borde.discard(0)
+ext = np.isin(lab, list(borde))
+F3[lejos &amp; ext] = +10.0                 # exterior conexo con la frontera
+F3[lejos &amp; ~ext] = -10.0                # cavidades internas del solido
+print(&#x27;Campo implicito: rejilla {} = {:.2f} M nodos; cascara evaluada = &#x27;
+      &#x27;{:.1f} por ciento; componentes lejanas = {:d}&#x27;
+      .format(forma, F3.size / 1e6, 100.0 * cerca.mean(), nlab))
+
+V_m, F_m, _, _ = measure.marching_cubes(F3, level=0.0,
+                                        spacing=(H_GRID,) * 3)
+V_m = V_m + lo
+F_MC0 = len(F_m)
+V_m, F_m, N_COMP = componente_mayor(V_m, F_m)
+F_m = orientar_hacia_afuera(V_m, F_m)
+print(&#x27;Marching Cubes bruto: {:d} caras en {:d} piezas conexas; se conserva &#x27;
+      &#x27;la mayor con {:d} caras ({:.1f} por ciento)&#x27;
+      .format(F_MC0, N_COMP, len(F_m), 100.0 * len(F_m) / F_MC0))
+
+
+# ----------------------------------------------------------------------
+# 7. Auditoria topologica
+# ----------------------------------------------------------------------
+def auditar(V, F):
+    e = np.sort(np.vstack([F[:, [0, 1]], F[:, [1, 2]], F[:, [2, 0]]]), axis=1)
+    _, cnt = np.unique(e, axis=0, return_counts=True)
+    tri = V[F]
+    ar = 0.5 * np.linalg.norm(np.cross(tri[:, 1] - tri[:, 0],
+                                       tri[:, 2] - tri[:, 0]), axis=1)
+    c = V.mean(0)
+    t0 = tri - c                       # origen en el centroide (robustez)
+    vol = np.abs(np.einsum(&#x27;ij,ij-&gt;i&#x27;, np.cross(t0[:, 0], t0[:, 1]),
+                           t0[:, 2]).sum() / 6.0)
+    return dict(V=len(V), E=len(cnt), F=len(F),
+                chi=len(V) - len(cnt) + len(F),
+                frontera=int(np.sum(cnt == 1)),
+                nomanifold=int(np.sum(cnt &gt; 2)),
+                degeneradas=int(np.sum(ar &lt; 1e-9)),
+                area=float(ar.sum()), volumen=float(vol))
+
+
+aud0 = auditar(V_m, F_m)
+print(&#x27;-&#x27; * 72)
+print(&#x27;Marching Cubes: V = {V:d}, E = {E:d}, F = {F:d}, chi = {chi:d}, &#x27;
+      &#x27;genero = {g:d}&#x27;.format(g=(2 - aud0[&#x27;chi&#x27;]) // 2, **aud0))
+print(&#x27;     aristas de frontera = {frontera:d}, no-manifold = {nomanifold:d}, &#x27;
+      &#x27;degeneradas = {degeneradas:d}&#x27;.format(**aud0))
+print(&#x27;     estanca = {}&#x27;.format(aud0[&#x27;frontera&#x27;] == 0
+                                 and aud0[&#x27;nomanifold&#x27;] == 0))
+
+
+# ----------------------------------------------------------------------
+# 8. Suavizado de Taubin, decimacion y exportacion
+# ----------------------------------------------------------------------
+def laplaciano_uniforme(V, F):
+    e = np.vstack([F[:, [0, 1]], F[:, [1, 2]], F[:, [2, 0]]])
+    e = np.vstack([e, e[:, ::-1]])
+    A = coo_matrix((np.ones(len(e)), (e[:, 0], e[:, 1])),
+                   shape=(len(V),) * 2).tocsr()
+    A.data[:] = 1.0
+    gr = np.asarray(A.sum(1)).ravel()
+    return (A @ V) / np.maximum(gr, 1)[:, None] - V
+
+
+def taubin(V, F, lam=LAM_T, mu=MU_T, it=IT_T):
+    Vs = V.copy()
+    for _ in range(it):
+        Vs = Vs + lam * laplaciano_uniforme(Vs, F)
+        Vs = Vs + mu * laplaciano_uniforme(Vs, F)
+    return Vs
+
+
+def decimar_por_agrupamiento(V, F, a):
+    idx = np.floor((V - V.min(0)) / a).astype(np.int64)
+    _, inv = np.unique(idx, axis=0, return_inverse=True)
+    n = inv.max() + 1
+    Vn = np.zeros((n, 3))
+    cnt = np.bincount(inv, minlength=n)[:, None]
+    np.add.at(Vn, inv, V)
+    Vn /= np.maximum(cnt, 1)
+    Fn = inv[F]
+    ok = ((Fn[:, 0] != Fn[:, 1]) &amp; (Fn[:, 1] != Fn[:, 2])
+          &amp; (Fn[:, 0] != Fn[:, 2]))
+    Fn = Fn[ok]
+    # rotacion canonica: conserva la orientacion y permite deduplicar
+    r = np.argmin(Fn, axis=1)
+    Fn = np.take_along_axis(Fn, (r[:, None] + np.arange(3)[None, :]) % 3, 1)
+    _, uniq = np.unique(Fn, axis=0, return_index=True)
+    Fn = Fn[np.sort(uniq)]
+    usados, Fn = np.unique(Fn, return_inverse=True)
+    return Vn[usados], Fn.reshape(-1, 3)
+
+
+def escribir_stl_binario(ruta, V, F):
+    tri = V[F].astype(np.float32)
+    n = np.cross(tri[:, 1] - tri[:, 0], tri[:, 2] - tri[:, 0])
+    n /= np.maximum(np.linalg.norm(n, axis=1, keepdims=True), 1e-12)
+    with open(ruta, &#x27;wb&#x27;) as fh:
+        fh.write(b&#x27;Semana12 DITA malla fotogrametrica&#x27;.ljust(80, b&#x27; &#x27;))
+        fh.write(struct.pack(&#x27;&lt;I&#x27;, len(F)))
+        for k in range(len(F)):
+            fh.write(struct.pack(&#x27;&lt;12fH&#x27;, *n[k], *tri[k, 0], *tri[k, 1],
+                                 *tri[k, 2], 0))
+    return os.path.getsize(ruta)
+
+
+V_s = taubin(V_m, F_m)
+aud1 = auditar(V_s, F_m)
+V_d, F_d = decimar_por_agrupamiento(V_s, F_m, A_CLUS)
+V_d, F_d, _ = componente_mayor(V_d, F_d)
+F_d = orientar_hacia_afuera(V_d, F_d)
+aud2 = auditar(V_d, F_d)
+BYTES = escribir_stl_binario(&#x27;Figuras/S12_pieza_final.stl&#x27;, V_s, F_m)
+
+print(&#x27;-&#x27; * 72)
+print(&#x27;Taubin (lambda = {:.2f}, mu = {:.2f}, {:d} pasadas): cambio de &#x27;
+      &#x27;volumen = {:+.3f} por ciento&#x27;
+      .format(LAM_T, MU_T, IT_T,
+              100.0 * (aud1[&#x27;volumen&#x27;] / aud0[&#x27;volumen&#x27;] - 1.0)))
+print(&#x27;Decimacion por agrupamiento (a = {:.2f} mm): {:d} -&gt; {:d} caras &#x27;
+      &#x27;({:.1f} por ciento)&#x27;.format(A_CLUS, aud0[&#x27;F&#x27;], aud2[&#x27;F&#x27;],
+                                   100.0 * aud2[&#x27;F&#x27;] / aud0[&#x27;F&#x27;]))
+print(&#x27;     coste topologico: chi = {chi:d}, frontera = {frontera:d}, &#x27;
+      &#x27;aristas no-manifold = {nomanifold:d}&#x27;.format(**aud2))
+print(&#x27;     ADVERTENCIA: el agrupamiento de vertices no preserva la variedad;&#x27;)
+print(&#x27;     para el entregable se decima con QEM (MeshLab / Open3D) y se&#x27;)
+print(&#x27;     reaudita. Se exporta la malla suavizada, estanca y de genero 1.&#x27;)
+print(&#x27;STL binario exportado (malla suavizada): {:.2f} MB, {:d} caras&#x27;
+      .format(BYTES / 1e6, aud1[&#x27;F&#x27;]))
+
+# ----------------------------------------------------------------------
+# 9. Verificacion dimensional contra el SDF analitico
+# ----------------------------------------------------------------------
+dev_mc = sdf_pieza(V_m)
+dev_fin = sdf_pieza(V_s)
+RMS_MC = float(np.sqrt(np.mean(dev_mc ** 2)))
+RMS_FIN = float(np.sqrt(np.mean(dev_fin ** 2)))
+P95 = float(np.percentile(np.abs(dev_fin), 95))
+MAXD = float(np.max(np.abs(dev_fin)))
+BIAS = float(np.mean(dev_fin))
+E_VOL = 100.0 * (aud1[&#x27;volumen&#x27;] / VOL_GT - 1.0)
+
+print(&#x27;-&#x27; * 72)
+print(&#x27;VERIFICACION CONTRA LA VERDAD DE TERRENO&#x27;)
+print(&#x27;     RMS tras Marching Cubes      = {:.4f} mm&#x27;.format(RMS_MC))
+print(&#x27;     RMS de la malla entregable   = {:.4f} mm&#x27;.format(RMS_FIN))
+print(&#x27;     sesgo medio                  = {:+.4f} mm&#x27;.format(BIAS))
+print(&#x27;     P95 de |desviacion|          = {:.4f} mm&#x27;.format(P95))
+print(&#x27;     maximo de |desviacion|       = {:.4f} mm&#x27;.format(MAXD))
+print(&#x27;     volumen GT = {:.1f} mm3; malla = {:.1f} mm3; error = &#x27;
+      &#x27;{:+.3f} por ciento&#x27;.format(VOL_GT, aud1[&#x27;volumen&#x27;], E_VOL))
+print(&#x27;     area superficial de la malla = {:.1f} mm2&#x27;.format(aud1[&#x27;area&#x27;]))
+print(&#x27;     s_n de entrada = {:.3f} mm -&gt; reduccion efectiva = {:.2f}x&#x27;
+      .format(S_N, S_N / RMS_FIN))
+print(&#x27;=&#x27; * 72)
+
+# ----------------------------------------------------------------------
+# 10. Figura de tres paneles
+# ----------------------------------------------------------------------
+AZUL = &#x27;#003366&#x27;
+ROJO = &#x27;#B22222&#x27;
+VERDE = &#x27;#2E7D32&#x27;
+
+fig = plt.figure(figsize=(15.0, 4.6))
+
+ax0 = fig.add_subplot(1, 3, 1, projection=&#x27;3d&#x27;)
+sub = rng.choice(len(P_all), 5000, replace=False)
+inl = sub[~es_outlier[sub]]
+out = sub[es_outlier[sub]]
+ax0.scatter(P_all[inl, 0], P_all[inl, 1], P_all[inl, 2], s=0.8,
+            c=P_all[inl, 2], cmap=&#x27;viridis&#x27;, alpha=0.55)
+ax0.scatter(P_all[out, 0], P_all[out, 1], P_all[out, 2], s=9,
+            color=ROJO, marker=&#x27;x&#x27;, lw=0.8, label=&#x27;outliers inyectados&#x27;)
+ax0.set_title(&#x27;(a) Nube cruda: ruido $\\sigma_n$ = {:.2f} mm + &#x27;
+              &#x27;{:.0f} por ciento de outliers&#x27;.format(S_N, 100 * F_OUT),
+              fontsize=9.5, loc=&#x27;left&#x27;)
+ax0.set_xlabel(&#x27;X [mm]&#x27;, fontsize=8)
+ax0.set_ylabel(&#x27;Y [mm]&#x27;, fontsize=8)
+ax0.set_zlabel(&#x27;Z [mm]&#x27;, fontsize=8)
+ax0.tick_params(labelsize=7)
+ax0.legend(fontsize=7.5, frameon=False, loc=&#x27;upper right&#x27;)
+ax0.view_init(elev=18, azim=35)
+
+ax1 = fig.add_subplot(1, 3, 2, projection=&#x27;3d&#x27;)
+V_p, F_p = decimar_por_agrupamiento(V_s, F_m, 2.20)   # solo para render
+V_p, F_p, _ = componente_mayor(V_p, F_p)
+tri_p = V_p[F_p]
+col = plt.cm.viridis((tri_p[:, :, 2].mean(1) - V_s[:, 2].min())
+                     / np.ptp(V_s[:, 2]))
+pc = Poly3DCollection(tri_p, facecolors=col, edgecolors=&#x27;k&#x27;,
+                      linewidths=0.12, alpha=1.0)
+pc.set_sort_zpos(0)
+ax1.add_collection3d(pc)
+ax1.set_xlim(V_s[:, 0].min(), V_s[:, 0].max())
+ax1.set_ylim(V_s[:, 1].min(), V_s[:, 1].max())
+ax1.set_zlim(V_s[:, 2].min(), V_s[:, 2].max())
+ax1.set_box_aspect((1, 1, np.ptp(V_s[:, 2]) / np.ptp(V_s[:, 0])))
+ax1.set_title(&#x27;(b) Malla entregable: {:d} caras, estanca, $\\chi$ = {:d} &#x27;
+              &#x27;(genero 1)\n(vista simplificada a {:d} caras)&#x27;
+              .format(aud1[&#x27;F&#x27;], aud1[&#x27;chi&#x27;], len(F_p)),
+              fontsize=9.5, loc=&#x27;left&#x27;)
+ax1.set_xlabel(&#x27;X [mm]&#x27;, fontsize=8)
+ax1.set_ylabel(&#x27;Y [mm]&#x27;, fontsize=8)
+ax1.set_zlabel(&#x27;Z [mm]&#x27;, fontsize=8)
+ax1.tick_params(labelsize=7)
+ax1.view_init(elev=18, azim=35)
+
+ax2 = fig.add_subplot(1, 3, 3)
+ax2.hist(dev_fin * 1000, bins=90, color=AZUL, alpha=0.82,
+         edgecolor=&#x27;none&#x27;, density=True)
+ax2.axvline(0.0, color=&#x27;k&#x27;, lw=0.8)
+for x, c, lab in [(RMS_FIN * 1000, ROJO, &#x27;RMS = {:.0f} $\\mu$m&#x27;
+                   .format(RMS_FIN * 1000)),
+                  (-RMS_FIN * 1000, ROJO, None),
+                  (P95 * 1000, VERDE, &#x27;P95 = {:.0f} $\\mu$m&#x27;
+                   .format(P95 * 1000)),
+                  (-P95 * 1000, VERDE, None)]:
+    ax2.axvline(x, color=c, ls=&#x27;--&#x27;, lw=1.3, label=lab)
+ax2.set_xlim(-300, 300)
+ax2.set_xlabel(&#x27;Desviacion malla - solido analitico [$\\mu$m]&#x27;)
+ax2.set_ylabel(&#x27;Densidad [1/$\\mu$m]&#x27;)
+ax2.set_title(&#x27;(c) Verificacion dimensional (sesgo = {:+.0f} $\\mu$m)&#x27;
+              .format(BIAS * 1000), fontsize=9.5, loc=&#x27;left&#x27;)
+ax2.legend(fontsize=8, frameon=False)
+ax2.grid(alpha=0.3)
+
+fig.tight_layout()
+fig.savefig(&#x27;Figuras/S12_nube_a_malla.png&#x27;, dpi=300, bbox_inches=&#x27;tight&#x27;)
+# plt.show()
+print(&#x27;Figura guardada: Figuras/S12_nube_a_malla.png&#x27;)
+</textarea>
+  <div class="code-output-wrap" hidden>
+    <div class="code-output-console"></div>
+    <div class="code-output-figures"></div>
+  </div>
+  <div class="code-status"></div>
+</div>
+
+    <div class="pendiente-box">
+      <h3>Contenido completo de la semana</h3>
+      <p>Esta página trae el objetivo de cátedra, el temario, el resultado de aprendizaje esperado y todo
+        el código Python de esta semana, ya ejecutable. El desarrollo teórico completo (ecuaciones,
+        demostraciones, tablas de resultados y discusión) vive por ahora en el PDF/<code>.tex</code> del
+        curso — pégalo aquí como HTML cuando tengas tiempo, o pide que se convierta esa parte también.</p>
+    </div>
+
+    <div class="week-nav">
+      <a href="../semana-11/index.html">&larr; Semana 11</a>
+      <span class="to-index"><a href="../../index.html">&uarr; Volver al índice del curso</a></span>
+      <span></span>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div>Doctorado en Ingeniería y Tecnología Aplicada &middot; Universidad La Salle Bajío</div>
+    <div>Dr. Jorge Ramón Parra Michel &middot; Prototipado y Simulación</div>
+  </div>
+</footer>
+
+<script src="../../assets/js/main.js"></script>
+<script src="../../assets/js/pyodide-runner.js"></script>
+
+<script>
+window.addEventListener("load", function () {
+  if (window.renderMathInElement) {
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left: "$$", right: "$$", display: true},
+        {left: "$", right: "$", display: false}
+      ],
+      throwOnError: false
+    });
+  }
+});
+</script>
+
+</body>
+</html>
