@@ -1,0 +1,1032 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Semana 6. Cuantificación de incertidumbre: GUM y métodos Monte Carlo — Prototipado y Simulación</title>
+<meta name="description" content="Semana 6. Cuantificación de incertidumbre: GUM y métodos Monte Carlo: objetivo, temario y código ejecutable.">
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-cpW21h6RZv/phavutF+AuVYrr+dA8xD9zs6FwLpaCePvcCWnZ8IU9UNlXhpKUAJI" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-vZTG03m+2yp6N6BNi5iM4rW4oIwk5DfcNdFfxkk9ZWpDriOkXX8voJBFrAO7MpVl" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-GvrOXuhMATgEsSwCs4smul74iXGOixntILdUW9XmUC6+HX0sLNAK3q71HotJqlAn" crossorigin="anonymous">
+<link rel="stylesheet" href="../../assets/css/style.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="topbar-brand" href="../../index.html">
+      <img src="../../assets/img/logo-lasalle.png" alt="Universidad La Salle Bajío">
+      Prototipado y Simulación
+    </a>
+    <nav>
+      <a href="../../index.html#semanas">Semanas</a>
+      <a href="../../README.md">Repositorio</a>
+      <a class="topbar-pdf-btn" href="../../assets/apuntes/Apuntes_Curso_Doctoral_Simulacion_Prototipado_COMPLETO.pdf" download>Descargar PDF</a>
+    </nav>
+  </div>
+</div>
+
+<header class="week-header">
+  <div class="wrap">
+    <div class="breadcrumb"><a href="../../index.html">Inicio</a> &rsaquo; Semana 06</div>
+    <p class="num">Semana 06</p>
+    <h1>Cuantificación de incertidumbre: GUM y métodos Monte Carlo</h1>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <div class="callout">
+      <h3>Objetivo de la cátedra</h3>
+      <p>Formular y propagar la incertidumbre de medición de un mensurando por dos vías complementarias: la ley de propagación de incertidumbres de la GUM (JCGM&nbsp;100) y la propagación de distribuciones por Monte Carlo (JCGM&nbsp;101). El estudiante debe ser capaz de construir el modelo de medición, evaluar contribuciones Tipo&nbsp;A y Tipo&nbsp;B, asignar funciones de densidad por máxima entropía, generar números pseudoaleatorios de calidad y reportar un intervalo de cobertura defendible, validando la aproximación analítica contra la simulación.</p>
+    </div>
+    <div class="callout proposito">
+      <h3>Propósito del tema</h3>
+      <p>En las semanas anteriores cada simulación devolvía un número: una temperatura, una deflexión, una eficiencia. Ese número, sin una afirmación cuantitativa sobre su dispersión, es científicamente incompleto. Esta semana convierte cada resultado determinista en una variable aleatoria con una distribución, y enseña a responder la pregunta que todo comité doctoral formula: <em>¿cuál es la incertidumbre de ese valor y cómo la calculó?</em> El marco es metrológico (GUM), pero la herramienta de cálculo — Monte Carlo — es la misma que articula todo el curso.</p>
+    </div>
+    
+    <div class="callout resultado">
+      <h3>Resultado de aprendizaje esperado</h3>
+      <p>Al término de la semana el estudiante podrá: (i)&nbsp;escribir el modelo de medición $Y=f(X_1,\dots,X_n)$ de su propio proyecto e identificar cada fuente de incertidumbre como Tipo&nbsp;A o Tipo&nbsp;B; (ii)&nbsp;calcular la incertidumbre combinada por LPU incluyendo correlaciones y reportar la incertidumbre expandida con su factor de cobertura; (iii)&nbsp;implementar la propagación Monte Carlo en Google Colab con un generador reproducible y construir el intervalo de cobertura por percentiles; y (iv)&nbsp;decidir, con un criterio numérico explícito, si la aproximación GUM es válida para su problema o si la no linealidad obliga a reportar el resultado Monte Carlo.</p>
+    </div>
+    <h2 class="section-heading" style="margin-top:36px">Temario</h2>
+    <ul class="temario"><li>Mensurando, modelo de medición y fuentes de incertidumbre.</li><li>Evaluación Tipo&nbsp;A (estadística) y Tipo&nbsp;B (información previa).</li><li>Ley de propagación de incertidumbres (LPU): coeficientes de sensibilidad, correlación, incertidumbre expandida y Welch–Satterthwaite.</li><li>Funciones de densidad de probabilidad y principio de máxima entropía.</li><li>Generación de números pseudoaleatorios: LCG, Mersenne Twister, PCG64; transformada inversa, Box–Muller, aceptación–rechazo.</li><li>Método Monte Carlo para la propagación de distribuciones (JCGM&nbsp;101): intervalo de cobertura, procedimiento adaptativo y validación de la GUM.</li><li>Aplicación a seis problemas de ingeniería con incertidumbre lineal, no lineal, multiplicativa, correlacionada y de soporte acotado.</li></ul>
+    <h2 class="section-heading" style="margin-top:44px">Figuras de la semana</h2>
+    <p class="section-intro">6 imagen(es) referenciadas en los apuntes de esta semana.
+      Colócalas en <code>assets/img/semana-06/</code> con el nombre exacto indicado debajo
+      de cada recuadro; mientras no estén, se muestra un marcador en su lugar.</p>
+    <div class="gallery">
+    <figure>
+      <img src="../../assets/img/semana-06/fig_s6_ej1_calibracion.png" alt="fig_s6_ej1_calibracion.png" data-fallback-name="fig_s6_ej1_calibracion.png" loading="lazy">
+      <figcaption>fig_s6_ej1_calibracion.png</figcaption>
+    </figure><figure>
+      <img src="../../assets/img/semana-06/fig_s6_ej2_opgw_cortocircuito.png" alt="fig_s6_ej2_opgw_cortocircuito.png" data-fallback-name="fig_s6_ej2_opgw_cortocircuito.png" loading="lazy">
+      <figcaption>fig_s6_ej2_opgw_cortocircuito.png</figcaption>
+    </figure><figure>
+      <img src="../../assets/img/semana-06/fig_s6_ej3_losa_confiabilidad.png" alt="fig_s6_ej3_losa_confiabilidad.png" data-fallback-name="fig_s6_ej3_losa_confiabilidad.png" loading="lazy">
+      <figcaption>fig_s6_ej3_losa_confiabilidad.png</figcaption>
+    </figure><figure>
+      <img src="../../assets/img/semana-06/fig_s6_ej4_bomba_bep.png" alt="fig_s6_ej4_bomba_bep.png" data-fallback-name="fig_s6_ej4_bomba_bep.png" loading="lazy">
+      <figcaption>fig_s6_ej4_bomba_bep.png</figcaption>
+    </figure><figure>
+      <img src="../../assets/img/semana-06/fig_s6_ej5_uav_flujo.png" alt="fig_s6_ej5_uav_flujo.png" data-fallback-name="fig_s6_ej5_uav_flujo.png" loading="lazy">
+      <figcaption>fig_s6_ej5_uav_flujo.png</figcaption>
+    </figure><figure>
+      <img src="../../assets/img/semana-06/fig_s6_ej6_rag.png" alt="fig_s6_ej6_rag.png" data-fallback-name="fig_s6_ej6_rag.png" loading="lazy">
+      <figcaption>fig_s6_ej6_rag.png</figcaption>
+    </figure>
+  </div>
+    <h2 class="section-heading" style="margin-top:44px">Código de la semana (ejecutable)</h2>
+    <div class="pyodide-banner">
+      &#9432; El código corre por completo en tu navegador (Python vía WebAssembly, sin servidor). La
+      primera vez que pulses <strong>Ejecutar</strong> en esta página se descarga el runtime — tarda unos
+      segundos. Puedes editar el código antes de correrlo.
+    </div>
+    <div class="code-cell">
+  <div class="code-cell-header">
+    <span class="code-cell-title">Código 1</span>
+    <span class="code-cell-caption">Semana 6 – Código 1: Calibración de sensor: GUM vs Monte Carlo. Ejecutar en Google Colab.</span>
+    <button class="run-btn" type="button">&#9654; Ejecutar</button>
+  </div>
+  
+  <textarea class="code-input" spellcheck="false" rows="14">&quot;&quot;&quot;
+Semana 6 - Ejemplo 1: Calibracion de un sensor e incertidumbre del valor
+medido (caso canonico GUM: modelo lineal, Tipo A + Tipo B, LPU vs Monte Carlo).
+&quot;&quot;&quot;
+import numpy as np
+import matplotlib
+matplotlib.use(&#x27;Agg&#x27;)
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+from scipy import stats
+
+mpl.rcParams.update({
+    &#x27;font.size&#x27;: 10, &#x27;axes.titlesize&#x27;: 11, &#x27;axes.labelsize&#x27;: 10,
+    &#x27;figure.dpi&#x27;: 110, &#x27;savefig.dpi&#x27;: 300, &#x27;axes.grid&#x27;: True,
+    &#x27;grid.alpha&#x27;: 0.3, &#x27;mathtext.fontset&#x27;: &#x27;cm&#x27;,
+})
+
+rng = np.random.default_rng(20251117)
+import os; os.makedirs(&#x27;Figuras&#x27;, exist_ok=True)  # carpeta de salida en Colab
+
+# -------- datos de calibracion (sinteticos, reproducibles) --------
+a_true, b_true, sigma_y = 2.00, 0.500, 0.15      # mV, mV/kPa, mV
+x_cal = np.linspace(0.0, 100.0, 11)              # patron de referencia [kPa]
+y_cal = a_true + b_true*x_cal + rng.normal(0, sigma_y, x_cal.size)
+
+n = x_cal.size
+Xmat = np.column_stack([np.ones(n), x_cal])
+beta_hat, *_ = np.linalg.lstsq(Xmat, y_cal, rcond=None)
+a_hat, b_hat = beta_hat
+resid = y_cal - Xmat @ beta_hat
+dof = n - 2
+s2 = resid @ resid / dof                          # varianza residual (Tipo A)
+cov_beta = s2 * np.linalg.inv(Xmat.T @ Xmat)      # cov(a,b)
+ua, ub = np.sqrt(np.diag(cov_beta))
+rho_ab = cov_beta[0, 1] / (ua*ub)
+
+# -------- medicion nueva: lectura y0 -&gt; medir x0 --------
+y0 = 27.00                                         # mV lectura del sensor
+res_sensor = 0.01                                  # mV resolucion (rectangular)
+u_res = res_sensor / np.sqrt(12)
+u_rep = 0.05                                        # mV repetibilidad (Tipo A, 1 lectura)
+u_y0 = np.sqrt(u_res**2 + u_rep**2)
+half_ref = 0.20                                     # kPa  patron (rectangular, certificado)
+u_ref = half_ref / np.sqrt(3)
+
+x0 = (y0 - a_hat) / b_hat
+
+# -------- GUM (LPU) con coeficientes de sensibilidad --------
+c_y0 = 1.0 / b_hat
+c_a = -1.0 / b_hat
+c_b = -(y0 - a_hat) / b_hat**2
+c_ref = 1.0
+# termino de regresion con covarianza (a,b correlacionados)
+var_reg = np.array([c_a, c_b]) @ cov_beta @ np.array([c_a, c_b])
+u_c2 = c_y0**2 * u_y0**2 + var_reg + c_ref**2 * u_ref**2
+u_c = np.sqrt(u_c2)
+
+# Welch-Satterthwaite (Tipo A: dof; Tipo B: dof infinito)
+comp = {
+    &#x27;regresion&#x27;: (np.sqrt(var_reg), dof),
+    &#x27;lectura_y0_rep&#x27;: (abs(c_y0)*u_rep, 9),         # ~10 lecturas de repetibilidad
+    &#x27;lectura_y0_res&#x27;: (abs(c_y0)*u_res, np.inf),
+    &#x27;patron_ref&#x27;: (u_ref, np.inf),
+}
+num = u_c**4
+den = sum((ui**4 / vi) for (ui, vi) in comp.values() if np.isfinite(vi))
+nu_eff = num / den if den &gt; 0 else np.inf
+k = stats.t.ppf(0.975, nu_eff) if np.isfinite(nu_eff) else 1.96
+U_gum = k * u_c
+
+# -------- Monte Carlo (JCGM 101) --------
+M = 200_000
+ab_s = rng.multivariate_normal([a_hat, b_hat], cov_beta, size=M)
+y0_s = y0 + rng.normal(0, u_y0, M)
+ref_s = rng.uniform(-half_ref, half_ref, M)         # desplazamiento de escala del patron
+x0_s = (y0_s - ab_s[:, 0]) / ab_s[:, 1] + ref_s
+x0_mc = x0_s.mean()
+u_mc = x0_s.std(ddof=1)
+lo_mc, hi_mc = np.percentile(x0_s, [2.5, 97.5])
+
+# -------- validacion GUM por MC (JCGM 101, tolerancia numerica) --------
+ndig = 2                                            # cifras significativas de u_c
+delta = 0.5 * 10**(np.floor(np.log10(u_c)) - ndig + 1)
+lo_gum, hi_gum = x0 - U_gum, x0 + U_gum
+dlow = abs(lo_gum - lo_mc); dhigh = abs(hi_gum - hi_mc)
+validado = (dlow &lt;= delta) and (dhigh &lt;= delta)
+
+print(&quot;=== EJEMPLO 1: CALIBRACION ===&quot;)
+print(f&quot;Ajuste: a={a_hat:.4f} mV (u={ua:.4f}), b={b_hat:.5f} mV/kPa (u={ub:.5f}), rho_ab={rho_ab:+.3f}&quot;)
+print(f&quot;s (residual)={np.sqrt(s2):.4f} mV, dof={dof}&quot;)
+print(f&quot;x0 (medido) = {x0:.3f} kPa&quot;)
+print(f&quot;u_y0={u_y0:.4f} mV, u_ref={u_ref:.4f} kPa&quot;)
+print(f&quot;[GUM] u_c={u_c:.4f} kPa | nu_eff={nu_eff:.1f} | k={k:.3f} | U={U_gum:.4f} kPa&quot;)
+print(f&quot;      intervalo 95%: [{lo_gum:.3f}, {hi_gum:.3f}] kPa&quot;)
+print(f&quot;[MC ] media={x0_mc:.3f}, u={u_mc:.4f} kPa | 95%: [{lo_mc:.3f}, {hi_mc:.3f}] kPa&quot;)
+print(f&quot;tol delta={delta:.4f} | d_low={dlow:.4f} d_high={dhigh:.4f} -&gt; validado={validado}&quot;)
+budget = {kk: (vv[0], 100*vv[0]**2/u_c2) for kk, vv in comp.items()}
+print(&quot;Presupuesto (u_i [kPa], % var):&quot;)
+for kk, (ui, pc) in budget.items():
+    print(f&quot;   {kk:16s} {ui:.4f}  {pc:5.1f}%&quot;)
+
+# -------- figura --------
+fig, axs = plt.subplots(1, 4, figsize=(16, 3.7))
+
+ax = axs[0]
+xx = np.linspace(-5, 105, 200)
+yhat = a_hat + b_hat*xx
+# banda de prediccion 95%
+Xp = np.column_stack([np.ones_like(xx), xx])
+var_pred = s2*(1 + np.einsum(&#x27;ij,jk,ik-&gt;i&#x27;, Xp, np.linalg.inv(Xmat.T@Xmat), Xp))
+tval = stats.t.ppf(0.975, dof)
+band = tval*np.sqrt(var_pred)
+ax.fill_between(xx, yhat-band, yhat+band, color=&#x27;#c7d9ef&#x27;, label=&#x27;banda 95%&#x27;)
+ax.plot(xx, yhat, &#x27;-&#x27;, color=&#x27;#0b3d91&#x27;, lw=1.8, label=&#x27;ajuste OLS&#x27;)
+ax.plot(x_cal, y_cal, &#x27;o&#x27;, color=&#x27;#b22222&#x27;, ms=5, label=&#x27;puntos de calibracion&#x27;)
+ax.axhline(y0, color=&#x27;gray&#x27;, ls=&#x27;:&#x27;, lw=1)
+ax.plot([x0], [y0], &#x27;D&#x27;, color=&#x27;k&#x27;, ms=6)
+ax.annotate(f&#x27;$y_0={y0}$ mV\n$x_0={x0:.2f}$ kPa&#x27;, (x0, y0),
+            xytext=(x0-46, y0+1.5), fontsize=8,
+            arrowprops=dict(arrowstyle=&#x27;-&gt;&#x27;, lw=0.8))
+ax.set_xlabel(&#x27;referencia $x$ [kPa]&#x27;); ax.set_ylabel(&#x27;salida $y$ [mV]&#x27;)
+ax.set_title(&#x27;(a) Curva de calibracion&#x27;); ax.legend(fontsize=7.5, loc=&#x27;upper left&#x27;)
+
+ax = axs[1]
+ax.stem(x_cal, resid*1e3, basefmt=&#x27; &#x27;)
+ax.axhline(0, color=&#x27;k&#x27;, lw=0.8)
+ax.axhline(np.sqrt(s2)*1e3, color=&#x27;r&#x27;, ls=&#x27;--&#x27;, lw=0.9, label=r&#x27;$\pm s$&#x27;)
+ax.axhline(-np.sqrt(s2)*1e3, color=&#x27;r&#x27;, ls=&#x27;--&#x27;, lw=0.9)
+ax.set_xlabel(&#x27;referencia $x$ [kPa]&#x27;); ax.set_ylabel(r&#x27;residual [$\mu$V]&#x27;)
+ax.set_title(&#x27;(b) Residuales del ajuste&#x27;); ax.legend(fontsize=8)
+
+ax = axs[2]
+ax.hist(x0_s, bins=120, density=True, color=&#x27;#9ecae1&#x27;,
+        edgecolor=&#x27;none&#x27;, label=&#x27;MC&#x27;)
+xg = np.linspace(x0-4*u_c, x0+4*u_c, 300)
+ax.plot(xg, stats.norm.pdf(xg, x0, u_c), &#x27;r-&#x27;, lw=1.6, label=&#x27;GUM (normal)&#x27;)
+ax.axvline(lo_mc, color=&#x27;k&#x27;, ls=&#x27;--&#x27;, lw=1); ax.axvline(hi_mc, color=&#x27;k&#x27;, ls=&#x27;--&#x27;, lw=1)
+ax.axvline(lo_gum, color=&#x27;r&#x27;, ls=&#x27;:&#x27;, lw=1.2); ax.axvline(hi_gum, color=&#x27;r&#x27;, ls=&#x27;:&#x27;, lw=1.2)
+ax.set_xlabel(&#x27;$x_0$ [kPa]&#x27;); ax.set_ylabel(&#x27;densidad&#x27;)
+ax.set_title(&#x27;(c) GUM vs Monte Carlo&#x27;); ax.legend(fontsize=8)
+
+ax = axs[3]
+Ms = np.unique(np.logspace(2, np.log10(M), 40).astype(int))
+us = [x0_s[:m].std(ddof=1) for m in Ms]
+ax.semilogx(Ms, us, &#x27;-&#x27;, color=&#x27;#0b3d91&#x27;, lw=1.5)
+ax.axhline(u_c, color=&#x27;r&#x27;, ls=&#x27;--&#x27;, lw=1.2, label=f&#x27;$u_c$ GUM = {u_c:.3f}&#x27;)
+ax.fill_between(Ms, u_c*(1-1/np.sqrt(2*np.array(Ms))),
+                u_c*(1+1/np.sqrt(2*np.array(Ms))), color=&#x27;#fdd&#x27;, alpha=0.5)
+ax.set_xlabel(&#x27;numero de pruebas MC, $M$&#x27;); ax.set_ylabel(&#x27;$u(x_0)$ [kPa]&#x27;)
+ax.set_title(&#x27;(d) Convergencia de Monte Carlo&#x27;); ax.legend(fontsize=8)
+
+fig.suptitle(&#x27;Calibracion de sensor: incertidumbre del valor medido (GUM y Monte Carlo)&#x27;, y=1.03)
+plt.savefig(&#x27;fig_s6_ej1_calibracion.png&#x27;, dpi=300, bbox_inches=&#x27;tight&#x27;)
+# plt.show()
+print(&quot;Figura guardada.&quot;)</textarea>
+  <div class="code-output-wrap" hidden>
+    <div class="code-output-console"></div>
+    <div class="code-output-figures"></div>
+  </div>
+  <div class="code-status"></div>
+</div>
+<div class="code-cell">
+  <div class="code-cell-header">
+    <span class="code-cell-title">Código 2</span>
+    <span class="code-cell-caption">Semana 6 – Código 2: Cortocircuito en cable OPGW: no linealidad y probabilidad de falla. Ejecutar en Google Colab.</span>
+    <button class="run-btn" type="button">&#9654; Ejecutar</button>
+  </div>
+  
+  <textarea class="code-input" spellcheck="false" rows="14">&quot;&quot;&quot;
+Semana 6 - Ejemplo 2: Elevacion adiabatica de temperatura de un conductor
+OPGW ante cortocircuito (modelo exponencial fuertemente no lineal).
+Modelo IEC 60949 adiabatico:  I^2 t = K^2 S^2 ln((Tf+beta)/(Ti+beta))
+  =&gt;  Tf = (Ti+beta) exp( I^2 t / (K^2 S^2) ) - beta
+&quot;&quot;&quot;
+import numpy as np
+import matplotlib
+matplotlib.use(&#x27;Agg&#x27;)
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+from scipy import stats
+
+mpl.rcParams.update({
+    &#x27;font.size&#x27;: 10, &#x27;axes.titlesize&#x27;: 11, &#x27;axes.labelsize&#x27;: 10,
+    &#x27;figure.dpi&#x27;: 110, &#x27;savefig.dpi&#x27;: 300, &#x27;axes.grid&#x27;: True,
+    &#x27;grid.alpha&#x27;: 0.3, &#x27;mathtext.fontset&#x27;: &#x27;cm&#x27;,
+})
+rng = np.random.default_rng(60606)
+import os; os.makedirs(&#x27;Figuras&#x27;, exist_ok=True)  # carpeta de salida en Colab
+
+def Tf(I, t, S, Ti, K, beta):
+    return (Ti + beta)*np.exp(I**2 * t / (K**2 * S**2)) - beta
+
+# -------- magnitudes de entrada (valor, u, distribucion) --------
+# I [A], t [s], S [mm^2], Ti [C], K [A s^0.5 / mm^2], beta [C]  (aluminio)
+I0, uI = 12.5e3, 0.04*12.5e3          # Normal (4% rel: CT + calculo de falla)
+t0, ht = 0.50, 0.06                   # rectangular +-0.06 s
+S0, hS = 90.0, 0.02*90.0              # rectangular +-2% (tolerancia de fabricacion)
+Ti0, hTi = 40.0, 15.0                 # rectangular +-15 C (condicion de operacion)
+K0, uK = 148.0, 1.5                   # Normal (~1% propiedad de material)
+beta0, ubeta = 228.0, 3.0             # Normal
+T_lim = 200.0                          # C  limite de recocido del aluminio
+
+y0 = Tf(I0, t0, S0, Ti0, K0, beta0)
+
+# -------- GUM (LPU): sensibilidades analiticas (diferencias centradas) --------
+def num_partial(f, args, i, h):
+    a = list(args); b = list(args)
+    a[i] += h; b[i] -= h
+    return (f(*a) - f(*b)) / (2*h)
+
+args = [I0, t0, S0, Ti0, K0, beta0]
+us = [uI, ht/np.sqrt(3), hS/np.sqrt(3), hTi/np.sqrt(3), uK, ubeta]
+names = [&#x27;I&#x27;, &#x27;t&#x27;, &#x27;S&#x27;, &#x27;Ti&#x27;, &#x27;K&#x27;, &#x27;beta&#x27;]
+steps = [1.0, 1e-4, 1e-3, 1e-3, 1e-2, 1e-2]
+c = [num_partial(Tf, args, i, steps[i]) for i in range(6)]
+contrib = [(c[i]*us[i])**2 for i in range(6)]
+u_c = np.sqrt(sum(contrib))
+U_gum = 2.0*u_c
+lo_gum, hi_gum = y0 - U_gum, y0 + U_gum
+# Pf gaussiano (aprox GUM)
+Pf_gum = 1 - stats.norm.cdf(T_lim, loc=y0, scale=u_c)
+
+# -------- Monte Carlo (JCGM 101) --------
+M = 300_000
+Is = rng.normal(I0, uI, M)
+ts = rng.uniform(t0-ht, t0+ht, M)
+Ss = rng.uniform(S0-hS, S0+hS, M)
+Tis = rng.uniform(Ti0-hTi, Ti0+hTi, M)
+Ks = rng.normal(K0, uK, M)
+bs = rng.normal(beta0, ubeta, M)
+Y = Tf(Is, ts, Ss, Tis, Ks, bs)
+y_mc = Y.mean(); u_mc = Y.std(ddof=1)
+lo_mc, hi_mc = np.percentile(Y, [2.5, 97.5])
+g1 = stats.skew(Y)
+Pf_mc = np.mean(Y &gt; T_lim)
+# error estandar de Pf
+se_Pf = np.sqrt(Pf_mc*(1-Pf_mc)/M)
+
+# -------- validacion GUM por MC --------
+ndig = 2
+delta = 0.5*10**(np.floor(np.log10(u_c)) - ndig + 1)
+dlow = abs(lo_gum-lo_mc); dhigh = abs(hi_gum-hi_mc)
+validado = (dlow &lt;= delta) and (dhigh &lt;= delta)
+
+print(&quot;=== EJEMPLO 2: OPGW CORTOCIRCUITO ===&quot;)
+print(f&quot;Tf nominal = {y0:.1f} C&quot;)
+print(f&quot;[GUM] u_c={u_c:.2f} C | U={U_gum:.2f} | 95%: [{lo_gum:.1f}, {hi_gum:.1f}] | Pf={Pf_gum*100:.2f}%&quot;)
+print(f&quot;[MC ] media={y_mc:.1f} C | u={u_mc:.2f} C | 95%: [{lo_mc:.1f}, {hi_mc:.1f}]&quot;)
+print(f&quot;      skew={g1:+.3f} | Pf(Tf&gt;{T_lim:.0f})={Pf_mc*100:.2f}% (+-{se_Pf*100:.2f}%)&quot;)
+print(f&quot;      sesgo media MC-nominal = {y_mc-y0:+.2f} C&quot;)
+print(f&quot;tol delta={delta:.3f} | d_low={dlow:.2f} d_high={dhigh:.2f} -&gt; validado={validado}&quot;)
+print(&quot;Presupuesto GUM (u_i*c_i [C], % var):&quot;)
+order = np.argsort(contrib)[::-1]
+for i in order:
+    print(f&quot;   {names[i]:5s} c={c[i]:+.4g}  u={us[i]:.4g}  |c*u|={abs(c[i]*us[i]):7.2f}  {100*contrib[i]/u_c**2:5.1f}%&quot;)
+
+# -------- figura --------
+fig, axs = plt.subplots(1, 4, figsize=(16, 3.7))
+
+ax = axs[0]
+arg = np.linspace(0, 1.0, 200)
+ax.plot(arg, (Ti0+beta0)*np.exp(arg)-beta0, &#x27;-&#x27;, color=&#x27;#0b3d91&#x27;, lw=1.8)
+arg0 = I0**2*t0/(K0**2*S0**2)
+ax.plot([arg0], [y0], &#x27;D&#x27;, color=&#x27;b&#x27;, ms=7, label=&#x27;punto de operacion&#x27;)
+# propagar +-u en el argumento para ilustrar no linealidad
+da = np.std(Is**2*ts/(Ks**2*Ss**2))
+ax.axvspan(arg0-da, arg0+da, color=&#x27;#cfe2f3&#x27;, alpha=0.6, label=r&#x27;$\pm u$ en el argumento&#x27;)
+ax.axhline(T_lim, color=&#x27;r&#x27;, ls=&#x27;--&#x27;, lw=1, label=&#x27;limite 200 C&#x27;)
+ax.set_xlabel(r&#x27;argumento $I^2 t/(K^2 S^2)$&#x27;); ax.set_ylabel(&#x27;$T_f$ [C]&#x27;)
+ax.set_title(&#x27;(a) No linealidad exponencial&#x27;); ax.legend(fontsize=7.5, loc=&#x27;upper left&#x27;)
+
+ax = axs[1]
+ax.hist(Y, bins=140, density=True, color=&#x27;#9ecae1&#x27;, edgecolor=&#x27;none&#x27;, label=&#x27;MC&#x27;)
+xg = np.linspace(y0-4*u_c, y0+4*u_c, 300)
+ax.plot(xg, stats.norm.pdf(xg, y0, u_c), &#x27;r-&#x27;, lw=1.6, label=&#x27;GUM (normal)&#x27;)
+ax.axvline(T_lim, color=&#x27;k&#x27;, ls=&#x27;--&#x27;, lw=1.3, label=&#x27;$T_{lim}$&#x27;)
+ax.fill_between(xg[xg&gt;=T_lim], 0, stats.norm.pdf(xg[xg&gt;=T_lim], y0, u_c),
+                color=&#x27;red&#x27;, alpha=0.25)
+ax.set_xlabel(&#x27;$T_f$ [C]&#x27;); ax.set_ylabel(&#x27;densidad&#x27;)
+ax.set_title(f&#x27;(b) Distribucion (sesgo $\\gamma_1$={g1:+.2f})&#x27;); ax.legend(fontsize=7.5)
+
+ax = axs[2]
+pct = np.array([100*ci/u_c**2 for ci in contrib])
+idx = np.argsort(pct)
+ax.barh(np.array(names)[idx], pct[idx], color=&#x27;#0b3d91&#x27;)
+ax.set_xlabel(&#x27;% de la varianza combinada&#x27;)
+ax.set_title(&#x27;(c) Presupuesto de incertidumbre&#x27;)
+for yi, p in zip(range(len(idx)), pct[idx]):
+    ax.text(p+0.8, yi, f&#x27;{p:.1f}%&#x27;, va=&#x27;center&#x27;, fontsize=8)
+ax.set_xlim(0, max(pct)*1.18)
+
+ax = axs[3]
+qs = np.linspace(0, 100, 200)
+ax.plot(np.percentile(Y, qs), qs/100, &#x27;-&#x27;, color=&#x27;#0b3d91&#x27;, lw=1.8, label=&#x27;MC (empirica)&#x27;)
+ax.plot(stats.norm.ppf(np.clip(qs/100,1e-4,1-1e-4), y0, u_c), qs/100, &#x27;r--&#x27;, lw=1.4, label=&#x27;GUM (normal)&#x27;)
+ax.axhline(0.025, color=&#x27;gray&#x27;, ls=&#x27;:&#x27;, lw=0.8); ax.axhline(0.975, color=&#x27;gray&#x27;, ls=&#x27;:&#x27;, lw=0.8)
+ax.axvline(T_lim, color=&#x27;k&#x27;, ls=&#x27;--&#x27;, lw=1)
+ax.set_xlabel(&#x27;$T_f$ [C]&#x27;); ax.set_ylabel(&#x27;probabilidad acumulada&#x27;)
+ax.set_title(&#x27;(d) CDF: cobertura GUM vs MC&#x27;); ax.legend(fontsize=8, loc=&#x27;lower right&#x27;)
+
+fig.suptitle(&#x27;OPGW ante cortocircuito: propagacion no lineal de incertidumbre y probabilidad de exceder el limite termico&#x27;, y=1.03)
+plt.savefig(&#x27;fig_s6_ej2_opgw_cortocircuito.png&#x27;, dpi=300, bbox_inches=&#x27;tight&#x27;)
+# plt.show()
+print(&quot;Figura guardada.&quot;)</textarea>
+  <div class="code-output-wrap" hidden>
+    <div class="code-output-console"></div>
+    <div class="code-output-figures"></div>
+  </div>
+  <div class="code-status"></div>
+</div>
+<div class="code-cell">
+  <div class="code-cell-header">
+    <span class="code-cell-title">Código 3</span>
+    <span class="code-cell-caption">Semana 6 – Código 3: Confiabilidad estructural: losa maciza vs reticular. Ejecutar en Google Colab.</span>
+    <button class="run-btn" type="button">&#9654; Ejecutar</button>
+  </div>
+  
+  <textarea class="code-input" spellcheck="false" rows="14">&quot;&quot;&quot;
+Semana 6 - Ejemplo 3: Confiabilidad estructural de una losa (solida vs
+reticular/waffle). Estado limite de servicio por deflexion:
+   g = delta_adm - delta,   delta = alpha w L^4 / (E I),  delta_adm = L/360
+Se calcula la probabilidad de falla Pf=P(g&lt;0) y el indice de confiabilidad
+beta, y se propaga la incertidumbre de delta (GUM vs Monte Carlo).
+&quot;&quot;&quot;
+import numpy as np
+import matplotlib
+matplotlib.use(&#x27;Agg&#x27;)
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+from scipy import stats
+
+mpl.rcParams.update({
+    &#x27;font.size&#x27;: 10, &#x27;axes.titlesize&#x27;: 11, &#x27;axes.labelsize&#x27;: 10,
+    &#x27;figure.dpi&#x27;: 110, &#x27;savefig.dpi&#x27;: 300, &#x27;axes.grid&#x27;: True,
+    &#x27;grid.alpha&#x27;: 0.3, &#x27;mathtext.fontset&#x27;: &#x27;cm&#x27;,
+})
+rng = np.random.default_rng(360360)
+import os; os.makedirs(&#x27;Figuras&#x27;, exist_ok=True)  # carpeta de salida en Colab
+
+alpha = 5.0/384.0            # coeficiente de deflexion (apoyo simple, franja 1 m)
+L0, hL = 6.0, 0.02           # m, rectangular +-0.02 m
+
+# --- propiedades por tipo de losa (franja de 1 m de ancho) ---
+# Solida: mas pesada, menor I.  Reticular: mas ligera, mayor I (mas peralte).
+designs = {
+    &#x27;Solida&#x27;:    dict(wd=5.2, cov_wd=0.10, I=4.30e-4, cov_I=0.12),
+    &#x27;Reticular&#x27;: dict(wd=3.6, cov_wd=0.10, I=5.00e-4, cov_I=0.15),
+}
+wl0, cov_wl = 2.0, 0.25      # kPa carga viva (Normal trunc.), COV alto
+fc0, cov_fc = 25.0, 0.12     # MPa, lognormal
+M = 400_000
+
+def E_of_fc(fc):             # ACI: E = 4700 sqrt(fc) [MPa] -&gt; Pa
+    return 4700.0*np.sqrt(fc)*1e6
+
+results = {}
+fig, axs = plt.subplots(1, 4, figsize=(16, 3.7))
+colors = {&#x27;Solida&#x27;: &#x27;#b22222&#x27;, &#x27;Reticular&#x27;: &#x27;#0b3d91&#x27;}
+
+# muestras compartidas de variables comunes
+L_s = rng.uniform(L0-hL, L0+hL, M)
+fc_s = np.exp(rng.normal(np.log(fc0) - 0.5*np.log(1+cov_fc**2),
+                         np.sqrt(np.log(1+cov_fc**2)), M))   # lognormal
+E_s = E_of_fc(fc_s)
+wl_s = np.clip(rng.normal(wl0, cov_wl*wl0, M), 0, None)
+
+for name, d in designs.items():
+    wd_s = rng.normal(d[&#x27;wd&#x27;], d[&#x27;cov_wd&#x27;]*d[&#x27;wd&#x27;], M)
+    I_s = np.clip(rng.normal(d[&#x27;I&#x27;], d[&#x27;cov_I&#x27;]*d[&#x27;I&#x27;], M), 1e-6, None)
+    w_s = (wd_s + wl_s)*1e3                      # kPa -&gt; N/m (franja 1 m)
+    delta_s = alpha * w_s * L_s**4 / (E_s * I_s)  # m
+    delta_adm = L_s/360.0
+    g = delta_adm - delta_s
+    Pf = np.mean(g &lt; 0)
+    se = np.sqrt(Pf*(1-Pf)/M)
+    beta = -stats.norm.ppf(Pf) if Pf &gt; 0 else np.inf
+    beta_form = g.mean()/g.std(ddof=1)        # indice de Cornell (FORM 1er orden)
+    # nominal y GUM (LPU) sobre delta
+    w0 = (d[&#x27;wd&#x27;]+wl0)*1e3; E0 = E_of_fc(fc0); I0 = d[&#x27;I&#x27;]
+    delta0 = alpha*w0*L0**4/(E0*I0)
+    # sensibilidades relativas (modelo producto/potencia)
+    rel = np.sqrt((cov_wl*wl0/(d[&#x27;wd&#x27;]+wl0))**2 + (d[&#x27;cov_wd&#x27;]*d[&#x27;wd&#x27;]/(d[&#x27;wd&#x27;]+wl0))**2
+                  + (4*hL/np.sqrt(3)/L0)**2 + (0.5*cov_fc)**2 + d[&#x27;cov_I&#x27;]**2)
+    u_delta_gum = rel*delta0
+    results[name] = dict(delta_s=delta_s, delta0=delta0, u_gum=u_delta_gum,
+                         u_mc=delta_s.std(ddof=1), Pf=Pf, se=se, beta=beta,
+                         beta_form=beta_form, delta_adm0=L0/360, g=g)
+    print(f&quot;=== {name} ===&quot;)
+    print(f&quot;  delta0={delta0*1e3:.2f} mm | delta_adm={L0/360*1e3:.2f} mm | margen={delta0/(L0/360)*100:.1f}% de adm&quot;)
+    print(f&quot;  u_delta: GUM={u_delta_gum*1e3:.3f} mm | MC={delta_s.std(ddof=1)*1e3:.3f} mm&quot;)
+    print(f&quot;  Pf={Pf*100:.3f}% (+-{se*100:.3f}%) | beta_MC={beta:.3f} | beta_FORM={beta_form:.3f}&quot;)
+
+# (a) histograma de delta para ambas losas
+ax = axs[0]
+for name in designs:
+    r = results[name]
+    ax.hist(r[&#x27;delta_s&#x27;]*1e3, bins=120, density=True, alpha=0.55,
+            color=colors[name], edgecolor=&#x27;none&#x27;, label=name)
+ax.axvline(L0/360*1e3, color=&#x27;k&#x27;, ls=&#x27;--&#x27;, lw=1.4, label=r&#x27;$\delta_{adm}=L/360$&#x27;)
+ax.set_xlabel(r&#x27;deflexion $\delta$ [mm]&#x27;); ax.set_ylabel(&#x27;densidad&#x27;)
+ax.set_title(&#x27;(a) Distribucion de la deflexion&#x27;); ax.legend(fontsize=8)
+ax.set_xlim(0, max(results[&#x27;Solida&#x27;][&#x27;delta_s&#x27;].max(), L0/360*1.4)*1e3)
+
+# (b) Pf y beta comparados
+ax = axs[1]
+nm = list(designs.keys())
+Pfs = [results[n][&#x27;Pf&#x27;]*100 for n in nm]
+betas = [results[n][&#x27;beta&#x27;] for n in nm]
+bars = ax.bar(nm, Pfs, color=[colors[n] for n in nm], alpha=0.8)
+ax.set_ylabel(r&#x27;$P_f$ [%]&#x27;); ax.set_title(r&#x27;(b) Probabilidad de falla e indice $\beta$&#x27;)
+for b, n in zip(bars, nm):
+    bval = results[n][&#x27;beta&#x27;] if np.isfinite(results[n][&#x27;beta&#x27;]) else results[n][&#x27;beta_form&#x27;]
+    ax.text(b.get_x()+b.get_width()/2, b.get_height()*1.02 + 1e-3,
+            f&#x27;$P_f$={results[n][&quot;Pf&quot;]*100:.2f}%\n$\\beta$={bval:.2f}&#x27;,
+            ha=&#x27;center&#x27;, fontsize=8)
+ax.set_ylim(0, max(Pfs)*1.5 + 0.1)
+
+# (c) contribuciones de varianza (Reticular) por re-muestreo congelando variables
+ax = axs[2]
+base = results[&#x27;Reticular&#x27;][&#x27;delta_s&#x27;].var()
+labels_v = [&#x27;carga viva&#x27;, &#x27;carga muerta&#x27;, &#x27;span L&#x27;, &quot;f&#x27;c (E)&quot;, &#x27;inercia I&#x27;]
+# estimacion por correlacion-cuadrada (aprox first-order indices)
+d = designs[&#x27;Reticular&#x27;]
+wd_s = rng.normal(d[&#x27;wd&#x27;], d[&#x27;cov_wd&#x27;]*d[&#x27;wd&#x27;], M)
+I_s = np.clip(rng.normal(d[&#x27;I&#x27;], d[&#x27;cov_I&#x27;]*d[&#x27;I&#x27;], M), 1e-6, None)
+w_s = (wd_s + wl_s)*1e3
+delta_full = alpha*w_s*L_s**4/(E_s*I_s)
+def s1(var_samp, ref):
+    # indice de sensibilidad de primer orden (Var de E[Y|Xi]) aprox por binning
+    bins = np.quantile(var_samp, np.linspace(0,1,31))
+    idx = np.clip(np.digitize(var_samp, bins[1:-1]), 0, 29)
+    means = np.array([ref[idx==k].mean() if np.any(idx==k) else np.nan for k in range(30)])
+    return np.nanvar(means)/ref.var()
+S1 = [s1(wl_s, delta_full), s1(wd_s, delta_full), s1(L_s, delta_full),
+      s1(fc_s, delta_full), s1(I_s, delta_full)]
+S1 = np.array(S1); S1 = S1/ S1.sum()*100
+order = np.argsort(S1)
+ax.barh(np.array(labels_v)[order], S1[order], color=&#x27;#0b3d91&#x27;)
+for yi, p in zip(range(len(order)), S1[order]):
+    ax.text(p+0.6, yi, f&#x27;{p:.0f}%&#x27;, va=&#x27;center&#x27;, fontsize=8)
+ax.set_xlabel(&#x27;contribucion a la varianza [%]&#x27;)
+ax.set_title(&#x27;(c) Sensibilidad (losa reticular)&#x27;); ax.set_xlim(0, max(S1)*1.2)
+
+# (d) convergencia de Pf
+ax = axs[3]
+Ms = np.unique(np.logspace(2.5, np.log10(M), 40).astype(int))
+for name in designs:
+    g = results[name][&#x27;g&#x27;]
+    pfs = [np.mean(g[:m] &lt; 0) for m in Ms]
+    ax.semilogx(Ms, np.array(pfs)*100, &#x27;-&#x27;, color=colors[name], lw=1.5, label=name)
+    ax.axhline(results[name][&#x27;Pf&#x27;]*100, color=colors[name], ls=&#x27;:&#x27;, lw=1)
+ax.set_xlabel(&#x27;numero de pruebas MC, $M$&#x27;); ax.set_ylabel(r&#x27;$P_f$ [%]&#x27;)
+ax.set_title(&#x27;(d) Convergencia de $P_f$&#x27;); ax.legend(fontsize=8)
+
+fig.suptitle(&#x27;Confiabilidad de losa solida vs reticular: deflexion de servicio, $P_f$ e indice $\\beta$&#x27;, y=1.03)
+plt.savefig(&#x27;fig_s6_ej3_losa_confiabilidad.png&#x27;, dpi=300, bbox_inches=&#x27;tight&#x27;)
+# plt.show()
+print(&quot;Figura guardada.&quot;)</textarea>
+  <div class="code-output-wrap" hidden>
+    <div class="code-output-console"></div>
+    <div class="code-output-figures"></div>
+  </div>
+  <div class="code-status"></div>
+</div>
+<div class="code-cell">
+  <div class="code-cell-header">
+    <span class="code-cell-title">Código 4</span>
+    <span class="code-cell-caption">Semana 6 – Código 4: Optimización de bomba centrífuga: modelo multiplicativo y BEP. Ejecutar en Google Colab.</span>
+    <button class="run-btn" type="button">&#9654; Ejecutar</button>
+  </div>
+  
+  <textarea class="code-input" spellcheck="false" rows="14">&quot;&quot;&quot;
+Semana 6 - Ejemplo 4: Eficiencia de una bomba centrifuga (modelo
+multiplicativo) e incertidumbre del punto de mejor eficiencia (BEP).
+  eta = rho g Q H / P     (modelo producto/cociente -&gt; cuadratura relativa)
+Se propaga la incertidumbre por punto (GUM) y se localiza el BEP por ajuste
+parabolico, propagando la incertidumbre de (Q_BEP, eta_max) por Monte Carlo.
+&quot;&quot;&quot;
+import numpy as np
+import matplotlib
+matplotlib.use(&#x27;Agg&#x27;)
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+from scipy import stats
+
+mpl.rcParams.update({
+    &#x27;font.size&#x27;: 10, &#x27;axes.titlesize&#x27;: 11, &#x27;axes.labelsize&#x27;: 10,
+    &#x27;figure.dpi&#x27;: 110, &#x27;savefig.dpi&#x27;: 300, &#x27;axes.grid&#x27;: True,
+    &#x27;grid.alpha&#x27;: 0.3, &#x27;mathtext.fontset&#x27;: &#x27;cm&#x27;,
+})
+rng = np.random.default_rng(404404)
+import os; os.makedirs(&#x27;Figuras&#x27;, exist_ok=True)  # carpeta de salida en Colab
+
+g = 9.81
+rho0, u_rho = 997.0, 0.3                 # kg/m3 (agua ~25 C), u Tipo B
+# incertidumbres relativas de instrumentos
+relQ, relH, relP = 0.020, 0.015, 0.015   # caudalimetro, head, potencia al eje
+
+# curva &quot;verdadera&quot; de eficiencia (para generar datos de ensayo)
+Q_test = np.array([20, 30, 40, 50, 60, 70, 80])*1e-3/60   # m3/s  (L/min-&gt;m3/s)
+Q_bep_true, eta_max_true, curv = 50e-3/60, 0.78, 1.0e6
+eta_true = eta_max_true - curv*(Q_test - Q_bep_true)**2
+H_true = 30.0 - 1.5e3*(Q_test - 30e-3/60)**2 - 8e3*Q_test    # m, curva H-Q decreciente
+P_true = rho0*g*Q_test*H_true/eta_true                       # W
+
+# datos medidos (una corrida, ruido de instrumento)
+Qm = Q_test*(1 + rng.normal(0, relQ, Q_test.size))
+Hm = H_true*(1 + rng.normal(0, relH, Q_test.size))
+Pm = P_true*(1 + rng.normal(0, relP, Q_test.size))
+eta_m = rho0*g*Qm*Hm/Pm
+
+# GUM por punto: modelo multiplicativo -&gt; (u_eta/eta)^2 = sum (rel_i)^2
+rel_eta = np.sqrt((u_rho/rho0)**2 + relQ**2 + relH**2 + relP**2)
+u_eta_pt = rel_eta*eta_m
+print(&quot;=== EJEMPLO 4: BOMBA CENTRIFUGA ===&quot;)
+print(f&quot;u_eta/eta (GUM, multiplicativo) = {rel_eta*100:.3f}%&quot;)
+print(&quot;Contribuciones relativas a la varianza:&quot;)
+for nm, r in [(&#x27;rho&#x27;, u_rho/rho0), (&#x27;Q&#x27;, relQ), (&#x27;H&#x27;, relH), (&#x27;P&#x27;, relP)]:
+    print(f&quot;   {nm:4s} rel={r*100:.3f}%  ({100*r**2/rel_eta**2:.1f}% de la var.)&quot;)
+
+# --- BEP por ajuste parabolico de los puntos medidos ---
+def fit_bep(Q, eta):
+    A = np.column_stack([Q**2, Q, np.ones_like(Q)])
+    a, b, c = np.linalg.lstsq(A, eta, rcond=None)[0]
+    Qb = -b/(2*a)
+    eb = a*Qb**2 + b*Qb + c
+    return Qb, eb
+Qb0, eb0 = fit_bep(Qm, eta_m)
+print(f&quot;BEP medido: Q_BEP={Qb0*6e4:.2f} L/min, eta_max={eb0*100:.2f}%&quot;)
+
+# --- Monte Carlo: cada punto medido fluctua segun su incertidumbre ---
+M = 100_000
+Qbep_s = np.empty(M); etam_s = np.empty(M)
+for k in range(M):
+    rho_k = rng.normal(rho0, u_rho)
+    Qk = Qm*(1 + rng.normal(0, relQ, Qm.size))
+    Hk = Hm*(1 + rng.normal(0, relH, Hm.size))
+    Pk = Pm*(1 + rng.normal(0, relP, Pm.size))
+    eta_k = rho_k*g*Qk*Hk/Pk
+    Qbep_s[k], etam_s[k] = fit_bep(Qk, eta_k)
+Qbep_mc = Qbep_s.mean()*6e4; uQbep = Qbep_s.std(ddof=1)*6e4
+etam_mc = etam_s.mean()*100; uetam = etam_s.std(ddof=1)*100
+print(f&quot;[MC] Q_BEP = {Qbep_mc:.2f} +- {uQbep:.2f} L/min  (k=2: +-{2*uQbep:.2f})&quot;)
+print(f&quot;[MC] eta_max = {etam_mc:.2f} +- {uetam:.2f} %    (k=2: +-{2*uetam:.2f})&quot;)
+rho_corr = np.corrcoef(Qbep_s, etam_s)[0,1]
+print(f&quot;correlacion(Q_BEP, eta_max) = {rho_corr:+.3f}&quot;)
+
+# -------- figura --------
+fig, axs = plt.subplots(1, 4, figsize=(16, 3.7))
+
+ax = axs[0]
+Qg = np.linspace(Q_test.min(), Q_test.max(), 200)
+A = np.column_stack([Qm**2, Qm, np.ones_like(Qm)])
+coef = np.linalg.lstsq(A, eta_m, rcond=None)[0]
+etafit = coef[0]*Qg**2 + coef[1]*Qg + coef[2]
+# banda de incertidumbre de la curva por MC
+band = np.std([ (lambda cc: cc[0]*Qg**2+cc[1]*Qg+cc[2])(
+        np.linalg.lstsq(np.column_stack([ (Qm*(1+rng.normal(0,relQ,Qm.size)))**2,
+            Qm*(1+rng.normal(0,relQ,Qm.size)), np.ones_like(Qm)]),
+            eta_m*(1+rng.normal(0,rel_eta,Qm.size)), rcond=None)[0])
+        for _ in range(400)], axis=0)
+ax.fill_between(Qg*6e4, (etafit-2*band)*100, (etafit+2*band)*100,
+                color=&#x27;#cfe2f3&#x27;, label=&#x27;banda 95%&#x27;)
+ax.plot(Qg*6e4, etafit*100, &#x27;-&#x27;, color=&#x27;#0b3d91&#x27;, lw=1.8, label=&#x27;ajuste parabolico&#x27;)
+ax.errorbar(Qm*6e4, eta_m*100, yerr=2*u_eta_pt*100, fmt=&#x27;o&#x27;, color=&#x27;#b22222&#x27;,
+            ms=5, capsize=3, lw=1, label=&#x27;puntos $\\pm U$ (k=2)&#x27;)
+ax.axvline(Qbep_mc, color=&#x27;g&#x27;, ls=&#x27;--&#x27;, lw=1.2, label=&#x27;$Q_{BEP}$&#x27;)
+ax.set_xlabel(&#x27;caudal $Q$ [L/min]&#x27;); ax.set_ylabel(r&#x27;eficiencia $\eta$ [%]&#x27;)
+ax.set_title(&#x27;(a) Curva $\\eta$-$Q$ con incertidumbre&#x27;); ax.legend(fontsize=7.5, loc=&#x27;lower center&#x27;)
+
+ax = axs[1]
+labels = [r&#x27;$\rho$&#x27;, &#x27;$Q$&#x27;, &#x27;$H$&#x27;, &#x27;$P$&#x27;]
+rels = np.array([u_rho/rho0, relQ, relH, relP])
+pc = 100*rels**2/rel_eta**2
+ax.bar(labels, pc, color=&#x27;#0b3d91&#x27;)
+for i, p in enumerate(pc):
+    ax.text(i, p+1, f&#x27;{p:.0f}%&#x27;, ha=&#x27;center&#x27;, fontsize=8)
+ax.set_ylabel(&#x27;% de la varianza de $\\eta$&#x27;)
+ax.set_title(f&#x27;(b) Presupuesto: $u_\\eta/\\eta$={rel_eta*100:.2f}%&#x27;); ax.set_ylim(0, max(pc)*1.2)
+
+ax = axs[2]
+ax.hist(etam_s*100, bins=100, density=True, color=&#x27;#9ecae1&#x27;, edgecolor=&#x27;none&#x27;, label=&#x27;MC&#x27;)
+xg = np.linspace(etam_mc-4*uetam, etam_mc+4*uetam, 200)
+ax.plot(xg, stats.norm.pdf(xg, etam_mc, uetam), &#x27;r-&#x27;, lw=1.6, label=&#x27;GUM (normal)&#x27;)
+ax.set_xlabel(r&#x27;$\eta_{max}$ [%]&#x27;); ax.set_ylabel(&#x27;densidad&#x27;)
+ax.set_title(&#x27;(c) Incertidumbre de $\\eta_{max}$&#x27;); ax.legend(fontsize=8)
+
+ax = axs[3]
+hb = ax.hist2d(Qbep_s*6e4, etam_s*100, bins=70, cmap=&#x27;Blues&#x27;, density=True)
+ax.plot(Qbep_mc, etam_mc, &#x27;r+&#x27;, ms=12, mew=2)
+# elipse de covarianza 95%
+cov = np.cov(Qbep_s*6e4, etam_s*100)
+vals, vecs = np.linalg.eigh(cov)
+th = np.linspace(0, 2*np.pi, 100)
+ell = (vecs @ (np.sqrt(vals*stats.chi2.ppf(0.95,2))[:,None]*np.array([np.cos(th),np.sin(th)])))
+ax.plot(Qbep_mc+ell[0], etam_mc+ell[1], &#x27;r-&#x27;, lw=1.5, label=&#x27;elipse 95%&#x27;)
+ax.set_xlabel(&#x27;$Q_{BEP}$ [L/min]&#x27;); ax.set_ylabel(r&#x27;$\eta_{max}$ [%]&#x27;)
+ax.set_title(f&#x27;(d) Conjunta (corr={rho_corr:+.2f})&#x27;); ax.legend(fontsize=8)
+
+fig.suptitle(&#x27;Bomba centrifuga: incertidumbre de la eficiencia y del punto de mejor eficiencia (BEP)&#x27;, y=1.03)
+plt.savefig(&#x27;fig_s6_ej4_bomba_bep.png&#x27;, dpi=300, bbox_inches=&#x27;tight&#x27;)
+# plt.show()
+print(&quot;Figura guardada.&quot;)</textarea>
+  <div class="code-output-wrap" hidden>
+    <div class="code-output-console"></div>
+    <div class="code-output-figures"></div>
+  </div>
+  <div class="code-status"></div>
+</div>
+<div class="code-cell">
+  <div class="code-cell-header">
+    <span class="code-cell-title">Código 5</span>
+    <span class="code-cell-caption">Semana 6 – Código 5: Velocimetría por flujo óptico desde UAV: incertidumbre correlacionada. Ejecutar en Google Colab.</span>
+    <button class="run-btn" type="button">&#9654; Ejecutar</button>
+  </div>
+  
+  <textarea class="code-input" spellcheck="false" rows="14">&quot;&quot;&quot;
+Semana 6 - Ejemplo 5: Velocimetria vehicular desde UAV por flujo optico.
+Cadena fotogrametrica:
+   GSD = p_size * A / f            (m/px)
+   v   = dp * GSD / dt = dp * p_size * A / (f * dt)
+Punto clave: A, f, p_size son COMUNES a todos los vehiculos de un cuadro
+(sistematicos -&gt; correlacion total); dp y dt son por-vehiculo (aleatorios).
+La incertidumbre de la velocidad MEDIA de la flota NO promedia el termino
+sistematico. Se compara el tratamiento correlacionado vs el ingenuo.
+&quot;&quot;&quot;
+import numpy as np
+# matplotlib.use(&#x27;Agg&#x27;) # &lt;-- COMENTADO para que funcione visualmente en Colab
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+from scipy import stats
+import os
+
+mpl.rcParams.update({
+    &#x27;font.size&#x27;: 10, &#x27;axes.titlesize&#x27;: 11, &#x27;axes.labelsize&#x27;: 10,
+    &#x27;figure.dpi&#x27;: 110, &#x27;savefig.dpi&#x27;: 300, &#x27;axes.grid&#x27;: True,
+    &#x27;grid.alpha&#x27;: 0.3, &#x27;mathtext.fontset&#x27;: &#x27;cm&#x27;,
+})
+rng = np.random.default_rng(505505)
+os.makedirs(&#x27;Figuras&#x27;, exist_ok=True)  # carpeta de salida en Colab
+
+# --- parametros del sensor / vuelo (comunes al cuadro = sistematicos) ---
+p_size0, u_psize = 3.45e-6, 0.0          # m/px (dato de hoja, u~0)
+f0, u_f = 8.8e-3, 0.05e-3                # m, calibracion de camara
+A0, u_A = 80.0, 2.5                      # m, altura AGL (GPS/baro) -&gt; sistematico
+dt0, u_dt = 1/30.0, 0.5e-3               # s, intervalo entre cuadros (timestamp)
+
+GSD0 = p_size0*A0/f0
+print(&quot;=== EJEMPLO 5: UAV FLUJO OPTICO ===&quot;)
+print(f&quot;GSD nominal = {GSD0*100:.3f} cm/px&quot;)
+
+# --- flota: N vehiculos, desplazamiento dp por vehiculo (Tipo A, flujo) ---
+N = 8
+dp_true = np.array([14.0, 22.5, 9.2, 31.0, 18.7, 25.3, 12.4, 20.1])  # px/cuadro
+u_dp = 0.4                                 # px, incertidumbre del flujo optico
+v_nom = dp_true*GSD0/dt0
+print(&quot;v nominal por vehiculo [km/h]:&quot;, np.round(v_nom*3.6, 2))
+
+# --- GUM por vehiculo (modelo producto): rel^2 = sum rel_i^2 ---
+rel_sys2 = (u_psize/p_size0)**2 + (u_f/f0)**2 + (u_A/A0)**2 + (u_dt/dt0)**2
+u_v_pt = v_nom*np.sqrt(rel_sys2 + (u_dp/dp_true)**2)
+print(f&quot;componente sistematica (rel) = {np.sqrt(rel_sys2)*100:.3f}%&quot;)
+print(&quot;U(v) por vehiculo [km/h] (k=2):&quot;, np.round(2*u_v_pt*3.6, 2))
+
+# --- velocidad media de la flota: correlaciones IMPORTAN ---
+vbar = v_nom.mean()
+# (1) tratamiento correlacionado (correcto): el termino sistematico es comun
+u_vbar_corr2 = (rel_sys2)*vbar**2 + (1/N**2)*np.sum((v_nom*u_dp/dp_true)**2)
+u_vbar_corr = np.sqrt(u_vbar_corr2)
+# (2) tratamiento ingenuo (todo aleatorio e independiente): promedia todo
+u_vbar_naive = np.sqrt(np.sum(u_v_pt**2))/N
+print(f&quot;v_media = {vbar*3.6:.2f} km/h&quot;)
+print(f&quot;u(v_media) correlacionado = {u_vbar_corr*3.6:.3f} km/h&quot;)
+print(f&quot;u(v_media) ingenuo        = {u_vbar_naive*3.6:.3f} km/h&quot;)
+print(f&quot;subestimacion del ingenuo = factor {u_vbar_corr/u_vbar_naive:.2f}&quot;)
+
+# --- Monte Carlo confirmatorio ---
+M = 200_000
+# sistematicos: UN sorteo por prueba, COMPARTIDO por la flota
+A_s = rng.normal(A0, u_A, M)
+f_s = rng.normal(f0, u_f, M)
+dt_s = rng.normal(dt0, u_dt, M)
+GSD_s = p_size0*A_s/f_s
+
+# CORRECCIÓN AQUÍ: usar np.zeros en lugar de np.empty
+vbar_corr_mc = np.zeros(M)
+vbar_naive_mc = np.zeros(M)
+
+for j in range(N):
+    dp_s = dp_true[j] + rng.normal(0, u_dp, M)      # aleatorio por vehiculo
+    vbar_corr_mc += dp_s*GSD_s/dt_s
+    # ingenuo: cada vehiculo sortea TODO de forma independiente
+    A_i = rng.normal(A0, u_A, M); f_i = rng.normal(f0, u_f, M); dt_i = rng.normal(dt0, u_dt, M)
+    vbar_naive_mc += (dp_true[j]+rng.normal(0,u_dp,M))*(p_size0*A_i/f_i)/dt_i
+vbar_corr_mc /= N; vbar_naive_mc /= N
+print(f&quot;[MC] u(v_media) correlacionado = {vbar_corr_mc.std(ddof=1)*3.6:.3f} km/h&quot;)
+print(f&quot;[MC] u(v_media) ingenuo        = {vbar_naive_mc.std(ddof=1)*3.6:.3f} km/h&quot;)
+
+# --- figura ---
+fig, axs = plt.subplots(1, 4, figsize=(16, 3.7))
+
+ax = axs[0]
+order = np.argsort(v_nom)
+yp = np.arange(N)
+ax.errorbar(v_nom[order]*3.6, yp, xerr=2*u_v_pt[order]*3.6, fmt=&#x27;o&#x27;,
+            color=&#x27;#0b3d91&#x27;, ms=6, capsize=3, lw=1.2)
+ax.axvline(vbar*3.6, color=&#x27;g&#x27;, ls=&#x27;--&#x27;, lw=1.2, label=&#x27;media de la flota&#x27;)
+ax.axvspan((vbar-2*u_vbar_corr)*3.6, (vbar+2*u_vbar_corr)*3.6, color=&#x27;#d9ead3&#x27;,
+           alpha=0.7, label=&#x27;$U$(media) correl.&#x27;)
+ax.set_yticks(yp); ax.set_yticklabels([f&#x27;V{ i+1}&#x27; for i in order])
+ax.set_xlabel(&#x27;velocidad [km/h]&#x27;); ax.set_title(&#x27;(a) Velocidades $\\pm U$ (k=2)&#x27;)
+ax.legend(fontsize=7.5, loc=&#x27;lower right&#x27;)
+
+ax = axs[1]
+labels = [&#x27;$A$ (altura)&#x27;, &#x27;$f$ (focal)&#x27;, &#x27;$\\Delta t$&#x27;, &#x27;$\\Delta p$ (flujo)&#x27;]
+# para un vehiculo tipico (mediano)
+jt = np.argsort(dp_true)[N//2]
+comps = np.array([(u_A/A0)**2, (u_f/f0)**2, (u_dt/dt0)**2, (u_dp/dp_true[jt])**2])
+pc = 100*comps/comps.sum()
+ax.bar(labels, pc, color=[&#x27;#b22222&#x27;,&#x27;#b22222&#x27;,&#x27;#b22222&#x27;,&#x27;#0b3d91&#x27;])
+for i, p in enumerate(pc):
+    ax.text(i, p+1, f&#x27;{p:.0f}%&#x27;, ha=&#x27;center&#x27;, fontsize=8)
+ax.set_ylabel(&#x27;% de la varianza de $v$&#x27;)
+ax.set_title(&#x27;(b) Presupuesto (rojo=sistematico)&#x27;); ax.set_ylim(0, max(pc)*1.2)
+
+ax = axs[2]
+ax.hist(vbar_naive_mc*3.6, bins=120, density=True, color=&#x27;#f4cccc&#x27;, edgecolor=&#x27;none&#x27;,
+        label=f&#x27;ingenuo (u={vbar_naive_mc.std(ddof=1)*3.6:.2f})&#x27;)
+ax.hist(vbar_corr_mc*3.6, bins=120, density=True, color=&#x27;#9fc5e8&#x27;, edgecolor=&#x27;none&#x27;,
+        alpha=0.8, label=f&#x27;correlacionado (u={vbar_corr_mc.std(ddof=1)*3.6:.2f})&#x27;)
+ax.set_xlabel(&#x27;velocidad media de la flota [km/h]&#x27;); ax.set_ylabel(&#x27;densidad&#x27;)
+ax.set_title(&#x27;(c) Efecto de la correlacion&#x27;); ax.legend(fontsize=7.5)
+
+ax = axs[3]
+Ns = np.arange(1, 25)
+u_corr = np.sqrt(rel_sys2*vbar**2 + (1/Ns**2)*N*(vbar*u_dp/dp_true.mean())**2)*3.6
+u_naive = np.sqrt((rel_sys2 + (u_dp/dp_true.mean())**2)*vbar**2/Ns)*3.6
+ax.plot(Ns, u_corr, &#x27;-o&#x27;, color=&#x27;#0b3d91&#x27;, ms=3, lw=1.4, label=&#x27;correlacionado&#x27;)
+ax.plot(Ns, u_naive, &#x27;-s&#x27;, color=&#x27;#b22222&#x27;, ms=3, lw=1.4, label=&#x27;ingenuo&#x27;)
+ax.axhline(np.sqrt(rel_sys2)*vbar*3.6, color=&#x27;gray&#x27;, ls=&#x27;:&#x27;, lw=1.2, label=&#x27;piso sistematico&#x27;)
+ax.set_xlabel(&#x27;numero de vehiculos $N$&#x27;); ax.set_ylabel(&#x27;$u$(media) [km/h]&#x27;)
+ax.set_title(&#x27;(d) La sistematica no promedia&#x27;); ax.legend(fontsize=8)
+
+fig.suptitle(&#x27;UAV + flujo optico: incertidumbre de la velocidad y el papel de las correlaciones (sistematico vs aleatorio)&#x27;, y=1.03)
+plt.savefig(&#x27;fig_s6_ej5_uav_flujo.png&#x27;, dpi=300, bbox_inches=&#x27;tight&#x27;)
+plt.show() # &lt;-- DESCOMENTADO para ver la gráfica directamente en Colab
+print(&quot;Figura generada y guardada.&quot;)</textarea>
+  <div class="code-output-wrap" hidden>
+    <div class="code-output-console"></div>
+    <div class="code-output-figures"></div>
+  </div>
+  <div class="code-status"></div>
+</div>
+<div class="code-cell">
+  <div class="code-cell-header">
+    <span class="code-cell-title">Código 6</span>
+    <span class="code-cell-caption">Semana 6 – Código 6: Exactitud de un sistema RAG: soporte acotado. Ejecutar en Google Colab.</span>
+    <button class="run-btn" type="button">&#9654; Ejecutar</button>
+  </div>
+  
+  <textarea class="code-input" spellcheck="false" rows="14">&quot;&quot;&quot;
+Semana 6 - Ejemplo 6: Incertidumbre de la exactitud de un sistema RAG
+industrial estimada con un conjunto de evaluacion FINITO.
+Modelo de composicion:  a_e2e = a_ret * a_gen|ret   (dos proporciones)
+Cada proporcion se estima de n ensayos -&gt; incertidumbre Tipo A binomial.
+Punto clave: con n pequeno y p cerca de 1, el intervalo GUM-normal puede
+exceder [0,1] (no fisico); MC/Beta respeta el soporte. Se comparan
+GUM (LPU), Monte Carlo (posterior Beta) y Wilson.
+&quot;&quot;&quot;
+import numpy as np
+import matplotlib
+matplotlib.use(&#x27;Agg&#x27;)
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+from scipy import stats
+
+mpl.rcParams.update({
+    &#x27;font.size&#x27;: 10, &#x27;axes.titlesize&#x27;: 11, &#x27;axes.labelsize&#x27;: 10,
+    &#x27;figure.dpi&#x27;: 110, &#x27;savefig.dpi&#x27;: 300, &#x27;axes.grid&#x27;: True,
+    &#x27;grid.alpha&#x27;: 0.3, &#x27;mathtext.fontset&#x27;: &#x27;cm&#x27;,
+})
+rng = np.random.default_rng(606606)
+import os; os.makedirs(&#x27;Figuras&#x27;, exist_ok=True)  # carpeta de salida en Colab
+
+# --- resultados de la evaluacion (conteos) ---
+n_ret, k_ret = 60, 54        # 54/60 recuperaciones correctas
+n_gen, k_gen = 48, 46        # 46/48 generaciones correctas (alta exactitud, n pequeno)
+p_ret = k_ret/n_ret
+p_gen = k_gen/n_gen
+a0 = p_ret*p_gen
+print(&quot;=== EJEMPLO 6: SISTEMA RAG ===&quot;)
+print(f&quot;a_ret={p_ret:.4f} (n={n_ret}), a_gen={p_gen:.4f} (n={n_gen}), a_e2e={a0:.4f}&quot;)
+
+# --- Tipo A binomial (error estandar de cada proporcion) ---
+u_ret = np.sqrt(p_ret*(1-p_ret)/n_ret)
+u_gen = np.sqrt(p_gen*(1-p_gen)/n_gen)
+# --- GUM (LPU) modelo producto ---
+u_a = a0*np.sqrt((u_ret/p_ret)**2 + (u_gen/p_gen)**2)
+U_a = 1.96*u_a
+lo_gum, hi_gum = a0-U_a, a0+U_a
+print(f&quot;u_ret={u_ret:.4f}, u_gen={u_gen:.4f}, u(a_e2e)={u_a:.4f}&quot;)
+hi_gen_normal = p_gen + 1.96*u_gen
+print(f&quot;[GUM] componente a_gen normal 95% sup = {hi_gen_normal:.4f}  (excede 1? {hi_gen_normal&gt;1})&quot;)
+print(f&quot;[GUM] 95%: [{lo_gum:.4f}, {hi_gum:.4f}]   (a_e2e excede 1? {hi_gum&gt;1})&quot;)
+
+# --- Monte Carlo con posterior Beta (Jeffreys: a=k+0.5, b=n-k+0.5) ---
+M = 300_000
+ret_s = rng.beta(k_ret+0.5, n_ret-k_ret+0.5, M)
+gen_s = rng.beta(k_gen+0.5, n_gen-k_gen+0.5, M)
+a_s = ret_s*gen_s
+a_mc = a_s.mean(); u_mc = a_s.std(ddof=1)
+lo_mc, hi_mc = np.percentile(a_s, [2.5, 97.5])
+print(f&quot;[MC ] media={a_mc:.4f}, u={u_mc:.4f}, 95%: [{lo_mc:.4f}, {hi_mc:.4f}]&quot;)
+
+# --- Wilson para a_e2e via delta-method sobre log (referencia) ---
+def wilson(k, n, z=1.96):
+    p = k/n
+    den = 1+z**2/n
+    c = (p + z**2/(2*n))/den
+    hw = z*np.sqrt(p*(1-p)/n + z**2/(4*n**2))/den
+    return c-hw, c+hw
+lo_rw, hi_rw = wilson(k_ret, n_ret); lo_gw, hi_gw = wilson(k_gen, n_gen)
+# producto de intervalos (conservador)
+lo_w, hi_w = lo_rw*lo_gw, hi_rw*hi_gw
+print(f&quot;[Wilson prod] 95%: [{lo_w:.4f}, {hi_w:.4f}]&quot;)
+
+# --- proyeccion: respuestas correctas esperadas por 1000 consultas ---
+print(f&quot;Por 1000 consultas: {a0*1000:.0f} correctas; 95% MC: [{lo_mc*1000:.0f}, {hi_mc*1000:.0f}]&quot;)
+
+# --- u(a_e2e) en funcion del tamano del conjunto de evaluacion ---
+ns = np.array([20, 30, 50, 80, 120, 200, 400, 800])
+u_vs_n = a0*np.sqrt((np.sqrt(p_ret*(1-p_ret)/ns)/p_ret)**2
+                    + (np.sqrt(p_gen*(1-p_gen)/ns)/p_gen)**2)
+
+# --- figura ---
+fig, axs = plt.subplots(1, 4, figsize=(16, 3.7))
+
+ax = axs[0]
+xx = np.linspace(0.6, 1.08, 500)
+ax.plot(xx, stats.beta.pdf(xx, k_ret+0.5, n_ret-k_ret+0.5), color=&#x27;#0b3d91&#x27;, lw=1.8,
+        label=f&#x27;$a_{{ret}}$ Beta ({k_ret}/{n_ret})&#x27;)
+ax.plot(xx, stats.beta.pdf(xx, k_gen+0.5, n_gen-k_gen+0.5), color=&#x27;#b22222&#x27;, lw=1.8,
+        label=f&#x27;$a_{{gen}}$ Beta ({k_gen}/{n_gen})&#x27;)
+# aproximacion normal del componente alto: cola no fisica &gt; 1
+ng = stats.norm.pdf(xx, p_gen, u_gen)
+ax.plot(xx, ng, color=&#x27;#b22222&#x27;, lw=1.2, ls=&#x27;--&#x27;, label=&#x27;$a_{gen}$ normal (GUM)&#x27;)
+ax.fill_between(xx[xx&gt;1], 0, ng[xx&gt;1], color=&#x27;red&#x27;, alpha=0.3)
+ax.axvline(1.0, color=&#x27;k&#x27;, lw=1.2)
+ax.text(1.002, ax.get_ylim()[1]*0.5, &#x27;cola\n$&gt;1$&#x27;, fontsize=7.5, color=&#x27;red&#x27;)
+ax.set_xlabel(&#x27;proporcion&#x27;); ax.set_ylabel(&#x27;densidad posterior&#x27;)
+ax.set_title(&#x27;(a) La normal asigna masa a $p&gt;1$&#x27;); ax.legend(fontsize=7.2, loc=&#x27;upper left&#x27;)
+
+ax = axs[1]
+ax.hist(a_s, bins=120, density=True, color=&#x27;#9ecae1&#x27;, edgecolor=&#x27;none&#x27;, label=&#x27;MC (Beta)&#x27;)
+xg = np.linspace(a0-4*u_a, min(a0+4*u_a, 1.05), 300)
+ax.plot(xg, stats.norm.pdf(xg, a0, u_a), &#x27;r-&#x27;, lw=1.6, label=&#x27;GUM (normal)&#x27;)
+ax.axvline(a0, color=&#x27;#b22222&#x27;, ls=&#x27;:&#x27;, lw=1.2)
+ax.axvline(a_mc, color=&#x27;k&#x27;, ls=&#x27;:&#x27;, lw=1.2)
+ax.set_xlabel(&#x27;$a_{e2e}$&#x27;); ax.set_ylabel(&#x27;densidad&#x27;)
+ax.set_title(f&#x27;(b) Asimetria por soporte ($\\gamma_1$={stats.skew(a_s):+.2f})&#x27;); ax.legend(fontsize=8, loc=&#x27;upper left&#x27;)
+
+ax = axs[2]
+methods = [&#x27;GUM\n(normal)&#x27;, &#x27;Monte Carlo\n(Beta)&#x27;, &#x27;Wilson\n(producto)&#x27;]
+los = [lo_gum, lo_mc, lo_w]; his = [hi_gum, hi_mc, hi_w]
+cen = [a0, a_mc, a0]
+for i,(l,h,c) in enumerate(zip(los,his,cen)):
+    ax.plot([l,h],[i,i],&#x27;-&#x27;, color=&#x27;#0b3d91&#x27;, lw=3)
+    ax.plot(c,i,&#x27;o&#x27;,color=&#x27;#b22222&#x27;,ms=7)
+ax.axvline(1.0, color=&#x27;k&#x27;, ls=&#x27;--&#x27;, lw=1.2)
+ax.set_yticks(range(3)); ax.set_yticklabels(methods, fontsize=8.5)
+ax.set_xlabel(&#x27;$a_{e2e}$ (intervalo 95%)&#x27;)
+ax.set_title(&#x27;(c) Intervalos de cobertura&#x27;); ax.set_ylim(-0.6, 2.6)
+
+ax = axs[3]
+ax.loglog(ns, u_vs_n, &#x27;-o&#x27;, color=&#x27;#0b3d91&#x27;, ms=4, lw=1.5, label=&#x27;$u(a_{e2e})$&#x27;)
+ax.loglog(ns, u_a*np.sqrt(n_ret/ns), &#x27;r--&#x27;, lw=1.2, label=r&#x27;$\propto n^{-1/2}$&#x27;)
+for utgt, lbl in [(0.01,&#x27;1%&#x27;)]:
+    ax.axhline(utgt, color=&#x27;gray&#x27;, ls=&#x27;:&#x27;, lw=1)
+    ax.text(ns[0], utgt*1.1, f&#x27;objetivo {lbl}&#x27;, fontsize=7.5, color=&#x27;gray&#x27;)
+ax.set_xlabel(&#x27;tamano del conjunto de evaluacion $n$&#x27;); ax.set_ylabel(&#x27;$u(a_{e2e})$&#x27;)
+ax.set_title(&#x27;(d) Precision vs tamano de evaluacion&#x27;); ax.legend(fontsize=8)
+
+fig.suptitle(&#x27;Sistema RAG: incertidumbre de la exactitud por muestra finita (GUM, Monte Carlo y Wilson)&#x27;, y=1.03)
+plt.savefig(&#x27;fig_s6_ej6_rag.png&#x27;, dpi=300, bbox_inches=&#x27;tight&#x27;)
+# plt.show()
+print(&quot;Figura guardada.&quot;)</textarea>
+  <div class="code-output-wrap" hidden>
+    <div class="code-output-console"></div>
+    <div class="code-output-figures"></div>
+  </div>
+  <div class="code-status"></div>
+</div>
+
+    <h2 class="section-heading" style="margin-top:44px">Desarrollo teórico completo</h2>
+    <p class="section-intro">Ecuaciones, demostraciones, tablas y discusión de esta semana, tal como están
+      en los apuntes del curso — mismo documento fuente que el PDF completo, recortado a esta semana.</p>
+    <div class="theory-pdf-wrap">
+      <iframe src="../../assets/apuntes/semana-06.pdf" title="Desarrollo teórico — Semana 6. Cuantificación de incertidumbre: GUM y métodos Monte Carlo" loading="lazy"></iframe>
+    </div>
+    <p class="theory-pdf-fallback">
+      ¿No se ve el documento arriba? <a href="../../assets/apuntes/semana-06.pdf" download>Descarga el PDF de esta semana</a>
+      o <a href="../../assets/apuntes/semana-06.pdf" target="_blank" rel="noopener">ábrelo en una pestaña nueva</a>.
+    </p>
+
+    <div class="week-nav">
+      <a href="../semana-05/index.html">&larr; Semana 05</a>
+      <span class="to-index"><a href="../../index.html">&uarr; Volver al índice del curso</a></span>
+      <a href="../semana-07/index.html">Semana 07 &rarr;</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div>Doctorado en Ingeniería y Tecnología Aplicada &middot; Universidad La Salle Bajío</div>
+    <div>Dr. Jorge Ramón Parra Michel &middot; Prototipado y Simulación</div>
+  </div>
+</footer>
+
+<script src="../../assets/js/main.js"></script>
+<script src="../../assets/js/pyodide-runner.js"></script>
+
+<script>
+window.addEventListener("load", function () {
+  if (window.renderMathInElement) {
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left: "$$", right: "$$", display: true},
+        {left: "$", right: "$", display: false}
+      ],
+      throwOnError: false
+    });
+  }
+});
+</script>
+
+</body>
+</html>

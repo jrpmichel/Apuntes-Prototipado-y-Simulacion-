@@ -1,0 +1,1160 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Semana 5. Simulación Bidimensional de Campos — Prototipado y Simulación</title>
+<meta name="description" content="Semana 5. Simulación Bidimensional de Campos: objetivo, temario y código ejecutable.">
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-cpW21h6RZv/phavutF+AuVYrr+dA8xD9zs6FwLpaCePvcCWnZ8IU9UNlXhpKUAJI" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-vZTG03m+2yp6N6BNi5iM4rW4oIwk5DfcNdFfxkk9ZWpDriOkXX8voJBFrAO7MpVl" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-GvrOXuhMATgEsSwCs4smul74iXGOixntILdUW9XmUC6+HX0sLNAK3q71HotJqlAn" crossorigin="anonymous">
+<link rel="stylesheet" href="../../assets/css/style.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="topbar-brand" href="../../index.html">
+      <img src="../../assets/img/logo-lasalle.png" alt="Universidad La Salle Bajío">
+      Prototipado y Simulación
+    </a>
+    <nav>
+      <a href="../../index.html#semanas">Semanas</a>
+      <a href="../../README.md">Repositorio</a>
+      <a class="topbar-pdf-btn" href="../../assets/apuntes/Apuntes_Curso_Doctoral_Simulacion_Prototipado_COMPLETO.pdf" download>Descargar PDF</a>
+    </nav>
+  </div>
+</div>
+
+<header class="week-header">
+  <div class="wrap">
+    <div class="breadcrumb"><a href="../../index.html">Inicio</a> &rsaquo; Semana 05</div>
+    <p class="num">Semana 05</p>
+    <h1>Simulación Bidimensional de Campos</h1>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <div class="callout">
+      <h3>Objetivo de la cátedra</h3>
+      <p>Implementar simulaciones bidimensionales de difusión, propagación de
+ondas y transporte en dominios con geometría compleja, dominando el
+mallado cartesiano 2D, la representación de obstáculos y cavidades
+mediante máscaras, el ensamblaje disperso de sistemas lineales, los
+criterios de estabilidad en dos dimensiones y la visualización
+cuantitativa de campos escalares, con énfasis en la interpretación
+física y el diagnóstico de los errores numéricos propios de 2D.</p>
+    </div>
+    <div class="callout proposito">
+      <h3>Propósito del tema</h3>
+      <p>La Semana&nbsp;4 estableció las EDPs canónicas y sus esquemas en una
+dimensión espacial. Esta semana da el salto a dos dimensiones, que
+es donde la simulación empieza a parecerse a los problemas reales
+de una tesis doctoral: secciones transversales de componentes
+compuestos, placas con cavidades, recintos con obstáculos, flujos
+recirculantes y campos medidos por redes de sensores. El salto no
+es trivial: el costo computacional crece cuadráticamente con la
+resolución, los criterios de estabilidad se endurecen, la
+geometría deja de ser un intervalo y se convierte en una decisión
+de modelado, y la elección de condiciones de frontera en los bordes
+<em>internos</em> (huecos, obstáculos) puede invertir por completo la
+conclusión de un estudio. Esta semana se aprende a anticipar y
+diagnosticar esos efectos.</p>
+    </div>
+    
+    <div class="callout resultado">
+      <h3>Resultado de aprendizaje esperado</h3>
+      <p>Al finalizar la sesión, el estudiante será capaz de:
+(i)&nbsp;discretizar el laplaciano 2D con el stencil de cinco puntos y
+cuantificar su error de truncamiento; (ii)&nbsp;derivar y aplicar los
+criterios de estabilidad FTCS y CFL en dos dimensiones;
+(iii)&nbsp;representar geometrías complejas (dominios circulares,
+perforaciones, obstáculos) sobre mallas cartesianas mediante máscaras
+booleanas, incluyendo interfaces entre materiales con media armónica;
+(iv)&nbsp;ensamblar y resolver sistemas dispersos para problemas elípticos
+en dominios no triviales; (v)&nbsp;cuantificar la difusión y la dispersión
+numéricas de los esquemas de transporte en 2D mediante pruebas con
+solución exacta conocida; y (vi)&nbsp;seleccionar visualizaciones de campos
+escalares que permitan comparación cuantitativa y no solo cualitativa.</p>
+    </div>
+    <h2 class="section-heading" style="margin-top:36px">Temario</h2>
+    <ul class="temario"><li>Simulación 2D de difusión.</li><li>Propagación de ondas.</li><li>Obstáculos y condiciones geométricas.</li><li>Mallado bidimensional.</li><li>Visualización de campos escalares.</li><li>Análisis temporal de simulaciones.</li><li>Interpretación física de resultados.</li></ul>
+    <h2 class="section-heading" style="margin-top:44px">Figuras de la semana</h2>
+    <p class="section-intro">6 imagen(es) referenciadas en los apuntes de esta semana.
+      Colócalas en <code>assets/img/semana-05/</code> con el nombre exacto indicado debajo
+      de cada recuadro; mientras no estén, se muestra un marcador en su lugar.</p>
+    <div class="gallery">
+    <figure>
+      <img src="../../assets/img/semana-05/fig_s5_ej1_difusion2D_cable.png" alt="fig_s5_ej1_difusion2D_cable.png" data-fallback-name="fig_s5_ej1_difusion2D_cable.png" loading="lazy">
+      <figcaption>fig_s5_ej1_difusion2D_cable.png</figcaption>
+    </figure><figure>
+      <img src="../../assets/img/semana-05/fig_s5_ej2_onda2D_difraccion.png" alt="fig_s5_ej2_onda2D_difraccion.png" data-fallback-name="fig_s5_ej2_onda2D_difraccion.png" loading="lazy">
+      <figcaption>fig_s5_ej2_onda2D_difraccion.png</figcaption>
+    </figure><figure>
+      <img src="../../assets/img/semana-05/fig_s5_ej3_poisson2D_losa.png" alt="fig_s5_ej3_poisson2D_losa.png" data-fallback-name="fig_s5_ej3_poisson2D_losa.png" loading="lazy">
+      <figcaption>fig_s5_ej3_poisson2D_losa.png</figcaption>
+    </figure><figure>
+      <img src="../../assets/img/semana-05/fig_s5_ej4_convdif2D_vortice.png" alt="fig_s5_ej4_convdif2D_vortice.png" data-fallback-name="fig_s5_ej4_convdif2D_vortice.png" loading="lazy">
+      <figcaption>fig_s5_ej4_convdif2D_vortice.png</figcaption>
+    </figure><figure>
+      <img src="../../assets/img/semana-05/fig_s5_ej5_adveccion2D_rotacion.png" alt="fig_s5_ej5_adveccion2D_rotacion.png" data-fallback-name="fig_s5_ej5_adveccion2D_rotacion.png" loading="lazy">
+      <figcaption>fig_s5_ej5_adveccion2D_rotacion.png</figcaption>
+    </figure><figure>
+      <img src="../../assets/img/semana-05/fig_s5_ej6_laplace_sensores.png" alt="fig_s5_ej6_laplace_sensores.png" data-fallback-name="fig_s5_ej6_laplace_sensores.png" loading="lazy">
+      <figcaption>fig_s5_ej6_laplace_sensores.png</figcaption>
+    </figure>
+  </div>
+    <h2 class="section-heading" style="margin-top:44px">Código de la semana (ejecutable)</h2>
+    <div class="pyodide-banner">
+      &#9432; El código corre por completo en tu navegador (Python vía WebAssembly, sin servidor). La
+      primera vez que pulses <strong>Ejecutar</strong> en esta página se descarga el runtime — tarda unos
+      segundos. Puedes editar el código antes de correrlo.
+    </div>
+    <div class="code-cell">
+  <div class="code-cell-header">
+    <span class="code-cell-title">Código 1</span>
+    <span class="code-cell-caption">Semana 5 – Código 1: Difusión de calor 2D transitoria (FTCS, stencil de 5 puntos) en una sección circular de dos materiales con fuente Joule conmutada. Ejecutar en Google Colab.</span>
+    <button class="run-btn" type="button">&#9654; Ejecutar</button>
+  </div>
+  
+  <textarea class="code-input" spellcheck="false" rows="14">&quot;&quot;&quot;
+Semana 5 - Ejemplo 1: Difusion de calor 2D transitoria en una seccion
+transversal compuesta (dominio circular con dos materiales)
+
+Aplicacion generica: cualquier componente cilindrico con generacion
+interna de calor (un cable compuesto, un eje, una barra de combustible).
+La seccion contiene un nucleo de baja conductividad (p.ej. un tubo
+con fibras opticas) rodeado por una corona conductora donde se
+disipa calor por efecto Joule.
+
+Fisica:  rho*cp * dT/dt = div( k(x,y) grad T ) + Q(x,y)
+Esquema: FTCS 2D (stencil de 5 puntos) con conductividad variable
+         evaluada con media armonica en las caras de celda.
+Geometria: dominio circular embebido en una malla cartesiana
+         mediante una mascara booleana (metodo de frontera escalonada).
+&quot;&quot;&quot;
+
+# ============================================================
+# BLOQUE 1: Librerias
+# ============================================================
+import numpy as np
+import matplotlib
+matplotlib.use(&#x27;Agg&#x27;)
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+
+mpl.rcParams.update({
+    &#x27;font.size&#x27;: 10, &#x27;axes.titlesize&#x27;: 11, &#x27;axes.labelsize&#x27;: 10,
+    &#x27;figure.dpi&#x27;: 110, &#x27;savefig.dpi&#x27;: 300,
+})
+
+# ============================================================
+# BLOQUE 2: Parametros fisicos
+# Dos materiales: nucleo (tubo polimerico) y corona (aleacion Al)
+# ============================================================
+R_ext   = 6.0e-3      # [m]  radio exterior de la seccion
+R_nuc   = 1.8e-3      # [m]  radio del nucleo de baja conductividad
+
+# Material 1: nucleo polimerico (protege elementos sensibles)
+k1, rho1, cp1 = 0.30, 1400.0, 1200.0    # [W/m/K], [kg/m3], [J/kg/K]
+# Material 2: corona metalica (aluminio, donde se genera el calor)
+k2, rho2, cp2 = 200.0, 2700.0, 900.0
+
+# Generacion volumetrica de calor (efecto Joule) SOLO en la corona
+Q_J = 4.0e8           # [W/m3] densidad de potencia durante el transitorio
+t_pulso = 0.30        # [s]   duracion del pulso de corriente
+t_total = 0.60        # [s]   tiempo total simulado (pulso + enfriamiento)
+
+T0    = 25.0          # [C]  temperatura inicial uniforme
+h_cv  = 25.0          # [W/m2/K] conveccion natural en la superficie
+T_inf = 25.0          # [C]  temperatura ambiente
+
+# ============================================================
+# BLOQUE 3: Malla cartesiana 2D y mascara del dominio circular
+# ============================================================
+N  = 121                          # nodos por direccion (malla N x N)
+L  = 2.0 * R_ext * 1.05           # lado del cuadrado que contiene al circulo
+dx = L / (N - 1)
+x  = np.linspace(-L/2, L/2, N)
+X, Y = np.meshgrid(x, x, indexing=&#x27;xy&#x27;)
+r    = np.sqrt(X**2 + Y**2)
+
+dentro  = r &lt;= R_ext              # mascara del dominio fisico
+nucleo  = r &lt;= R_nuc              # subdominio 1
+corona  = dentro &amp; ~nucleo        # subdominio 2
+# frontera: celdas del dominio con al menos un vecino fuera
+front = dentro &amp; (
+    ~np.roll(dentro, 1, 0) | ~np.roll(dentro, -1, 0) |
+    ~np.roll(dentro, 1, 1) | ~np.roll(dentro, -1, 1))
+
+# Campos de propiedades por celda
+k_map  = np.where(nucleo, k1, k2)
+rc_map = np.where(nucleo, rho1*cp1, rho2*cp2)
+Q_map  = np.where(corona, Q_J, 0.0)
+
+# ============================================================
+# BLOQUE 4: Paso de tiempo estable (criterio FTCS 2D)
+# dt &lt;= dx^2 / (4 * alpha_max)
+# ============================================================
+alpha_max = (k_map / rc_map)[dentro].max()
+dt = 0.40 * dx**2 / (4.0 * alpha_max)     # margen de seguridad
+n_pasos = int(np.ceil(t_total / dt))
+print(f&quot;dx = {dx*1e3:.3f} mm | alpha_max = {alpha_max:.3e} m2/s&quot;)
+print(f&quot;dt = {dt*1e6:.2f} us | pasos = {n_pasos}&quot;)
+
+# ============================================================
+# BLOQUE 5: Conductividades de cara (media armonica)
+# k_face = 2 k_i k_j / (k_i + k_j) garantiza continuidad de flujo
+# en la interfaz entre materiales
+# ============================================================
+def k_face(ka, kb):
+    return 2.0 * ka * kb / (ka + kb)
+
+kE = k_face(k_map, np.roll(k_map, -1, 1))   # cara este
+kW = k_face(k_map, np.roll(k_map,  1, 1))   # cara oeste
+kN = k_face(k_map, np.roll(k_map, -1, 0))   # cara norte
+kS = k_face(k_map, np.roll(k_map,  1, 0))   # cara sur
+
+# Anular el flujo a traves de caras que cruzan la frontera del circulo:
+# equivale a imponer condicion de Neumann homogenea (adiabatica) en la
+# frontera escalonada. La perdida convectiva se agrega como sumidero.
+kE[~np.roll(dentro, -1, 1)] = 0.0
+kW[~np.roll(dentro,  1, 1)] = 0.0
+kN[~np.roll(dentro, -1, 0)] = 0.0
+kS[~np.roll(dentro,  1, 0)] = 0.0
+
+# ============================================================
+# BLOQUE 6: Bucle temporal FTCS con fuente conmutada
+# La conveccion superficial se modela como sumidero volumetrico
+# en las celdas de frontera: q_cv = h (T - T_inf) * (P/A) ~ h(T-T_inf)/dx
+# ============================================================
+T = np.full((N, N), T0)
+hist_t, hist_Tmax, hist_Tnuc = [], [], []
+snaps = {}
+t_snap = [0.05, 0.30, 0.60]
+idx_c = N // 2                      # nodo central
+j_int = idx_c + int(R_nuc/dx) - 2   # nodo dentro del nucleo, cerca de la interfaz
+hist_Tint = []
+
+t = 0.0
+for n in range(n_pasos):
+    Q_n = Q_map if t &lt; t_pulso else np.zeros_like(Q_map)
+
+    TE = np.roll(T, -1, 1); TW = np.roll(T, 1, 1)
+    TN = np.roll(T, -1, 0); TS = np.roll(T, 1, 0)
+    lap = (kE*(TE-T) + kW*(TW-T) + kN*(TN-T) + kS*(TS-T)) / dx**2
+
+    sumidero = np.zeros_like(T)
+    sumidero[front] = h_cv * (T[front] - T_inf) / dx   # [W/m3]
+
+    T = T + dt * (lap + Q_n - sumidero) / rc_map
+    T[~dentro] = T0                 # el exterior no participa
+    t += dt
+
+    hist_t.append(t)
+    hist_Tmax.append(T[dentro].max())
+    hist_Tnuc.append(T[idx_c, idx_c])
+    hist_Tint.append(T[idx_c, j_int])
+    for ts in t_snap:
+        if ts not in snaps and t &gt;= ts:
+            snaps[ts] = T.copy()
+
+print(f&quot;T_max global       = {max(hist_Tmax):.1f} C&quot;)
+print(f&quot;T_max en el nucleo = {max(hist_Tnuc):.1f} C&quot;)
+print(f&quot;T_nucleo al final  = {hist_Tnuc[-1]:.1f} C&quot;)
+print(f&quot;T_max al final     = {hist_Tmax[-1]:.1f} C&quot;)
+print(f&quot;T interfaz nucleo (max) = {max(hist_Tint):.1f} C&quot;)
+
+# ============================================================
+# BLOQUE 7: Visualizacion (campo escalar + historia temporal)
+# ============================================================
+fig, axs = plt.subplots(1, 4, figsize=(15, 3.8),
+                        gridspec_kw={&#x27;width_ratios&#x27;: [1, 1, 1, 1.25]})
+vmax = max(hist_Tmax)
+for ax, ts in zip(axs[:3], t_snap):
+    Tp = np.where(dentro, snaps[ts], np.nan)
+    im = ax.pcolormesh(X*1e3, Y*1e3, Tp, cmap=&#x27;inferno&#x27;,
+                       vmin=T0, vmax=vmax, shading=&#x27;auto&#x27;)
+    th = np.linspace(0, 2*np.pi, 200)
+    ax.plot(R_nuc*1e3*np.cos(th), R_nuc*1e3*np.sin(th), &#x27;c--&#x27;, lw=1)
+    ax.set_title(f&quot;t = {ts:.2f} s&quot;)
+    ax.set_xlabel(&quot;x [mm]&quot;); ax.set_aspect(&#x27;equal&#x27;)
+axs[0].set_ylabel(&quot;y [mm]&quot;)
+fig.colorbar(im, ax=axs[:3], shrink=0.85, label=&quot;T [[C]]&quot;)
+
+axs[3].plot(hist_t, hist_Tmax, &#x27;r-&#x27;, lw=1.6, label=r&quot;$T_{max}$ (corona)&quot;)
+axs[3].plot(hist_t, hist_Tint, &#x27;g-&#x27;, lw=1.6, label=r&quot;$T$ interfaz nucleo&quot;)
+axs[3].plot(hist_t, hist_Tnuc, &#x27;b-&#x27;, lw=1.6, label=r&quot;$T$ centro del nucleo&quot;)
+axs[3].axvline(t_pulso, color=&#x27;k&#x27;, ls=&#x27;:&#x27;, lw=1)
+axs[3].text(t_pulso*1.02, T0+5, &quot;fin del pulso&quot;, rotation=90, fontsize=8)
+axs[3].set_xlabel(&quot;t [s]&quot;); axs[3].set_ylabel(&quot;T [[C]]&quot;)
+axs[3].set_title(&quot;Historia termica&quot;)
+axs[3].legend(fontsize=8); axs[3].grid(alpha=0.3)
+
+fig.suptitle(&quot;Difusion 2D en seccion compuesta: pulso Joule y enfriamiento&quot;,
+             y=1.02)
+plt.savefig(&#x27;Figuras/fig_s5_ej1_difusion2D_cable.png&#x27;,
+            dpi=300, bbox_inches=&#x27;tight&#x27;)
+# plt.show()
+print(&quot;Figura guardada.&quot;)
+</textarea>
+  <div class="code-output-wrap" hidden>
+    <div class="code-output-console"></div>
+    <div class="code-output-figures"></div>
+  </div>
+  <div class="code-status"></div>
+</div>
+<div class="code-cell">
+  <div class="code-cell-header">
+    <span class="code-cell-title">Código 2</span>
+    <span class="code-cell-caption">Semana 5 – Código 2: Ecuación de onda 2D con esquema leapfrog, obstáculo con rendija (difracción) y monitoreo de la energía discreta. Ejecutar en Google Colab.</span>
+    <button class="run-btn" type="button">&#9654; Ejecutar</button>
+  </div>
+  
+  <textarea class="code-input" spellcheck="false" rows="14">&quot;&quot;&quot;
+Semana 5 - Ejemplo 2: Ecuacion de onda 2D con obstaculo --
+reflexion y difraccion a traves de una rendija
+
+Aplicacion generica: propagacion de perturbaciones mecanicas u
+opticas en un medio bidimensional (ondas de presion generadas por
+una descarga, vibraciones en una membrana, frentes de onda en
+metrologia optica). El obstaculo con rendija reproduce el
+experimento clasico de difraccion.
+
+Fisica:  d2u/dt2 = c^2 (d2u/dx2 + d2u/dy2)
+Esquema: leapfrog explicito de segundo orden en tiempo y espacio.
+Estabilidad (CFL 2D): c*dt/dx &lt;= 1/sqrt(2).
+&quot;&quot;&quot;
+
+# ============================================================
+# BLOQUE 1: Librerias
+# ============================================================
+import numpy as np
+import matplotlib
+matplotlib.use(&#x27;Agg&#x27;)
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+
+mpl.rcParams.update({
+    &#x27;font.size&#x27;: 10, &#x27;axes.titlesize&#x27;: 11, &#x27;axes.labelsize&#x27;: 10,
+    &#x27;figure.dpi&#x27;: 110, &#x27;savefig.dpi&#x27;: 300,
+})
+
+# ============================================================
+# BLOQUE 2: Parametros fisicos y geometricos
+# ============================================================
+Lx, Ly = 1.0, 1.0        # [m]    dominio cuadrado
+c      = 340.0           # [m/s]  velocidad de propagacion (aire)
+T_fin  = 2.6e-3          # [s]    tiempo total simulado
+
+# Fuente: pulso gaussiano inicial centrado en (x0, y0)
+x0, y0 = 0.25, 0.50      # [m]    posicion de la fuente
+sigma  = 0.025           # [m]    ancho del pulso
+
+# Obstaculo: pared vertical en x = x_b con una rendija centrada
+x_b      = 0.50          # [m]    posicion de la pared
+espesor  = 0.02          # [m]    espesor de la pared
+a_rendija = 0.10         # [m]    apertura de la rendija
+
+# ============================================================
+# BLOQUE 3: Malla y numero de Courant 2D
+# ============================================================
+N  = 401
+dx = Lx / (N - 1)
+x  = np.linspace(0, Lx, N)
+X, Y = np.meshgrid(x, x, indexing=&#x27;xy&#x27;)
+
+# CFL 2D: elegimos S = c dt/dx = 0.5 &lt; 1/sqrt(2) ~ 0.707
+S  = 0.5
+dt = S * dx / c
+n_pasos = int(np.ceil(T_fin / dt))
+print(f&quot;dx = {dx*1e3:.2f} mm | dt = {dt*1e6:.2f} us | pasos = {n_pasos}&quot;)
+print(f&quot;Numero de Courant 2D: S = {S} (limite 1/sqrt(2) = {1/np.sqrt(2):.3f})&quot;)
+
+# Mascara del obstaculo (True = pared rigida, u = 0)
+pared = (np.abs(X - x_b) &lt;= espesor/2) &amp; (np.abs(Y - Ly/2) &gt; a_rendija/2)
+
+# ============================================================
+# BLOQUE 4: Condiciones iniciales
+# u^0: pulso gaussiano; u^1 obtenido con arranque de Taylor
+# u^1 = u^0 + (dt^2 c^2 / 2) lap(u^0)   (velocidad inicial nula)
+# ============================================================
+def laplaciano(u):
+    lap = np.zeros_like(u)
+    lap[1:-1, 1:-1] = (u[1:-1, 2:] + u[1:-1, :-2] +
+                       u[2:, 1:-1] + u[:-2, 1:-1] -
+                       4.0 * u[1:-1, 1:-1]) / dx**2
+    return lap
+
+u0 = np.exp(-((X - x0)**2 + (Y - y0)**2) / (2 * sigma**2))
+u0[pared] = 0.0
+u1 = u0 + 0.5 * (c * dt)**2 * laplaciano(u0)
+u1[pared] = 0.0
+
+# ============================================================
+# BLOQUE 5: Bucle temporal leapfrog
+# u^{n+1} = 2u^n - u^{n-1} + (c dt)^2 lap(u^n)
+# Fronteras exteriores: Dirichlet u = 0 (paredes rigidas)
+# Energia discreta: E = sum( (du/dt)^2 + c^2 |grad u|^2 ) dx^2 / 2
+# ============================================================
+u_prev, u = u0.copy(), u1.copy()
+snaps, hist_t, hist_E = {}, [], []
+t_snap = [0.5e-3, 1.2e-3, 2.4e-3]
+
+t = dt
+for n in range(n_pasos):
+    u_next = 2.0*u - u_prev + (c*dt)**2 * laplaciano(u)
+    u_next[pared] = 0.0          # obstaculo rigido (Dirichlet interno)
+    u_next[0, :] = u_next[-1, :] = 0.0
+    u_next[:, 0] = u_next[:, -1] = 0.0
+
+    # Energia discreta (diagnostico de conservacion)
+    ut = (u_next - u_prev) / (2*dt)
+    ux = (u[1:-1, 2:] - u[1:-1, :-2]) / (2*dx)
+    uy = (u[2:, 1:-1] - u[:-2, 1:-1]) / (2*dx)
+    E = 0.5*np.sum(ut[1:-1, 1:-1]**2)*dx**2 \
+        + 0.5*c**2*(np.sum(ux**2) + np.sum(uy**2))*dx**2
+    hist_t.append(t); hist_E.append(E)
+
+    u_prev, u = u, u_next
+    t += dt
+    for ts in t_snap:
+        if ts not in snaps and t &gt;= ts:
+            snaps[ts] = u.copy()
+
+E = np.array(hist_E)
+deriva = abs(E[-1] - E[len(E)//4]) / E[len(E)//4] * 100
+print(f&quot;Deriva de energia tras el transitorio inicial: {deriva:.2f} %&quot;)
+
+# ============================================================
+# BLOQUE 6: Visualizacion
+# ============================================================
+fig, axs = plt.subplots(1, 4, figsize=(15.5, 3.9),
+                        gridspec_kw={&#x27;width_ratios&#x27;: [1, 1, 1, 1.2]})
+for ax, ts in zip(axs[:3], t_snap):
+    up = np.ma.array(snaps[ts], mask=pared)
+    im = ax.pcolormesh(X, Y, up, cmap=&#x27;RdBu_r&#x27;, vmin=-0.12, vmax=0.12,
+                       shading=&#x27;auto&#x27;)
+    ax.add_patch(plt.Rectangle((x_b-espesor/2, 0), espesor,
+                 Ly/2 - a_rendija/2, color=&#x27;k&#x27;))
+    ax.add_patch(plt.Rectangle((x_b-espesor/2, Ly/2 + a_rendija/2),
+                 espesor, Ly/2 - a_rendija/2, color=&#x27;k&#x27;))
+    ax.set_title(f&quot;t = {ts*1e3:.1f} ms&quot;)
+    ax.set_xlabel(&quot;x [m]&quot;); ax.set_aspect(&#x27;equal&#x27;)
+axs[0].set_ylabel(&quot;y [m]&quot;)
+fig.colorbar(im, ax=axs[:3], shrink=0.85, label=&quot;u (amplitud)&quot;)
+
+axs[3].plot(np.array(hist_t)*1e3, E/E[len(E)//4], &#x27;k-&#x27;, lw=1.4)
+axs[3].set_xlabel(&quot;t [ms]&quot;)
+axs[3].set_ylabel(r&quot;$E(t)/E_{ref}$&quot;)
+axs[3].set_title(&quot;Conservacion de energia&quot;)
+axs[3].grid(alpha=0.3); axs[3].set_ylim(0.9, 1.1)
+
+fig.suptitle(&quot;Onda 2D: reflexion en la pared y difraccion por la rendija&quot;,
+             y=1.03)
+plt.savefig(&#x27;Figuras/fig_s5_ej2_onda2D_difraccion.png&#x27;,
+            dpi=300, bbox_inches=&#x27;tight&#x27;)
+# plt.show()
+print(&quot;Figura guardada.&quot;)
+</textarea>
+  <div class="code-output-wrap" hidden>
+    <div class="code-output-console"></div>
+    <div class="code-output-figures"></div>
+  </div>
+  <div class="code-status"></div>
+</div>
+<div class="code-cell">
+  <div class="code-cell-header">
+    <span class="code-cell-title">Código 3</span>
+    <span class="code-cell-caption">Semana 5 – Código 3: Ecuación de Poisson 2D sobre un dominio con cavidades, ensamblada en formato disperso (scipy.sparse) con condiciones Neumann o Dirichlet en las fronteras internas. Ejecutar en Google Colab.</span>
+    <button class="run-btn" type="button">&#9654; Ejecutar</button>
+  </div>
+  
+  <textarea class="code-input" spellcheck="false" rows="14">&quot;&quot;&quot;
+Semana 5 - Ejemplo 3: Ecuacion de Poisson 2D en un dominio con
+perforaciones -- calor de hidratacion en una losa aligerada
+
+Aplicacion generica: elementos estructurales de concreto con
+cavidades (losas reticulares o aligeradas). Durante el fraguado, la
+hidratacion del cemento genera calor; el campo estacionario de
+temperatura satisface la ecuacion de Poisson. Las cavidades reducen
+el volumen que genera calor y modifican la geometria del dominio.
+
+Fisica:   -k * lap(T) = q_h        en el concreto
+          T = T_amb                en el contorno exterior (Dirichlet)
+          dT/dn = 0                en las paredes de las cavidades
+                                   (Neumann homogenea, aislamiento aprox.)
+Metodo:   ensamblaje disperso (scipy.sparse) del stencil de 5 puntos
+          SOLO sobre las celdas activas del dominio enmascarado.
+&quot;&quot;&quot;
+
+# ============================================================
+# BLOQUE 1: Librerias
+# ============================================================
+import numpy as np
+import matplotlib
+matplotlib.use(&#x27;Agg&#x27;)
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+from scipy.sparse import lil_matrix, csr_matrix
+from scipy.sparse.linalg import spsolve
+
+mpl.rcParams.update({
+    &#x27;font.size&#x27;: 10, &#x27;axes.titlesize&#x27;: 11, &#x27;axes.labelsize&#x27;: 10,
+    &#x27;figure.dpi&#x27;: 110, &#x27;savefig.dpi&#x27;: 300,
+})
+
+# ============================================================
+# BLOQUE 2: Parametros fisicos
+# ============================================================
+Lx, Ly = 3.0, 3.0       # [m]      planta de la losa (vista en planta)
+k_c    = 1.8            # [W/m/K]  conductividad del concreto
+q_h    = 250.0          # [W/m3]   generacion por hidratacion (pico tipico)
+T_amb  = 22.0           # [C]      temperatura del contorno
+
+# Patron de cavidades: arreglo de nc x nc huecos cuadrados
+nc      = 4             # huecos por direccion
+l_hueco = 0.45          # [m] lado de cada hueco
+
+# ============================================================
+# BLOQUE 3: Malla y mascaras (solida vs aligerada)
+# ============================================================
+N  = 181
+dx = Lx / (N - 1)
+x  = np.linspace(0, Lx, N)
+X, Y = np.meshgrid(x, x, indexing=&#x27;xy&#x27;)
+
+def mascara_aligerada():
+    &quot;&quot;&quot;True = celda de concreto (activa).&quot;&quot;&quot;
+    act = np.ones((N, N), dtype=bool)
+    paso = Lx / nc
+    for ii in range(nc):
+        for jj in range(nc):
+            cx = (ii + 0.5) * paso
+            cy = (jj + 0.5) * paso
+            hueco = (np.abs(X - cx) &lt;= l_hueco/2) &amp; \
+                    (np.abs(Y - cy) &lt;= l_hueco/2)
+            act &amp;= ~hueco
+    return act
+
+masc_solida    = np.ones((N, N), dtype=bool)
+masc_aligerada = mascara_aligerada()
+frac_vol = masc_aligerada.sum() / masc_solida.sum()
+print(f&quot;Fraccion de volumen de la losa aligerada: {frac_vol*100:.1f} %&quot;)
+
+# ============================================================
+# BLOQUE 4: Ensamblaje disperso sobre celdas activas
+# Numeramos las incognitas con un mapa (i,j) -&gt; indice global.
+# Dirichlet en el contorno exterior; Neumann homogenea en los
+# bordes internos (simplemente se omite la conexion al hueco y
+# el coeficiente diagonal cuenta solo los vecinos activos).
+# ============================================================
+def resolver_poisson(activa, bc_hueco=&#x27;neumann&#x27;):
+    &quot;&quot;&quot;bc_hueco: &#x27;neumann&#x27; (cavidad sellada, adiabatica) o
+    &#x27;dirichlet&#x27; (cavidad ventilada a T_amb).&quot;&quot;&quot;
+    interior = activa.copy()
+    interior[0, :] = interior[-1, :] = False
+    interior[:, 0] = interior[:, -1] = False
+
+    idx = -np.ones((N, N), dtype=int)
+    nodos = np.argwhere(interior)
+    idx[interior] = np.arange(len(nodos))
+    n_inc = len(nodos)
+
+    A = lil_matrix((n_inc, n_inc))
+    b = np.full(n_inc, q_h / k_c * dx**2)   # termino fuente
+    vecinos = [(0, 1), (0, -1), (1, 0), (-1, 0)]
+
+    for p, (i, j) in enumerate(nodos):
+        diag = 0.0
+        for di, dj in vecinos:
+            ii, jj = i + di, j + dj
+            if not activa[ii, jj]:
+                if bc_hueco == &#x27;dirichlet&#x27;:
+                    diag += 1.0
+                    b[p] += T_amb            # cavidad ventilada a T_amb
+                continue                     # &#x27;neumann&#x27;: flujo nulo
+            diag += 1.0
+            if interior[ii, jj]:
+                A[p, idx[ii, jj]] = -1.0
+            else:
+                b[p] += T_amb                # vecino Dirichlet exterior
+        A[p, p] = diag
+    A = csr_matrix(A)
+
+    T = np.full((N, N), np.nan)
+    T[interior] = spsolve(A, b)
+    T[activa &amp; ~interior] = T_amb            # contorno exterior
+    return T, A, n_inc
+
+T_sol, A_sol, n_sol = resolver_poisson(masc_solida)
+T_ali, A_ali, n_ali = resolver_poisson(masc_aligerada, &#x27;neumann&#x27;)
+T_ven, A_ven, n_ven = resolver_poisson(masc_aligerada, &#x27;dirichlet&#x27;)
+
+print(f&quot;Losa solida:    {n_sol} incognitas, nnz = {A_sol.nnz}&quot;)
+print(f&quot;Losa aligerada: {n_ali} incognitas, nnz = {A_ali.nnz}&quot;)
+print(f&quot;Densidad de A (aligerada): &quot;
+      f&quot;{A_ali.nnz / n_ali**2 * 100:.4f} % de entradas no nulas&quot;)
+print(f&quot;T_max solida                 = {np.nanmax(T_sol):.2f} C&quot;)
+print(f&quot;T_max aligerada (sellada)    = {np.nanmax(T_ali):.2f} C&quot;)
+print(f&quot;T_max aligerada (ventilada)  = {np.nanmax(T_ven):.2f} C&quot;)
+
+# ============================================================
+# BLOQUE 5: Visualizacion comparativa
+# ============================================================
+fig, axs = plt.subplots(1, 4, figsize=(16, 4.0),
+                        gridspec_kw={&#x27;width_ratios&#x27;: [1, 1, 1, 1.15]})
+vmax = np.nanmax(T_ali)
+for ax, T, titulo in zip(
+        axs[:3], [T_sol, T_ali, T_ven],
+        [&quot;Solida&quot;, &quot;Aligerada, cavidades selladas&quot;,
+         &quot;Aligerada, cavidades ventiladas&quot;]):
+    im = ax.pcolormesh(X, Y, T, cmap=&#x27;inferno&#x27;, vmin=T_amb, vmax=vmax,
+                       shading=&#x27;auto&#x27;)
+    ax.set_title(titulo, fontsize=10)
+    ax.set_xlabel(&quot;x [m]&quot;); ax.set_aspect(&#x27;equal&#x27;)
+axs[0].set_ylabel(&quot;y [m]&quot;)
+fig.colorbar(im, ax=axs[:3], shrink=0.85, label=&quot;T [[C]]&quot;)
+
+# Perfil por la linea media y = Ly/2
+jm = N // 2
+axs[3].plot(x, T_sol[jm, :], &#x27;r-&#x27;,  lw=1.6, label=&quot;solida&quot;)
+axs[3].plot(x, T_ali[jm, :], &#x27;b-&#x27;,  lw=1.6, label=&quot;sellada&quot;)
+axs[3].plot(x, T_ven[jm, :], &#x27;g-&#x27;,  lw=1.6, label=&quot;ventilada&quot;)
+axs[3].set_xlabel(&quot;x [m]&quot;); axs[3].set_ylabel(&quot;T [[C]]&quot;)
+axs[3].set_title(r&quot;Perfil en $y = L_y/2$&quot;)
+axs[3].legend(fontsize=8); axs[3].grid(alpha=0.3)
+
+fig.suptitle(&quot;Poisson 2D con geometria perforada: calor de hidratacion&quot;,
+             y=1.02)
+plt.savefig(&#x27;Figuras/fig_s5_ej3_poisson2D_losa.png&#x27;,
+            dpi=300, bbox_inches=&#x27;tight&#x27;)
+# plt.show()
+print(&quot;Figura guardada.&quot;)
+</textarea>
+  <div class="code-output-wrap" hidden>
+    <div class="code-output-console"></div>
+    <div class="code-output-figures"></div>
+  </div>
+  <div class="code-status"></div>
+</div>
+<div class="code-cell">
+  <div class="code-cell-header">
+    <span class="code-cell-title">Código 4</span>
+    <span class="code-cell-caption">Semana 5 – Código 4: Transporte convectivo-difusivo de un trazador en un vórtice analítico, esquema upwind 2D, con diagnóstico del número de Péclet de malla y de la difusión numérica. Ejecutar en Google Colab.</span>
+    <button class="run-btn" type="button">&#9654; Ejecutar</button>
+  </div>
+  
+  <textarea class="code-input" spellcheck="false" rows="14">&quot;&quot;&quot;
+Semana 5 - Ejemplo 4: Conveccion-difusion 2D de un escalar pasivo
+en un flujo recirculante (vortice)
+
+Aplicacion generica: transporte de un trazador (colorante, calor,
+contaminante) en el seno de un fluido en recirculacion, como ocurre
+en camaras de mezclado, tanques agitados o el interior de equipos de
+bombeo. El campo de velocidad se impone analiticamente (vortice de
+una celda) y el escalar se transporta segun la EDP de conveccion-
+difusion.
+
+Fisica:   dc/dt + u dc/dx + v dc/dy = D (d2c/dx2 + d2c/dy2)
+Campo de velocidad solenoidal (div u = 0):
+   u =  U0 * sin(pi x/L) * cos(pi y/L)
+   v = -U0 * cos(pi x/L) * sin(pi y/L)
+Esquema:  upwind de primer orden (conveccion) + centrado (difusion).
+Estabilidad: dt &lt;= min( dx/(|u|+|v|),  dx^2/(4D) ).
+El numero de Peclet de malla Pe_h = |u| dx / D controla el regimen.
+&quot;&quot;&quot;
+
+# ============================================================
+# BLOQUE 1: Librerias
+# ============================================================
+import numpy as np
+import matplotlib
+matplotlib.use(&#x27;Agg&#x27;)
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+
+mpl.rcParams.update({
+    &#x27;font.size&#x27;: 10, &#x27;axes.titlesize&#x27;: 11, &#x27;axes.labelsize&#x27;: 10,
+    &#x27;figure.dpi&#x27;: 110, &#x27;savefig.dpi&#x27;: 300,
+})
+
+# ============================================================
+# BLOQUE 2: Parametros fisicos
+# Dos regimenes: dominado por difusion (Pe bajo) y por
+# conveccion (Pe alto). Solo cambia D.
+# ============================================================
+L   = 0.10            # [m]    lado de la cavidad
+U0  = 0.05            # [m/s]  velocidad caracteristica del vortice
+T_fin = 6.0           # [s]    tiempo simulado (~3 vueltas del vortice)
+
+casos = {
+    &quot;Pe bajo&quot;:  5.0e-5,   # [m2/s]  D grande  -&gt; Pe ~ 100
+    &quot;Pe alto&quot;:  5.0e-7,   # [m2/s]  D pequeno -&gt; Pe ~ 10000
+}
+
+# Mancha inicial de trazador: gaussiana descentrada
+x0, y0, s0 = 0.05, 0.075, 0.006   # [m]
+
+# ============================================================
+# BLOQUE 3: Malla y campo de velocidad analitico
+# ============================================================
+N  = 161
+dx = L / (N - 1)
+x  = np.linspace(0, L, N)
+X, Y = np.meshgrid(x, x, indexing=&#x27;xy&#x27;)
+
+U =  U0 * np.sin(np.pi * X / L) * np.cos(np.pi * Y / L)
+V = -U0 * np.cos(np.pi * X / L) * np.sin(np.pi * Y / L)
+print(f&quot;max |u| = {np.abs(U).max():.3f} m/s ; &quot;
+      f&quot;div u (maximo discreto) ~ &quot;
+      f&quot;{np.abs(np.gradient(U, dx, axis=1) + np.gradient(V, dx, axis=0)).max():.2e}&quot;)
+
+# ============================================================
+# BLOQUE 4: Esquema upwind 2D conservando el signo local
+# ============================================================
+def derivada_upwind(c, vel, eje):
+    &quot;&quot;&quot;Derivada de primer orden contra la corriente.&quot;&quot;&quot;
+    atras    = (c - np.roll(c,  1, axis=eje)) / dx   # usa nodo aguas arriba si vel&gt;0
+    adelante = (np.roll(c, -1, axis=eje) - c) / dx   # si vel&lt;0
+    return np.where(vel &gt; 0, atras, adelante)
+
+def laplaciano(c):
+    return (np.roll(c, -1, 1) + np.roll(c, 1, 1) +
+            np.roll(c, -1, 0) + np.roll(c, 1, 0) - 4*c) / dx**2
+
+resultados = {}
+for nombre, D in casos.items():
+    Pe = U0 * L / D
+    Pe_h = U0 * dx / D
+    dt_adv = dx / (np.abs(U).max() + np.abs(V).max())
+    dt_dif = dx**2 / (4.0 * D)
+    dt = 0.4 * min(dt_adv, dt_dif)
+    n_pasos = int(np.ceil(T_fin / dt))
+    D_num = U0 * dx / 2.0      # difusion numerica del upwind O(u dx/2)
+    print(f&quot;\n{nombre}: Pe = {Pe:.0f} | Pe_h = {Pe_h:.1f} | &quot;
+          f&quot;dt = {dt*1e3:.2f} ms | pasos = {n_pasos}&quot;)
+    print(f&quot;   D fisica = {D:.1e} m2/s | D numerica (upwind) ~ {D_num:.1e} m2/s &quot;
+          f&quot;(razon D_num/D = {D_num/D:.1f})&quot;)
+
+    c = np.exp(-((X-x0)**2 + (Y-y0)**2) / (2*s0**2))
+    masa0 = c.sum() * dx**2
+    snaps, t = {}, 0.0
+    t_snap = [1.0, 3.0, 6.0]
+    for n in range(n_pasos):
+        adv = U * derivada_upwind(c, U, 1) + V * derivada_upwind(c, V, 0)
+        c = c + dt * (-adv + D * laplaciano(c))
+        # Fronteras: pared impermeable (Neumann homogenea, copia del vecino)
+        c[0, :], c[-1, :] = c[1, :], c[-2, :]
+        c[:, 0], c[:, -1] = c[:, 1], c[:, -2]
+        t += dt
+        for ts in t_snap:
+            if ts not in snaps and t &gt;= ts:
+                snaps[ts] = c.copy()
+    masa_f = c.sum() * dx**2
+    print(f&quot;   conservacion de masa: {masa_f/masa0*100:.2f} % | &quot;
+          f&quot;c_max final = {c.max():.3f}&quot;)
+    resultados[nombre] = (snaps, Pe)
+
+# ============================================================
+# BLOQUE 5: Visualizacion (2 regimenes x 3 tiempos)
+# ============================================================
+fig, axs = plt.subplots(2, 3, figsize=(12.5, 8.0))
+for fila, (nombre, (snaps, Pe)) in enumerate(resultados.items()):
+    for col, ts in enumerate([1.0, 3.0, 6.0]):
+        ax = axs[fila, col]
+        im = ax.pcolormesh(X*100, Y*100, snaps[ts], cmap=&#x27;viridis&#x27;,
+                           vmin=0, vmax=0.65, shading=&#x27;auto&#x27;)
+        if fila == 0 and col == 0:
+            sk = 12
+            ax.quiver(X[::sk, ::sk]*100, Y[::sk, ::sk]*100,
+                      U[::sk, ::sk], V[::sk, ::sk],
+                      color=&#x27;w&#x27;, scale=1.0, width=0.004, alpha=0.8)
+        ax.set_title(f&quot;{nombre} (Pe = {Pe:.0f}), t = {ts:.0f} s&quot;,
+                     fontsize=9.5)
+        ax.set_aspect(&#x27;equal&#x27;)
+        if fila == 1: ax.set_xlabel(&quot;x [cm]&quot;)
+        if col == 0:  ax.set_ylabel(&quot;y [cm]&quot;)
+fig.colorbar(im, ax=axs, shrink=0.8, label=&quot;c (adimensional)&quot;)
+fig.suptitle(&quot;Conveccion-difusion 2D en un vortice: efecto del numero de Peclet&quot;,
+             y=0.98)
+plt.savefig(&#x27;Figuras/fig_s5_ej4_convdif2D_vortice.png&#x27;,
+            dpi=300, bbox_inches=&#x27;tight&#x27;)
+# plt.show()
+print(&quot;\nFigura guardada.&quot;)
+</textarea>
+  <div class="code-output-wrap" hidden>
+    <div class="code-output-console"></div>
+    <div class="code-output-figures"></div>
+  </div>
+  <div class="code-status"></div>
+</div>
+<div class="code-cell">
+  <div class="code-cell-header">
+    <span class="code-cell-title">Código 5</span>
+    <span class="code-cell-caption">Semana 5 – Código 5: Test de rotación sólida con solución exacta conocida; comparación cuantitativa de disipación (upwind) y dispersión (MacCormack). Ejecutar en Google Colab.</span>
+    <button class="run-btn" type="button">&#9654; Ejecutar</button>
+  </div>
+  
+  <textarea class="code-input" spellcheck="false" rows="14">&quot;&quot;&quot;
+Semana 5 - Ejemplo 5: Adveccion pura 2D de un campo de densidad bajo
+rotacion solida -- difusion numerica vs dispersion numerica
+
+Aplicacion generica: transporte de un campo de densidad (densidad
+vehicular, concentracion de particulas, intensidad en un flujo
+optico) cuando el campo de velocidad se conoce en cada punto, por
+ejemplo estimado a partir de imagenes aereas. La rotacion solida es
+el banco de pruebas clasico: tras una revolucion completa, la
+solucion exacta coincide con la condicion inicial, de modo que TODO
+el error observado es error numerico.
+
+Fisica:   d rho/dt + u d rho/dx + v d rho/dy = 0
+Velocidad de rotacion solida alrededor del centro (xc, yc):
+   u = -omega (y - yc) ;  v = omega (x - xc)
+Esquemas comparados:
+   (a) upwind de primer orden  -&gt; disipativo (difusion numerica)
+   (b) MacCormack (equivalente 2D de Lax-Wendroff, 2do orden)
+       -&gt; dispersivo (oscilaciones cerca de gradientes fuertes)
+&quot;&quot;&quot;
+
+# ============================================================
+# BLOQUE 1: Librerias
+# ============================================================
+import numpy as np
+import matplotlib
+matplotlib.use(&#x27;Agg&#x27;)
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+
+mpl.rcParams.update({
+    &#x27;font.size&#x27;: 10, &#x27;axes.titlesize&#x27;: 11, &#x27;axes.labelsize&#x27;: 10,
+    &#x27;figure.dpi&#x27;: 110, &#x27;savefig.dpi&#x27;: 300,
+})
+
+# ============================================================
+# BLOQUE 2: Parametros
+# ============================================================
+L     = 1.0                 # [-] dominio unitario
+omega = 2.0 * np.pi         # [rad/s]: una revolucion por segundo
+T_rev = 1.0                 # [s]  tiempo de una revolucion completa
+xc = yc = 0.5
+
+N  = 201
+dx = L / (N - 1)
+x  = np.linspace(0, L, N)
+X, Y = np.meshgrid(x, x, indexing=&#x27;xy&#x27;)
+
+U = -omega * (Y - yc)
+V =  omega * (X - xc)
+
+# Paso de tiempo por CFL 2D
+vmax = np.abs(U).max() + np.abs(V).max()
+dt = 0.4 * dx / vmax
+n_pasos = int(np.ceil(T_rev / dt))
+dt = T_rev / n_pasos        # ajusta para cerrar exactamente la revolucion
+print(f&quot;dx = {dx:.4f} | dt = {dt*1e3:.3f} ms | pasos = {n_pasos}&quot;)
+print(f&quot;CFL efectivo = {vmax*dt/dx:.3f}&quot;)
+
+# ============================================================
+# BLOQUE 3: Condicion inicial -- cono suave + bloque discontinuo
+# El cono evalua la perdida de amplitud (disipacion);
+# el bloque evalua oscilaciones espurias (dispersion).
+# ============================================================
+def condicion_inicial():
+    rho = np.zeros((N, N))
+    # cono suave centrado en (0.5, 0.75)
+    r1 = np.sqrt((X-0.5)**2 + (Y-0.75)**2)
+    rho += np.maximum(0.0, 1.0 - r1/0.12)
+    # bloque cuadrado discontinuo centrado en (0.5, 0.25)
+    rho += np.where((np.abs(X-0.5) &lt; 0.08) &amp; (np.abs(Y-0.25) &lt; 0.08),
+                    1.0, 0.0)
+    return rho
+
+rho0 = condicion_inicial()
+
+# ============================================================
+# BLOQUE 4: Esquemas numericos
+# ============================================================
+def paso_upwind(r):
+    rx_b = (r - np.roll(r,  1, 1)) / dx
+    rx_f = (np.roll(r, -1, 1) - r) / dx
+    ry_b = (r - np.roll(r,  1, 0)) / dx
+    ry_f = (np.roll(r, -1, 0) - r) / dx
+    adv = U * np.where(U &gt; 0, rx_b, rx_f) + V * np.where(V &gt; 0, ry_b, ry_f)
+    return r - dt * adv
+
+def paso_maccormack(r):
+    # Predictor: diferencias hacia adelante
+    rx_f = (np.roll(r, -1, 1) - r) / dx
+    ry_f = (np.roll(r, -1, 0) - r) / dx
+    rp = r - dt * (U * rx_f + V * ry_f)
+    # Corrector: diferencias hacia atras sobre el predictor
+    rx_b = (rp - np.roll(rp, 1, 1)) / dx
+    ry_b = (rp - np.roll(rp, 1, 0)) / dx
+    return 0.5 * (r + rp - dt * (U * rx_b + V * ry_b))
+
+resultados = {}
+for nombre, paso in [(&quot;Upwind O(1)&quot;, paso_upwind),
+                     (&quot;MacCormack O(2)&quot;, paso_maccormack)]:
+    r = rho0.copy()
+    for n in range(n_pasos):
+        r = paso(r)
+        r[0, :] = r[-1, :] = 0.0   # frontera lejana: densidad nula
+        r[:, 0] = r[:, -1] = 0.0
+    err_L2  = np.sqrt(np.mean((r - rho0)**2))
+    pico    = r.max()
+    minimo  = r.min()
+    masa    = r.sum() / rho0.sum() * 100
+    print(f&quot;\n{nombre} tras 1 revolucion:&quot;)
+    print(f&quot;   error L2 = {err_L2:.4f} | pico = {pico:.3f} (exacto 1.000)&quot;)
+    print(f&quot;   minimo = {minimo:.3f} (oscilaciones si &lt; 0) | masa = {masa:.1f} %&quot;)
+    resultados[nombre] = r
+
+# ============================================================
+# BLOQUE 5: Visualizacion
+# ============================================================
+fig, axs = plt.subplots(1, 4, figsize=(16, 4.0),
+                        gridspec_kw={&#x27;width_ratios&#x27;: [1, 1, 1, 1.15]})
+campos = [(&quot;Condicion inicial (= exacta)&quot;, rho0),
+          (&quot;Upwind O(1), 1 rev.&quot;, resultados[&quot;Upwind O(1)&quot;]),
+          (&quot;MacCormack O(2), 1 rev.&quot;, resultados[&quot;MacCormack O(2)&quot;])]
+for ax, (titulo, campo) in zip(axs[:3], campos):
+    im = ax.pcolormesh(X, Y, campo, cmap=&#x27;magma&#x27;, vmin=-0.15, vmax=1.05,
+                       shading=&#x27;auto&#x27;)
+    ax.set_title(titulo, fontsize=9.5)
+    ax.set_xlabel(&quot;x&quot;); ax.set_aspect(&#x27;equal&#x27;)
+axs[0].set_ylabel(&quot;y&quot;)
+fig.colorbar(im, ax=axs[:3], shrink=0.85, label=r&quot;$\rho$&quot;)
+
+# Perfiles por la linea x = 0.5
+jm = N // 2
+axs[3].plot(x, rho0[:, jm], &#x27;k-&#x27;,  lw=1.4, label=&quot;exacta&quot;)
+axs[3].plot(x, resultados[&quot;Upwind O(1)&quot;][:, jm], &#x27;b-&#x27;, lw=1.4,
+            label=&quot;upwind&quot;)
+axs[3].plot(x, resultados[&quot;MacCormack O(2)&quot;][:, jm], &#x27;r-&#x27;, lw=1.4,
+            label=&quot;MacCormack&quot;)
+axs[3].axhline(0, color=&#x27;gray&#x27;, lw=0.7)
+axs[3].set_xlabel(&quot;y (corte en x = 0.5)&quot;); axs[3].set_ylabel(r&quot;$\rho$&quot;)
+axs[3].set_title(&quot;Perfiles tras 1 revolucion&quot;)
+axs[3].legend(fontsize=8); axs[3].grid(alpha=0.3)
+
+fig.suptitle(&quot;Adveccion 2D bajo rotacion solida: disipacion vs dispersion &quot;
+             &quot;numericas&quot;, y=1.03)
+plt.savefig(&#x27;Figuras/fig_s5_ej5_adveccion2D_rotacion.png&#x27;,
+            dpi=300, bbox_inches=&#x27;tight&#x27;)
+# plt.show()
+print(&quot;\nFigura guardada.&quot;)
+</textarea>
+  <div class="code-output-wrap" hidden>
+    <div class="code-output-console"></div>
+    <div class="code-output-figures"></div>
+  </div>
+  <div class="code-status"></div>
+</div>
+<div class="code-cell">
+  <div class="code-cell-header">
+    <span class="code-cell-title">Código 6</span>
+    <span class="code-cell-caption">Semana 5 – Código 6: Reconstrucción de un campo escalar 2D a partir de mediciones puntuales, resolviendo Laplace con condiciones de Dirichlet interiores; estudio RMSE vs número de sensores. Ejecutar en Google Colab.</span>
+    <button class="run-btn" type="button">&#9654; Ejecutar</button>
+  </div>
+  
+  <textarea class="code-input" spellcheck="false" rows="14">&quot;&quot;&quot;
+Semana 5 - Ejemplo 6: Reconstruccion de un campo escalar 2D a partir
+de mediciones puntuales dispersas (interpolacion armonica)
+
+Aplicacion generica: una red de sensores calibrados mide una variable
+fisica (temperatura, presion, concentracion) en puntos dispersos de
+una placa o recinto, y se requiere estimar el campo completo. Si el
+campo verdadero es suave, una estimacion natural es la funcion
+ARMONICA que interpola las mediciones: se resuelve la ecuacion de
+Laplace con condiciones de Dirichlet puntuales en los sensores.
+
+Fisica/metodo:
+   lap(T) = 0          en todo nodo sin sensor
+   T = T_medida        en los nodos con sensor (Dirichlet interno)
+   dT/dn = 0           en el contorno exterior (Neumann homogenea)
+La solucion minimiza la integral de |grad T|^2 sujeta a las
+mediciones: es el interpolador &quot;de minima energia&quot;.
+
+Estudio: error RMS de reconstruccion vs numero de sensores.
+&quot;&quot;&quot;
+
+# ============================================================
+# BLOQUE 1: Librerias
+# ============================================================
+import numpy as np
+import matplotlib
+matplotlib.use(&#x27;Agg&#x27;)
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+from scipy.sparse import lil_matrix, csr_matrix
+from scipy.sparse.linalg import spsolve
+
+mpl.rcParams.update({
+    &#x27;font.size&#x27;: 10, &#x27;axes.titlesize&#x27;: 11, &#x27;axes.labelsize&#x27;: 10,
+    &#x27;figure.dpi&#x27;: 110, &#x27;savefig.dpi&#x27;: 300,
+})
+rng = np.random.default_rng(7)     # semilla fija: reproducibilidad
+
+# ============================================================
+# BLOQUE 2: Campo verdadero sintetico (ground truth)
+# Suma de modos suaves; representa el campo fisico real que la
+# red de sensores intenta capturar.
+# ============================================================
+L = 1.0
+N = 121
+dx = L / (N - 1)
+x  = np.linspace(0, L, N)
+X, Y = np.meshgrid(x, x, indexing=&#x27;xy&#x27;)
+
+T_true = (60.0
+          + 18.0 * np.sin(np.pi * X) * np.sin(np.pi * Y)
+          + 7.0  * np.cos(2*np.pi * X) * np.sin(np.pi * Y)
+          - 5.0  * X * Y)
+sigma_med = 0.3      # [unidades de T] ruido RMS de cada sensor calibrado
+
+# ============================================================
+# BLOQUE 3: Reconstruccion armonica con sensores como Dirichlet
+# ============================================================
+def reconstruir(n_sens):
+    # posiciones aleatorias (evitando una franja del borde)
+    ii = rng.integers(5, N-5, size=n_sens)
+    jj = rng.integers(5, N-5, size=n_sens)
+    medidas = T_true[ii, jj] + rng.normal(0.0, sigma_med, n_sens)
+
+    es_sensor = np.zeros((N, N), dtype=bool)
+    es_sensor[ii, jj] = True
+
+    idx = -np.ones((N, N), dtype=int)
+    libres = ~es_sensor
+    nodos = np.argwhere(libres)
+    idx[libres] = np.arange(len(nodos))
+    n_inc = len(nodos)
+
+    val_sensor = np.zeros((N, N))
+    val_sensor[ii, jj] = medidas
+
+    A = lil_matrix((n_inc, n_inc))
+    b = np.zeros(n_inc)
+    for p, (i, j) in enumerate(nodos):
+        diag = 0.0
+        for di, dj in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
+            ni, nj = i + di, j + dj
+            if ni &lt; 0 or ni &gt;= N or nj &lt; 0 or nj &gt;= N:
+                continue                  # Neumann: el borde no aporta flujo
+            diag += 1.0
+            if es_sensor[ni, nj]:
+                b[p] += val_sensor[ni, nj]
+            else:
+                A[p, idx[ni, nj]] = -1.0
+        A[p, p] = diag
+    A = csr_matrix(A)
+
+    T_rec = np.zeros((N, N))
+    T_rec[libres] = spsolve(A, b)
+    T_rec[es_sensor] = val_sensor[es_sensor]
+    rmse = np.sqrt(np.mean((T_rec - T_true)**2))
+    return T_rec, (ii, jj), rmse
+
+# Barrido: numero de sensores
+n_lista = [5, 10, 20, 40, 80, 160]
+rmse_lista, casos = [], {}
+for ns in n_lista:
+    T_rec, pos, rmse = reconstruir(ns)
+    rmse_lista.append(rmse)
+    casos[ns] = (T_rec, pos)
+    print(f&quot;n_sensores = {ns:4d} | RMSE = {rmse:.3f}&quot;)
+print(f&quot;(ruido de sensor sigma = {sigma_med}: piso de error esperado)&quot;)
+
+# ============================================================
+# BLOQUE 4: Visualizacion
+# ============================================================
+fig, axs = plt.subplots(1, 4, figsize=(16, 4.0),
+                        gridspec_kw={&#x27;width_ratios&#x27;: [1, 1, 1, 1.15]})
+vmin, vmax = T_true.min(), T_true.max()
+
+im = axs[0].pcolormesh(X, Y, T_true, cmap=&#x27;plasma&#x27;, vmin=vmin, vmax=vmax,
+                       shading=&#x27;auto&#x27;)
+axs[0].set_title(&quot;Campo verdadero&quot;)
+axs[0].set_xlabel(&quot;x&quot;); axs[0].set_ylabel(&quot;y&quot;); axs[0].set_aspect(&#x27;equal&#x27;)
+
+for ax, ns in zip(axs[1:3], [10, 80]):
+    T_rec, (ii, jj) = casos[ns]
+    ax.pcolormesh(X, Y, T_rec, cmap=&#x27;plasma&#x27;, vmin=vmin, vmax=vmax,
+                  shading=&#x27;auto&#x27;)
+    ax.plot(x[jj], x[ii], &#x27;wo&#x27;, ms=3, mec=&#x27;k&#x27;, mew=0.5)
+    ax.set_title(f&quot;Reconstruccion, {ns} sensores&quot;)
+    ax.set_xlabel(&quot;x&quot;); ax.set_aspect(&#x27;equal&#x27;)
+fig.colorbar(im, ax=axs[:3], shrink=0.85, label=&quot;T [[C]]&quot;)
+
+axs[3].loglog(n_lista, rmse_lista, &#x27;ko-&#x27;, lw=1.4)
+axs[3].axhline(sigma_med, color=&#x27;r&#x27;, ls=&#x27;--&#x27;, lw=1,
+               label=r&quot;ruido del sensor $\sigma$&quot;)
+axs[3].set_xlabel(&quot;numero de sensores&quot;)
+axs[3].set_ylabel(&quot;RMSE de reconstruccion&quot;)
+axs[3].set_title(&quot;Convergencia con la densidad de sensores&quot;)
+axs[3].legend(fontsize=8); axs[3].grid(alpha=0.3, which=&#x27;both&#x27;)
+
+fig.suptitle(&quot;Reconstruccion armonica de un campo 2D a partir de &quot;
+             &quot;mediciones dispersas&quot;, y=1.03)
+plt.savefig(&#x27;Figuras/fig_s5_ej6_laplace_sensores.png&#x27;,
+            dpi=300, bbox_inches=&#x27;tight&#x27;)
+# plt.show()
+print(&quot;Figura guardada.&quot;)
+</textarea>
+  <div class="code-output-wrap" hidden>
+    <div class="code-output-console"></div>
+    <div class="code-output-figures"></div>
+  </div>
+  <div class="code-status"></div>
+</div>
+
+    <h2 class="section-heading" style="margin-top:44px">Desarrollo teórico completo</h2>
+    <p class="section-intro">Ecuaciones, demostraciones, tablas y discusión de esta semana, tal como están
+      en los apuntes del curso — mismo documento fuente que el PDF completo, recortado a esta semana.</p>
+    <div class="theory-pdf-wrap">
+      <iframe src="../../assets/apuntes/semana-05.pdf" title="Desarrollo teórico — Semana 5. Simulación Bidimensional de Campos" loading="lazy"></iframe>
+    </div>
+    <p class="theory-pdf-fallback">
+      ¿No se ve el documento arriba? <a href="../../assets/apuntes/semana-05.pdf" download>Descarga el PDF de esta semana</a>
+      o <a href="../../assets/apuntes/semana-05.pdf" target="_blank" rel="noopener">ábrelo en una pestaña nueva</a>.
+    </p>
+
+    <div class="week-nav">
+      <a href="../semana-04/index.html">&larr; Semana 04</a>
+      <span class="to-index"><a href="../../index.html">&uarr; Volver al índice del curso</a></span>
+      <a href="../semana-06/index.html">Semana 06 &rarr;</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div>Doctorado en Ingeniería y Tecnología Aplicada &middot; Universidad La Salle Bajío</div>
+    <div>Dr. Jorge Ramón Parra Michel &middot; Prototipado y Simulación</div>
+  </div>
+</footer>
+
+<script src="../../assets/js/main.js"></script>
+<script src="../../assets/js/pyodide-runner.js"></script>
+
+<script>
+window.addEventListener("load", function () {
+  if (window.renderMathInElement) {
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left: "$$", right: "$$", display: true},
+        {left: "$", right: "$", display: false}
+      ],
+      throwOnError: false
+    });
+  }
+});
+</script>
+
+</body>
+</html>

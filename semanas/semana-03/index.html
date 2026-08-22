@@ -1,0 +1,1950 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Semana 3. Métodos Numéricos Fundamentales — Prototipado y Simulación</title>
+<meta name="description" content="Semana 3. Métodos Numéricos Fundamentales: objetivo, temario y código ejecutable.">
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-cpW21h6RZv/phavutF+AuVYrr+dA8xD9zs6FwLpaCePvcCWnZ8IU9UNlXhpKUAJI" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-vZTG03m+2yp6N6BNi5iM4rW4oIwk5DfcNdFfxkk9ZWpDriOkXX8voJBFrAO7MpVl" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-GvrOXuhMATgEsSwCs4smul74iXGOixntILdUW9XmUC6+HX0sLNAK3q71HotJqlAn" crossorigin="anonymous">
+<link rel="stylesheet" href="../../assets/css/style.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="topbar-brand" href="../../index.html">
+      <img src="../../assets/img/logo-lasalle.png" alt="Universidad La Salle Bajío">
+      Prototipado y Simulación
+    </a>
+    <nav>
+      <a href="../../index.html#semanas">Semanas</a>
+      <a href="../../README.md">Repositorio</a>
+      <a class="topbar-pdf-btn" href="../../assets/apuntes/Apuntes_Curso_Doctoral_Simulacion_Prototipado_COMPLETO.pdf" download>Descargar PDF</a>
+    </nav>
+  </div>
+</div>
+
+<header class="week-header">
+  <div class="wrap">
+    <div class="breadcrumb"><a href="../../index.html">Inicio</a> &rsaquo; Semana 03</div>
+    <p class="num">Semana 03</p>
+    <h1>Métodos Numéricos Fundamentales</h1>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <div class="callout">
+      <h3>Objetivo de la cátedra</h3>
+      <p>Aplicar técnicas de discretización y aproximación numérica para resolver problemas científicos y tecnológicos, comprendiendo los fundamentos de estabilidad, convergencia y condicionamiento que determinan la calidad de una solución computacional.</p>
+    </div>
+    <div class="callout proposito">
+      <h3>Propósito del tema</h3>
+      <p>En las Semanas 1 y 2 se construyó la cadena conceptual fenómeno $\to$ modelo matemático y la infraestructura técnica para ejecutarla. Esta semana se establece la base matemática que hace que esa ejecución sea correcta: cómo pasar de una ecuación continua a un sistema discreto resoluble, qué le ocurre al error en ese proceso, cuándo un algoritmo falla catastróficamente aunque el código esté bien escrito, y cómo cuantificar la confianza en un resultado numérico. Sin estos criterios, una simulación es una caja negra; con ellos, es un argumento científico defendible.</p>
+    </div>
+    
+    <div class="callout resultado">
+      <h3>Resultado de aprendizaje esperado</h3>
+      <p>Al finalizar la sesión, el estudiante será capaz de: (i) derivar fórmulas de diferencias finitas de orden arbitrario a partir de la expansión de Taylor y verificar su orden de convergencia empíricamente; (ii) seleccionar e implementar cuadraturas numéricas con criterios de orden y costo para integrales de interés físico; (iii) determinar el criterio de estabilidad de un esquema en diferencias finitas mediante análisis de von Neumann y verificarlo en la práctica; (iv) calcular el número de condición de un sistema lineal e interpretar su efecto sobre el error de la solución; y (v) formular la discretización de una EDP parabólica simple y justificar la elección entre esquemas explícitos e implícitos.</p>
+    </div>
+    <h2 class="section-heading" style="margin-top:36px">Temario</h2>
+    <ul class="temario"><li>Diferencias finitas: derivación numérica y orden de error.</li><li>Integración numérica: cuadraturas clásicas y Gauss–Legendre.</li><li>Estabilidad numérica y criterios de von Neumann.</li><li>Convergencia y orden de convergencia.</li><li>Condicionamiento numérico y número de condición.</li><li>Introducción a ecuaciones diferenciales parciales (EDPs).</li><li>Discretización en espacio y tiempo: esquemas explícitos e implícitos.</li></ul>
+    <h2 class="section-heading" style="margin-top:44px">Figuras de la semana</h2>
+    <p class="section-intro">8 imagen(es) referenciadas en los apuntes de esta semana.
+      Colócalas en <code>assets/img/semana-03/</code> con el nombre exacto indicado debajo
+      de cada recuadro; mientras no estén, se muestra un marcador en su lugar.</p>
+    <div class="gallery">
+    <figure>
+      <img src="../../assets/img/semana-03/fig_s3_condicionamiento.png" alt="fig_s3_condicionamiento.png" data-fallback-name="fig_s3_condicionamiento.png" loading="lazy">
+      <figcaption>fig_s3_condicionamiento.png</figcaption>
+    </figure><figure>
+      <img src="../../assets/img/semana-03/fig_s3_diferencias_finitas.png" alt="fig_s3_diferencias_finitas.png" data-fallback-name="fig_s3_diferencias_finitas.png" loading="lazy">
+      <figcaption>fig_s3_diferencias_finitas.png</figcaption>
+    </figure><figure>
+      <img src="../../assets/img/semana-03/fig_s3_estabilidad_ode.png" alt="fig_s3_estabilidad_ode.png" data-fallback-name="fig_s3_estabilidad_ode.png" loading="lazy">
+      <figcaption>fig_s3_estabilidad_ode.png</figcaption>
+    </figure><figure>
+      <img src="../../assets/img/semana-03/fig_s3_extra1_rag_condicionamiento.png" alt="fig_s3_extra1_rag_condicionamiento.png" data-fallback-name="fig_s3_extra1_rag_condicionamiento.png" loading="lazy">
+      <figcaption>fig_s3_extra1_rag_condicionamiento.png</figcaption>
+    </figure><figure>
+      <img src="../../assets/img/semana-03/fig_s3_extra2_losa_convergencia.png" alt="fig_s3_extra2_losa_convergencia.png" data-fallback-name="fig_s3_extra2_losa_convergencia.png" loading="lazy">
+      <figcaption>fig_s3_extra2_losa_convergencia.png</figcaption>
+    </figure><figure>
+      <img src="../../assets/img/semana-03/fig_s3_extra3_trafico_flujo.png" alt="fig_s3_extra3_trafico_flujo.png" data-fallback-name="fig_s3_extra3_trafico_flujo.png" loading="lazy">
+      <figcaption>fig_s3_extra3_trafico_flujo.png</figcaption>
+    </figure><figure>
+      <img src="../../assets/img/semana-03/fig_s3_extra4_bomba_qh.png" alt="fig_s3_extra4_bomba_qh.png" data-fallback-name="fig_s3_extra4_bomba_qh.png" loading="lazy">
+      <figcaption>fig_s3_extra4_bomba_qh.png</figcaption>
+    </figure><figure>
+      <img src="../../assets/img/semana-03/fig_s3_integracion_numerica.png" alt="fig_s3_integracion_numerica.png" data-fallback-name="fig_s3_integracion_numerica.png" loading="lazy">
+      <figcaption>fig_s3_integracion_numerica.png</figcaption>
+    </figure>
+  </div>
+    <h2 class="section-heading" style="margin-top:44px">Código de la semana (ejecutable)</h2>
+    <div class="pyodide-banner">
+      &#9432; El código corre por completo en tu navegador (Python vía WebAssembly, sin servidor). La
+      primera vez que pulses <strong>Ejecutar</strong> en esta página se descarga el runtime — tarda unos
+      segundos. Puedes editar el código antes de correrlo.
+    </div>
+    <div class="code-cell">
+  <div class="code-cell-header">
+    <span class="code-cell-title">Código 1</span>
+    <span class="code-cell-caption">Semana 3 – Ejemplo 1: Diferenciación numérica con verificación de orden. Ejecutar en Google Colab.</span>
+    <button class="run-btn" type="button">&#9654; Ejecutar</button>
+  </div>
+  <div class="code-banner code-banner-warn">&#9888; Código recuperado de un borrador anterior (semana_3 (1).py, fragmento 0) porque la versión pegada en el <code>.tex</code> perdió la indentación de Python. Ejecuta corriendo bien, pero puede diferir en detalles menores de la versión final — revísalo antes de usarlo en clase.</div>
+  <textarea class="code-input" spellcheck="false" rows="14">import numpy as np
+import matplotlib
+matplotlib.use(&#x27;Agg&#x27;)           # sin pantalla; cambiar a &#x27;TkAgg&#x27; si se ejecuta localmente
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+import os
+
+# ---- Configuración global de figuras (estilo publicación) ------------
+mpl.rcParams.update({
+    &quot;font.family&quot;:    &quot;serif&quot;,
+    &quot;font.size&quot;:      11,
+    &quot;axes.titlesize&quot;: 12,
+    &quot;axes.labelsize&quot;: 11,
+    &quot;xtick.labelsize&quot;:10,
+    &quot;ytick.labelsize&quot;:10,
+    &quot;legend.fontsize&quot;: 9,
+    &quot;axes.linewidth&quot;: 0.8,
+    &quot;lines.linewidth&quot;:1.4,
+    &quot;figure.dpi&quot;:     150,
+    &quot;savefig.dpi&quot;:    300,
+    &quot;savefig.bbox&quot;:   &quot;tight&quot;,
+})
+
+BLUE  = &quot;#003366&quot;   # Azul La Salle
+RED   = &quot;#C0392B&quot;
+GREEN = &quot;#1A7D3A&quot;
+GRAY  = &quot;#555555&quot;
+
+# ======================================================================
+# 1. FUNCIÓN DE PRUEBA Y SU DERIVADA ANALÍTICA
+#    Motivación física: perfil de deformación longitudinal en cable OPGW
+#    Los sensores FBG/BOTDR entregan epsilon(x) en puntos discretos;
+#    la derivada es proporcional a la fuerza cortante en el cable.
+# ======================================================================
+
+def f(x):
+    &quot;&quot;&quot;Perfil de deformación sintético con derivada analítica conocida.&quot;&quot;&quot;
+    return np.sin(2.0 * np.pi * x) * np.exp(-0.5 * x)
+
+def df_analitica(x):
+    &quot;&quot;&quot;Derivada exacta de f(x) = sin(2*pi*x) * exp(-0.5*x).&quot;&quot;&quot;
+    return (2.0 * np.pi * np.cos(2.0 * np.pi * x)
+            - 0.5 * np.sin(2.0 * np.pi * x)) * np.exp(-0.5 * x)
+
+# Punto de evaluación
+x0       = 0.75
+df_exact = df_analitica(x0)
+
+print(&quot;=&quot; * 60)
+print(&quot;SEMANA 3 — Ejemplo 1: Diferenciación numérica&quot;)
+print(&quot;=&quot; * 60)
+print(f&quot;  Función: f(x) = sin(2*pi*x) * exp(-0.5*x)&quot;)
+print(f&quot;  Punto:   x0 = {x0}&quot;)
+print(f&quot;  f&#x27;(x0) exacta = {df_exact:.10f}\n&quot;)
+
+# ======================================================================
+# 2. BARRIDO DE PASOS h (escala logarítmica)
+# ======================================================================
+
+h_vals = np.logspace(-7, -0.5, 60)
+
+err_fwd = np.abs((f(x0 + h_vals) - f(x0))            / h_vals       - df_exact)
+err_bwd = np.abs((f(x0)           - f(x0 - h_vals))  / h_vals       - df_exact)
+err_ctr = np.abs((f(x0 + h_vals)  - f(x0 - h_vals))  / (2.0*h_vals) - df_exact)
+
+# ======================================================================
+# 3. REPORTE DE VALORES SELECTOS
+# ======================================================================
+
+print(f&quot;  {&#x27;h&#x27;:&gt;10}  {&#x27;df_centrada&#x27;:&gt;14}  {&#x27;df_exacta&#x27;:&gt;14}  {&#x27;error&#x27;:&gt;12}&quot;)
+print(&quot;  &quot; + &quot;-&quot; * 56)
+for h in [1e-2, 1e-3, 1e-4, 1e-5, 1e-6]:
+    df_c = (f(x0 + h) - f(x0 - h)) / (2.0 * h)
+    print(f&quot;  {h:10.0e}  {df_c:14.8f}  {df_exact:14.8f}  {abs(df_c - df_exact):12.4e}&quot;)
+
+# ======================================================================
+# 4. VERIFICACIÓN DEL ORDEN DE CONVERGENCIA
+#    Pendiente en escala log-log = orden de convergencia
+# ======================================================================
+
+print(&quot;\n  Verificación del orden (pendiente log-log):&quot;)
+for nombre, err in [(&quot;Hacia adelante&quot;, err_fwd), (&quot;Centrada&quot;, err_ctr)]:
+    h1, h2 = 1e-4, 1e-3
+    idx1 = np.argmin(np.abs(h_vals - h1))
+    idx2 = np.argmin(np.abs(h_vals - h2))
+    orden = np.log(err[idx2] / err[idx1]) / np.log(h2 / h1)
+    print(f&quot;    {nombre:18s}: orden = {orden:.3f}&quot;)
+
+# Paso óptimo teórico para diferencia centrada: h_opt ~ eps_mach^(1/3)
+eps_mach = np.finfo(float).eps
+h_opt_ctr = eps_mach**(1.0/3.0)
+h_opt_fwd = np.sqrt(eps_mach)
+print(f&quot;\n  eps_mach              = {eps_mach:.2e}&quot;)
+print(f&quot;  h_opt (centrada)      = {h_opt_ctr:.2e}  [eps^(1/3)]&quot;)
+print(f&quot;  h_opt (hacia delante) = {h_opt_fwd:.2e}  [eps^(1/2)]&quot;)
+
+# ======================================================================
+# 5. FIGURA
+# ======================================================================
+
+x_plot = np.linspace(0.3, 1.3, 400)
+h_demo = 0.15
+
+# Líneas de referencia de orden
+idx_ref = np.argmin(np.abs(h_vals - 1e-3))
+ref_O1  = err_fwd[idx_ref] * (h_vals / h_vals[idx_ref])
+ref_O2  = err_ctr[idx_ref] * (h_vals / h_vals[idx_ref])**2
+
+fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+
+# --- Panel izquierdo: interpretación geométrica -----------------------
+ax = axes[0]
+ax.plot(x_plot, f(x_plot), color=BLUE, lw=2,
+        label=r&#x27;$f(x)=\sin(2\pi x)\,e^{-0.5x}$&#x27;)
+
+tang_x = np.array([x0 - h_demo, x0 + h_demo])
+tang_y = f(x0) + df_exact * (tang_x - x0)
+ax.plot(tang_x, tang_y, &#x27;-&#x27;, color=GRAY, lw=1.8, label=&#x27;Tangente analítica&#x27;)
+
+ax.plot([x0, x0 + h_demo], [f(x0), f(x0 + h_demo)], &#x27;--&#x27;, color=RED,
+        lw=1.4, label=&#x27;Hacia adelante O(h)&#x27;)
+ax.plot([x0 - h_demo, x0 + h_demo], [f(x0 - h_demo), f(x0 + h_demo)],
+        &#x27;-.&#x27;, color=GREEN, lw=1.4, label=&#x27;Centrada O(h²)&#x27;)
+
+ax.axvline(x0, color=&#x27;k&#x27;, lw=0.7, ls=&#x27;:&#x27;)
+ax.scatter([x0], [f(x0)], s=60, zorder=5, color=&#x27;k&#x27;)
+ax.set_xlabel(&#x27;$x$&#x27;); ax.set_ylabel(&#x27;$f(x)$&#x27;)
+ax.set_title(&#x27;Interpretación geométrica de diferencias finitas\n&#x27;
+             &#x27;Aplicación: perfil de deformación en cable OPGW&#x27;)
+ax.legend(loc=&#x27;upper right&#x27;, fontsize=8); ax.grid(alpha=0.3)
+
+# --- Panel derecho: convergencia log-log ------------------------------
+ax = axes[1]
+ax.loglog(h_vals, err_fwd, color=RED,   lw=1.3, label=&#x27;Hacia adelante O(h)&#x27;)
+ax.loglog(h_vals, err_bwd, color=BLUE,  lw=1.3, ls=&#x27;--&#x27;, label=&#x27;Hacia atrás O(h)&#x27;)
+ax.loglog(h_vals, err_ctr, color=GREEN, lw=1.3, ls=&#x27;-.&#x27;, label=&#x27;Centrada O(h²)&#x27;)
+ax.loglog(h_vals, ref_O1,  &#x27;k:&#x27;,  lw=0.9, label=&#x27;Pendiente 1 → O(h)&#x27;)
+ax.loglog(h_vals, ref_O2,  &#x27;k--&#x27;, lw=0.9, label=&#x27;Pendiente 2 → O(h²)&#x27;)
+
+ax.axvline(h_opt_ctr, color=&#x27;gray&#x27;, lw=0.8, ls=&#x27;:&#x27;)
+ax.text(h_opt_ctr * 1.5, 1e-5, r&#x27;$h_\mathrm{opt}$&#x27;,
+        fontsize=8, color=&#x27;gray&#x27;, rotation=90, va=&#x27;bottom&#x27;)
+
+ax.set_xlabel(&#x27;Tamaño de paso $h$&#x27;)
+ax.set_ylabel(&#x27;Error absoluto $|f\&#x27;_\mathrm{num} - f\&#x27;_\mathrm{exacta}|$&#x27;)
+ax.set_title(&#x27;Orden de convergencia de la derivación numérica\n&#x27;
+             &#x27;$x_0 = 0.75$,  $f(x) = \\sin(2\\pi x)\\,e^{-0.5x}$&#x27;)
+ax.legend(fontsize=8); ax.grid(alpha=0.3, which=&#x27;both&#x27;)
+
+plt.tight_layout()
+out = &#x27;fig_s3_diferencias_finitas.png&#x27;
+plt.savefig(out)
+print(f&quot;\n  Figura guardada: {os.path.abspath(out)}&quot;)
+# plt.show()   # descomentar para mostrar en pantalla
+
+&quot;&quot;&quot;
+============================================================
+SEMANA 3 — EJEMPLO 2
+Integración numérica y convergencia de cuadraturas
+------------------------------------------------------------
+Aplicación: energía disipada por arco eléctrico en
+            cortocircuito sobre cable OPGW
+            (Jurado Pérez — proyecto de tesis)
+
+Modelo físico: arco de Cassie simplificado
+  P(t) = I^2 * R0 * exp(-alpha * t)   [W]
+  E_exacta = I^2*R0/alpha * (1 - exp(-alpha*T))
+
+Métodos comparados:
+  - Regla de rectángulos  O(h)
+  - Regla de trapecios    O(h^2)
+  - Regla de Simpson      O(h^4)
+  - Gauss-Legendre        O(h^{2n})
+
+Ejecución:
+  pip install numpy scipy matplotlib
+  python S3_Ejemplo2_Integracion_Numerica.py
+
+Salida:
+  fig_s3_integracion_numerica.png
+============================================================
+&quot;&quot;&quot;
+</textarea>
+  <div class="code-output-wrap" hidden>
+    <div class="code-output-console"></div>
+    <div class="code-output-figures"></div>
+  </div>
+  <div class="code-status"></div>
+</div>
+<div class="code-cell">
+  <div class="code-cell-header">
+    <span class="code-cell-title">Código 2</span>
+    <span class="code-cell-caption">Semana 3 – Ejemplo 2: Integración numérica de la energía disipada por arco. Ejecutar en Google Colab.</span>
+    <button class="run-btn" type="button">&#9654; Ejecutar</button>
+  </div>
+  <div class="code-banner code-banner-warn">&#9888; Código recuperado de un borrador anterior (semana_3 (1).py, fragmento 1) porque la versión pegada en el <code>.tex</code> perdió la indentación de Python. Ejecuta corriendo bien, pero puede diferir en detalles menores de la versión final — revísalo antes de usarlo en clase.</div>
+  <textarea class="code-input" spellcheck="false" rows="14">import numpy as np
+import matplotlib
+matplotlib.use(&#x27;Agg&#x27;)
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+from scipy import integrate
+from numpy.polynomial.legendre import leggauss
+import os
+
+# ---- Configuración global de figuras ---------------------------------
+mpl.rcParams.update({
+    &quot;font.family&quot;:    &quot;serif&quot;,
+    &quot;font.size&quot;:      11,
+    &quot;axes.titlesize&quot;: 12,
+    &quot;axes.labelsize&quot;: 11,
+    &quot;xtick.labelsize&quot;:10,
+    &quot;ytick.labelsize&quot;:10,
+    &quot;legend.fontsize&quot;: 9,
+    &quot;axes.linewidth&quot;: 0.8,
+    &quot;lines.linewidth&quot;:1.4,
+    &quot;figure.dpi&quot;:     150,
+    &quot;savefig.dpi&quot;:    300,
+    &quot;savefig.bbox&quot;:   &quot;tight&quot;,
+})
+
+BLUE   = &quot;#003366&quot;
+RED    = &quot;#C0392B&quot;
+GREEN  = &quot;#1A7D3A&quot;
+ORANGE = &quot;#E67E22&quot;
+
+# ======================================================================
+# 1. PARÁMETROS FÍSICOS DEL MODELO DE ARCO (Cassie simplificado)
+# ======================================================================
+
+I     = 10e3        # corriente de cortocircuito [A]
+R0    = 50e-3       # resistencia inicial del arco [Ohm]
+alpha = 1.5e3       # tasa de extinción del arco   [1/s]
+T_fin = 5e-3        # duración del evento           [s]  (5 ms)
+
+def P(t):
+    &quot;&quot;&quot;Potencia disipada por el arco: P(t) = I² R0 exp(-alpha t)  [W]&quot;&quot;&quot;
+    return I**2 * R0 * np.exp(-alpha * t)
+
+# Integral exacta analítica (referencia para medir el error numérico)
+E_exacta = I**2 * R0 / alpha * (1.0 - np.exp(-alpha * T_fin))
+
+print(&quot;=&quot; * 60)
+print(&quot;SEMANA 3 — Ejemplo 2: Integración numérica&quot;)
+print(&quot;=&quot; * 60)
+print(f&quot;  Parámetros del arco:&quot;)
+print(f&quot;    I     = {I/1e3:.1f} kA&quot;)
+print(f&quot;    R0    = {R0*1e3:.1f} mOhm&quot;)
+print(f&quot;    alpha = {alpha:.0f} 1/s&quot;)
+print(f&quot;    T     = {T_fin*1e3:.1f} ms&quot;)
+print(f&quot;  Energía exacta (analítica): {E_exacta:.4f} J\n&quot;)
+
+# ======================================================================
+# 2. IMPLEMENTACIÓN DE LOS MÉTODOS DE CUADRATURA
+# ======================================================================
+
+def rect_izquierda(f, a, b, N):
+    &quot;&quot;&quot;Regla de rectángulos (punto izquierdo). Orden O(h).&quot;&quot;&quot;
+    h = (b - a) / N
+    x = np.linspace(a, b - h, N)
+    return h * np.sum(f(x))
+
+def trapecios(f, a, b, N):
+    &quot;&quot;&quot;Regla de los trapecios compuesta. Orden O(h^2).&quot;&quot;&quot;
+    x = np.linspace(a, b, N + 1)
+    return np.trapezoid(f(x), x)
+
+def simpson(f, a, b, N):
+    &quot;&quot;&quot;Regla de Simpson 1/3 compuesta. Orden O(h^4). Requiere N par.&quot;&quot;&quot;
+    if N % 2 != 0:
+        N += 1
+    x = np.linspace(a, b, N + 1)
+    return integrate.simpson(f(x), x=x)
+
+def gauss_legendre(f, a, b, n):
+    &quot;&quot;&quot;Cuadratura de Gauss-Legendre con n puntos. Orden O(h^{2n}).&quot;&quot;&quot;
+    xi, wi = leggauss(n)
+    t_pts  = 0.5 * (b - a) * xi + 0.5 * (b + a)
+    return 0.5 * (b - a) * float(np.dot(wi, f(t_pts)))
+
+# ======================================================================
+# 3. COMPARACIÓN PUNTUAL A N=100
+# ======================================================================
+
+print(f&quot;  Comparación con N=100 subintervalos (o puntos de cuadratura):&quot;)
+print(f&quot;  {&#x27;Método&#x27;:14s}  {&#x27;E_num [J]&#x27;:&gt;12}  {&#x27;Error [J]&#x27;:&gt;12}&quot;)
+print(&quot;  &quot; + &quot;-&quot; * 42)
+for nombre, metodo, args in [
+    (&quot;Rectángulos&quot;,  rect_izquierda, (P, 0, T_fin, 100)),
+    (&quot;Trapecios&quot;,    trapecios,      (P, 0, T_fin, 100)),
+    (&quot;Simpson&quot;,      simpson,        (P, 0, T_fin, 100)),
+    (&quot;Gauss-Legend&quot;, gauss_legendre, (P, 0, T_fin, 50)),
+]:
+    E_num = metodo(*args)
+    print(f&quot;  {nombre:14s}  {E_num:12.6f}  {abs(E_num - E_exacta):12.4e}&quot;)
+
+# ======================================================================
+# 4. VERIFICACIÓN DEL ORDEN DE CONVERGENCIA
+# ======================================================================
+
+print(&quot;\n  Verificación del orden (pendiente log-log):&quot;)
+for nombre, metodo in [(&quot;Trapecios&quot;, trapecios), (&quot;Simpson&quot;, simpson)]:
+    N1, N2 = 10, 100
+    e1 = abs(metodo(P, 0, T_fin, N1) - E_exacta)
+    e2 = abs(metodo(P, 0, T_fin, N2) - E_exacta)
+    orden = np.log(e1 / e2) / np.log(N2 / N1)
+    print(f&quot;    {nombre:14s}: orden = {orden:.3f}&quot;)
+
+# ======================================================================
+# 5. BARRIDO DE N PARA CURVAS DE CONVERGENCIA
+# ======================================================================
+
+N_vals = np.unique(np.logspace(0.3, 3.0, 50).astype(int))
+
+err_rect = np.array([abs(rect_izquierda(P, 0, T_fin, int(N)) - E_exacta) for N in N_vals])
+err_trap = np.array([abs(trapecios(P,    0, T_fin, int(N)) - E_exacta) for N in N_vals])
+err_simp = np.array([abs(simpson(P,      0, T_fin, int(N)) - E_exacta) for N in N_vals])
+err_gl   = np.array([abs(gauss_legendre(P, 0, T_fin, max(2, int(N) // 2)) - E_exacta)
+                     for N in N_vals])
+
+# Líneas de referencia de orden
+idx0 = 3
+ref_O1 = err_rect[idx0] * (N_vals[idx0] / N_vals)**1
+ref_O2 = err_trap[idx0] * (N_vals[idx0] / N_vals)**2
+ref_O4 = err_simp[idx0] * (N_vals[idx0] / N_vals)**4
+
+# ======================================================================
+# 6. FIGURA
+# ======================================================================
+
+fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+
+# --- Panel izquierdo: curva de potencia e ilustración trapecios -------
+ax = axes[0]
+t_plot = np.linspace(0, T_fin, 500)
+ax.fill_between(t_plot, 0, P(t_plot) / 1e3, alpha=0.12, color=BLUE,
+                label=&#x27;Energía total (área)&#x27;)
+ax.plot(t_plot, P(t_plot) / 1e3, color=BLUE, lw=2,
+        label=r&#x27;$P(t)=I^2 R_0\,e^{-\alpha t}$&#x27;)
+
+# Ilustración de la regla de trapecios con N=8
+N_demo = 8
+t_demo = np.linspace(0, T_fin, N_demo + 1)
+for i in range(N_demo):
+    ax.fill_between([t_demo[i], t_demo[i + 1]], 0,
+                    [P(t_demo[i]) / 1e3, P(t_demo[i + 1]) / 1e3],
+                    alpha=0.35, color=RED, edgecolor=RED, lw=0.5)
+ax.plot(t_demo, P(t_demo) / 1e3, &#x27;o&#x27;, color=RED, ms=5,
+        label=&#x27;Nodos trapecios (N=8)&#x27;)
+
+ax.set_xlabel(&#x27;Tiempo $t$ [s]&#x27;)
+ax.set_ylabel(&#x27;Potencia $P(t)$ [kW]&#x27;)
+ax.set_title(&#x27;Energía disipada por arco eléctrico\n&#x27;
+             f&#x27;I={I/1e3:.0f} kA, R₀={R0*1e3:.0f} mΩ, α={alpha:.0f} s⁻¹, T={T_fin*1e3:.0f} ms&#x27;)
+ax.legend(fontsize=8); ax.grid(alpha=0.3)
+ax.text(0.48 * T_fin, 0.52 * P(0) / 1e3,
+        f&#x27;$E_{{exacta}}$ = {E_exacta:.2f} J&#x27;, fontsize=9, color=BLUE)
+
+# --- Panel derecho: convergencia log-log ------------------------------
+ax = axes[1]
+ax.loglog(N_vals, err_rect, color=RED,    lw=1.3, label=&#x27;Rectángulos O(h)&#x27;)
+ax.loglog(N_vals, err_trap, color=BLUE,   lw=1.3, ls=&#x27;--&#x27;, label=&#x27;Trapecios O(h²)&#x27;)
+ax.loglog(N_vals, err_simp, color=GREEN,  lw=1.3, ls=&#x27;-.&#x27;, label=&#x27;Simpson O(h⁴)&#x27;)
+ax.loglog(N_vals[:30], err_gl[:30], color=ORANGE, lw=1.3, ls=&#x27;:&#x27;,
+          label=&#x27;Gauss-Legendre O(h^{2n})&#x27;)
+ax.loglog(N_vals, ref_O1, &#x27;k:&#x27;,  lw=0.9, label=&#x27;Pendiente −1&#x27;)
+ax.loglog(N_vals, ref_O2, &#x27;k--&#x27;, lw=0.9, label=&#x27;Pendiente −2&#x27;)
+ax.loglog(N_vals, ref_O4, &#x27;k-&#x27;,  lw=0.9, alpha=0.45, label=&#x27;Pendiente −4&#x27;)
+
+ax.set_xlabel(&#x27;Número de subintervalos $N$&#x27;)
+ax.set_ylabel(&#x27;$|E_\mathrm{num} - E_\mathrm{exacta}|$  [J]&#x27;)
+ax.set_title(&#x27;Convergencia de métodos de integración numérica\n&#x27;
+             &#x27;Energía disipada por arco eléctrico en cortocircuito&#x27;)
+ax.legend(fontsize=8); ax.grid(alpha=0.3, which=&#x27;both&#x27;)
+
+plt.tight_layout()
+out = &#x27;fig_s3_integracion_numerica.png&#x27;
+plt.savefig(out)
+print(f&quot;\n  Figura guardada: {os.path.abspath(out)}&quot;)
+# plt.show()
+
+&quot;&quot;&quot;
+============================================================
+SEMANA 3 — EJEMPLO 3
+Estabilidad numérica en ODEs rígidas
+------------------------------------------------------------
+Aplicación: dinámica térmica de cable OPGW bajo
+            cortocircuito (Méndez Gutiérrez, Jurado Pérez)
+
+Modelo concentrado (lumped capacitance):
+  rho*cp*V * dT/dt = I²*R(T) - h_conv*As*(T - T_inf)
+  R(T) = R20 * [1 + alpha_R*(T - 20)]   [modelo IEC 61597]
+
+Esquemas comparados:
+  - Euler explícito   (condicionalmente estable)
+  - Euler implícito   (A-estable, O(dt))
+  - Crank-Nicolson    (A-estable, O(dt²))
+  - RK45 scipy        (referencia de alta precisión)
+
+El código muestra cómo el Euler explícito diverge cuando
+dt &gt; dt_crit = 2/|lambda|, mientras que los esquemas
+implícitos convergen con cualquier paso de tiempo.
+
+Ejecución:
+  pip install numpy scipy matplotlib
+  python S3_Ejemplo3_Estabilidad_ODE.py
+
+Salida:
+  fig_s3_estabilidad_ode.png
+============================================================
+&quot;&quot;&quot;
+</textarea>
+  <div class="code-output-wrap" hidden>
+    <div class="code-output-console"></div>
+    <div class="code-output-figures"></div>
+  </div>
+  <div class="code-status"></div>
+</div>
+<div class="code-cell">
+  <div class="code-cell-header">
+    <span class="code-cell-title">Código 3</span>
+    <span class="code-cell-caption">Semana 3 – Ejemplo 3: Estabilidad de esquemas para la ODE térmica del cable OPGW. Ejecutar en Google Colab.</span>
+    <button class="run-btn" type="button">&#9654; Ejecutar</button>
+  </div>
+  <div class="code-banner code-banner-warn">&#9888; Código recuperado de un borrador anterior (semana_3 (1).py, fragmento 2) porque la versión pegada en el <code>.tex</code> perdió la indentación de Python. Ejecuta corriendo bien, pero puede diferir en detalles menores de la versión final — revísalo antes de usarlo en clase.</div>
+  <textarea class="code-input" spellcheck="false" rows="14">import numpy as np
+import matplotlib
+matplotlib.use(&#x27;Agg&#x27;)
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+from scipy.integrate import solve_ivp
+import os
+
+# ---- Configuración global de figuras ---------------------------------
+mpl.rcParams.update({
+    &quot;font.family&quot;:    &quot;serif&quot;,
+    &quot;font.size&quot;:      11,
+    &quot;axes.titlesize&quot;: 12,
+    &quot;axes.labelsize&quot;: 11,
+    &quot;xtick.labelsize&quot;:10,
+    &quot;ytick.labelsize&quot;:10,
+    &quot;legend.fontsize&quot;: 9,
+    &quot;axes.linewidth&quot;: 0.8,
+    &quot;lines.linewidth&quot;:1.4,
+    &quot;figure.dpi&quot;:     150,
+    &quot;savefig.dpi&quot;:    300,
+    &quot;savefig.bbox&quot;:   &quot;tight&quot;,
+})
+
+BLUE   = &quot;#003366&quot;
+RED    = &quot;#C0392B&quot;
+GREEN  = &quot;#1A7D3A&quot;
+ORANGE = &quot;#E67E22&quot;
+GRAY   = &quot;#555555&quot;
+
+# ======================================================================
+# 1. PARÁMETROS FÍSICOS DEL CABLE OPGW (aluminio exterior típico)
+# ======================================================================
+
+rho      = 2700.0        # densidad del aluminio         [kg/m³]
+cp       = 900.0         # calor específico              [J/(kg·K)]
+r_cab    = 5.0e-3        # radio exterior del cable      [m]
+L_cab    = 1.0           # longitud unitaria             [m]
+V        = np.pi * r_cab**2 * L_cab    # volumen          [m³]
+A_s      = 2.0 * np.pi * r_cab * L_cab # área superficial [m²]
+R20      = 1.0e-3        # resistencia eléctrica a 20 °C [Ohm]
+alpha_R  = 3.9e-3        # coef. térmico de resistencia  [1/K]
+h_conv   = 10.0          # coef. convección natural      [W/(m²·K)]
+T_inf    = 20.0          # temperatura ambiente           [°C]
+T0       = 20.0          # temperatura inicial            [°C]
+I_sc     = 5e3           # corriente de cortocircuito    [A]
+t_end    = 0.5           # duración de la simulación     [s]
+mC       = rho * cp * V  # capacidad térmica total       [J/K]
+
+print(&quot;=&quot; * 60)
+print(&quot;SEMANA 3 — Ejemplo 3: Estabilidad numérica (ODE rígida)&quot;)
+print(&quot;=&quot; * 60)
+print(f&quot;  Cable OPGW: r={r_cab*1e3:.1f} mm, L={L_cab:.1f} m, Al&quot;)
+print(f&quot;  mC     = {mC:.4e} J/K&quot;)
+print(f&quot;  I_sc   = {I_sc/1e3:.1f} kA&quot;)
+print(f&quot;  R(20°C)= {R20*1e3:.2f} mOhm&quot;)
+print(f&quot;  h_conv = {h_conv:.1f} W/(m²·K)\n&quot;)
+
+# ======================================================================
+# 2. MODELO: ODE Y SU JACOBIANO LINEALIZADO
+# ======================================================================
+
+def R_T(T):
+    &quot;&quot;&quot;Resistencia eléctrica dependiente de temperatura [Ohm].&quot;&quot;&quot;
+    return R20 * (1.0 + alpha_R * (T - 20.0))
+
+def dTdt(t, T_arr):
+    &quot;&quot;&quot;RHS del modelo concentrado. Compatible con scipy.integrate.&quot;&quot;&quot;
+    T = T_arr[0]
+    q_joule = I_sc**2 * R_T(T)
+    q_conv  = h_conv * A_s * (T - T_inf)
+    return [(q_joule - q_conv) / mC]
+
+# Eigenvalor linealizado en T0 (determina dt crítico)
+lam      = (I_sc**2 * R20 * alpha_R - h_conv * A_s) / mC
+dt_crit  = 2.0 / abs(lam)
+
+print(f&quot;  Eigenvalor linealizado lambda = {lam:.4f} /s&quot;)
+print(f&quot;  dt_critico (Euler explícito)  = {dt_crit*1e3:.4f} ms\n&quot;)
+
+# ======================================================================
+# 3. SOLUCIÓN DE REFERENCIA CON RK45 (alta precisión)
+# ======================================================================
+
+sol_ref = solve_ivp(dTdt, [0, t_end], [T0], method=&#x27;RK45&#x27;,
+                    dense_output=True, rtol=1e-9, atol=1e-12)
+t_ref   = np.linspace(0, t_end, 2000)
+T_ref   = sol_ref.sol(t_ref)[0]
+print(f&quot;  T máxima (RK45): {T_ref.max():.2f} °C&quot;)
+print(f&quot;  T final  (RK45): {T_ref[-1]:.4f} °C\n&quot;)
+
+# ======================================================================
+# 4. IMPLEMENTACIÓN DE LOS TRES ESQUEMAS
+# ======================================================================
+
+def euler_explicito(dt, t_fin):
+    &quot;&quot;&quot;Euler explícito. Inestable si dt &gt; dt_crit.&quot;&quot;&quot;
+    N = int(t_fin / dt)
+    t = np.linspace(0, N * dt, N + 1)
+    T = np.zeros(N + 1); T[0] = T0
+    for k in range(N):
+        T[k + 1] = T[k] + dt * dTdt(t[k], [T[k]])[0]
+    return t, T
+
+# Jacobiano linealizado (constante para la linealización en T0)
+_J_lin = (I_sc**2 * R20 * alpha_R - h_conv * A_s) / mC
+
+def euler_implicito(dt, t_fin):
+    &quot;&quot;&quot;Euler implícito con iteración de Newton (A-estable, O(dt)).&quot;&quot;&quot;
+    N = int(t_fin / dt)
+    t = np.linspace(0, N * dt, N + 1)
+    T = np.zeros(N + 1); T[0] = T0
+    for k in range(N):
+        Tk = T[k]
+        for _ in range(30):          # Newton
+            fval = dTdt(t[k + 1], [Tk])[0]
+            F    = Tk - T[k] - dt * fval
+            dF   = 1.0 - dt * _J_lin
+            Tk  -= F / dF
+            if abs(F) &lt; 1e-10:
+                break
+        T[k + 1] = Tk
+    return t, T
+
+def crank_nicolson(dt, t_fin):
+    &quot;&quot;&quot;Crank-Nicolson con Newton (A-estable, O(dt²)).&quot;&quot;&quot;
+    N = int(t_fin / dt)
+    t = np.linspace(0, N * dt, N + 1)
+    T = np.zeros(N + 1); T[0] = T0
+    for k in range(N):
+        fn = dTdt(t[k], [T[k]])[0]
+        Tk = T[k] + dt * fn           # predictor (Euler explícito)
+        for _ in range(30):           # Newton corrector
+            fn1  = dTdt(t[k + 1], [Tk])[0]
+            F    = Tk - T[k] - 0.5 * dt * (fn + fn1)
+            dF   = 1.0 - 0.5 * dt * _J_lin
+            Tk  -= F / dF
+            if abs(F) &lt; 1e-10:
+                break
+        T[k + 1] = Tk
+    return t, T
+
+# ======================================================================
+# 5. INTEGRACIÓN CON dt &gt; dt_crit PARA DEMOSTRAR INESTABILIDAD
+# ======================================================================
+
+dt_estable   = 0.5  * dt_crit    # Euler explícito: estable
+dt_inestable = 2.5  * dt_crit    # Euler explícito: inestable
+
+t_ee_s,  T_ee_s  = euler_explicito(dt_estable,   min(t_end, 0.15))
+t_ee_i,  T_ee_i  = euler_explicito(dt_inestable, min(t_end, 0.05))
+t_ei,    T_ei    = euler_implicito(dt_inestable, t_end)
+t_cn,    T_cn    = crank_nicolson(dt_inestable,  t_end)
+
+print(f&quot;  Comparación al tiempo final ({t_end} s):&quot;)
+print(f&quot;    RK45 (referencia):  {T_ref[-1]:.6f} °C&quot;)
+print(f&quot;    Euler implícito:    {T_ei[-1]:.6f} °C  (dt = {dt_inestable*1e3:.2f} ms)&quot;)
+print(f&quot;    Crank-Nicolson:     {T_cn[-1]:.6f} °C  (dt = {dt_inestable*1e3:.2f} ms)&quot;)
+
+# ======================================================================
+# 6. CONVERGENCIA: orden de Euler implícito vs Crank-Nicolson
+# ======================================================================
+
+t_check      = 0.1
+T_ref_check  = float(sol_ref.sol(t_check)[0])
+# Rango de dt donde el error es apreciable y varía limpiamente
+dt_arr       = np.array([0.1, 0.05, 0.02, 0.01, 0.005, 0.002, 0.001])
+
+err_ei = np.array([abs(euler_implicito(dt, t_check)[1][-1] - T_ref_check)
+                   for dt in dt_arr])
+err_cn = np.array([abs(crank_nicolson(dt, t_check)[1][-1] - T_ref_check)
+                   for dt in dt_arr])
+
+print(f&quot;\n  Orden empírico (t={t_check} s, log-log, rango dt=[0.1..0.001] s):&quot;)
+# Usar todos los puntos disponibles (ya están en la zona limpia)
+p_ei = np.polyfit(np.log10(dt_arr), np.log10(np.maximum(err_ei, 1e-15)), 1)
+p_cn = np.polyfit(np.log10(dt_arr), np.log10(np.maximum(err_cn, 1e-15)), 1)
+print(f&quot;    Euler implícito: orden = {p_ei[0]:.3f}  (esperado: 1)&quot;)
+print(f&quot;    Crank-Nicolson:  orden = {p_cn[0]:.3f}  (esperado: 2)&quot;)
+
+# ======================================================================
+# 7. FIGURA
+# ======================================================================
+
+fig, axes = plt.subplots(1, 2, figsize=(13, 5))
+
+# --- Panel izquierdo: comparación de esquemas -------------------------
+ax = axes[0]
+ax.plot(t_ref,  T_ref,  color=GRAY,   lw=2.5, zorder=5, label=&#x27;RK45 (referencia)&#x27;)
+ax.plot(t_ee_s, T_ee_s, color=GREEN,  lw=1.5, ls=&#x27;--&#x27;,
+        label=f&#x27;Euler exp. ESTABLE dt={dt_estable*1e3:.2f} ms&#x27;)
+ax.plot(t_ee_i, T_ee_i, color=RED,    lw=1.5, ls=&#x27;-.&#x27;,
+        label=f&#x27;Euler exp. INESTABLE dt={dt_inestable*1e3:.2f} ms&#x27;)
+ax.plot(t_ei,   T_ei,   color=BLUE,   lw=1.5, ls=&#x27;:&#x27;,
+        label=f&#x27;Euler impl. dt={dt_inestable*1e3:.2f} ms&#x27;)
+ax.plot(t_cn,   T_cn,   color=ORANGE, lw=1.5,
+        label=f&#x27;Crank-Nicolson dt={dt_inestable*1e3:.2f} ms&#x27;)
+
+ax.set_xlabel(&#x27;Tiempo [s]&#x27;)
+ax.set_ylabel(&#x27;Temperatura [°C]&#x27;)
+ax.set_title(&#x27;Dinámica térmica de cable OPGW bajo cortocircuito\n&#x27;
+             f&#x27;I={I_sc/1e3:.0f} kA — Estabilidad de esquemas numéricos&#x27;)
+ax.set_ylim([T0 - 10, T_ref.max() * 1.2])
+ax.legend(fontsize=8); ax.grid(alpha=0.3)
+
+# --- Panel derecho: convergencia de esquemas implícitos ---------------
+ax = axes[1]
+idx0   = 2   # índice de referencia para las líneas de orden en la figura
+ref_ei = err_ei[idx0] * (dt_arr / dt_arr[idx0])
+ref_cn = err_cn[idx0] * (dt_arr / dt_arr[idx0])**2
+
+ax.loglog(dt_arr, err_ei, &#x27;o-&#x27;, color=BLUE,   lw=1.5, ms=4,
+          label=&#x27;Euler implícito O(Δt)&#x27;)
+ax.loglog(dt_arr, err_cn, &#x27;s--&#x27;, color=ORANGE, lw=1.5, ms=4,
+          label=&#x27;Crank-Nicolson O(Δt²)&#x27;)
+ax.loglog(dt_arr, ref_ei, &#x27;k:&#x27;,  lw=0.9, label=&#x27;Pendiente 1&#x27;)
+ax.loglog(dt_arr, ref_cn, &#x27;k--&#x27;, lw=0.9, label=&#x27;Pendiente 2&#x27;)
+
+ax.set_xlabel(&#x27;Paso de tiempo $\Delta t$ [s]&#x27;)
+ax.set_ylabel(&#x27;$|T_\mathrm{num}(t=0.3\,\mathrm{s}) - T_\mathrm{RK45}|$ [K]&#x27;)
+ax.set_title(&#x27;Convergencia temporal de esquemas implícitos\n&#x27;
+             &#x27;Orden 1 (Euler) vs Orden 2 (Crank-Nicolson)&#x27;)
+ax.legend(fontsize=8); ax.grid(alpha=0.3, which=&#x27;both&#x27;)
+
+plt.tight_layout()
+out = &#x27;fig_s3_estabilidad_ode.png&#x27;
+plt.savefig(out)
+print(f&quot;\n  Figura guardada: {os.path.abspath(out)}&quot;)
+# plt.show()
+
+&quot;&quot;&quot;
+============================================================
+SEMANA 3 — EJEMPLO 4
+Condicionamiento numérico y resolución de sistemas lineales
+------------------------------------------------------------
+Aplicaciones:
+  - Análisis estructural FEM: losas y cimentaciones
+    (Lerma Lomelí, Lerma Martínez)
+  - Calibración de sensores (Álvarez Sánchez)
+  - Sistemas de ecuaciones en diseño de bomba (Leyva Jiménez)
+  - Álgebra lineal en sistemas RAG (Rodríguez Morales)
+
+Contenido:
+  1. Número de condición de la matriz de Hilbert
+  2. Amplificación del error por mal condicionamiento
+  3. Espectro de la matriz laplaciana 1D
+     (base de la discretización FEM/DF de losas)
+  4. Comparación de costo: LU directo vs Gradiente Conjugado
+
+Ejecución:
+  pip install numpy scipy matplotlib
+  python S3_Ejemplo4_Condicionamiento.py
+
+Salida:
+  fig_s3_condicionamiento.png
+============================================================
+&quot;&quot;&quot;
+</textarea>
+  <div class="code-output-wrap" hidden>
+    <div class="code-output-console"></div>
+    <div class="code-output-figures"></div>
+  </div>
+  <div class="code-status"></div>
+</div>
+<div class="code-cell">
+  <div class="code-cell-header">
+    <span class="code-cell-title">Código 4</span>
+    <span class="code-cell-caption">Semana 3 – Ejemplo 4: Condicionamiento numérico y resolución de sistemas lineales. Ejecutar en Google Colab.</span>
+    <button class="run-btn" type="button">&#9654; Ejecutar</button>
+  </div>
+  <div class="code-banner code-banner-warn">&#9888; Código recuperado de un borrador anterior (semana_3 (1).py, fragmento 3) porque la versión pegada en el <code>.tex</code> perdió la indentación de Python. Ejecuta corriendo bien, pero puede diferir en detalles menores de la versión final — revísalo antes de usarlo en clase.</div>
+  <textarea class="code-input" spellcheck="false" rows="14">import numpy as np
+import matplotlib
+matplotlib.use(&#x27;Agg&#x27;)
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+from scipy import linalg
+from scipy.sparse import diags
+from scipy.sparse.linalg import cg as sparse_cg
+import time
+import os
+
+# ---- Configuración global de figuras ---------------------------------
+mpl.rcParams.update({
+    &quot;font.family&quot;:    &quot;serif&quot;,
+    &quot;font.size&quot;:      11,
+    &quot;axes.titlesize&quot;: 12,
+    &quot;axes.labelsize&quot;: 11,
+    &quot;xtick.labelsize&quot;:10,
+    &quot;ytick.labelsize&quot;:10,
+    &quot;legend.fontsize&quot;: 9,
+    &quot;axes.linewidth&quot;: 0.8,
+    &quot;lines.linewidth&quot;:1.4,
+    &quot;figure.dpi&quot;:     150,
+    &quot;savefig.dpi&quot;:    300,
+    &quot;savefig.bbox&quot;:   &quot;tight&quot;,
+})
+
+BLUE   = &quot;#003366&quot;
+RED    = &quot;#C0392B&quot;
+GREEN  = &quot;#1A7D3A&quot;
+ORANGE = &quot;#E67E22&quot;
+GRAY   = &quot;#555555&quot;
+
+print(&quot;=&quot; * 60)
+print(&quot;SEMANA 3 — Ejemplo 4: Condicionamiento numérico&quot;)
+print(&quot;=&quot; * 60)
+
+# ======================================================================
+# PARTE 1: NÚMERO DE CONDICIÓN DE LA MATRIZ DE HILBERT
+#   H_{ij} = 1/(i+j-1)
+#   kappa crece ~10^(1.7*N) — caso canónico de mal condicionamiento
+#   Aparece en ajuste de mínimos cuadrados con funciones base
+#   casi linealmente dependientes.
+# ======================================================================
+
+N_rango   = range(3, 16)
+kappas    = [np.linalg.cond(linalg.hilbert(N)) for N in N_rango]
+
+print(&quot;\n  PARTE 1 — Matriz de Hilbert: kappa(H_N)&quot;)
+print(f&quot;  {&#x27;N&#x27;:&gt;4}  {&#x27;kappa&#x27;:&gt;14}  {&#x27;digitos perdidos&#x27;:&gt;16}&quot;)
+print(&quot;  &quot; + &quot;-&quot; * 38)
+for N, k in zip(N_rango, kappas):
+    nd = max(0, int(np.floor(np.log10(max(k, 1)))))
+    print(f&quot;  {N:4d}  {k:14.4e}  {nd:16d}&quot;)
+
+# ======================================================================
+# PARTE 2: EFECTO DEL CONDICIONAMIENTO EN LA SOLUCIÓN
+#   Perturbar b un 1% -&gt; medir ||delta_x|| / ||x||
+#   Cota teórica: ||delta_x||/||x|| &lt;= kappa * ||delta_b||/||b||
+# ======================================================================
+
+np.random.seed(2024)
+print(&quot;\n  PARTE 2 — Perturbación 1% en b → error en x&quot;)
+print(f&quot;  {&#x27;N&#x27;:&gt;4}  {&#x27;kappa&#x27;:&gt;12}  {&#x27;||dx||/||x||&#x27;:&gt;14}  {&#x27;cota_teorica&#x27;:&gt;14}&quot;)
+print(&quot;  &quot; + &quot;-&quot; * 50)
+
+err_rel_x = []
+for N in N_rango:
+    A      = linalg.hilbert(N)
+    x_true = np.ones(N)
+    b      = A @ x_true
+    # Perturbación aleatoria del 1% en b
+    db     = 0.01 * b * (2 * np.random.rand(N) - 1)
+    x_pert = np.linalg.solve(A, b + db)
+    err    = np.linalg.norm(x_pert - x_true) / np.linalg.norm(x_true)
+    err_rel_x.append(err)
+    k      = np.linalg.cond(A)
+    print(f&quot;  {N:4d}  {k:12.4e}  {err:14.4e}  {k*0.01:14.4e}&quot;)
+
+# ======================================================================
+# PARTE 3: ESPECTRO DE LA MATRIZ LAPLACIANA 1D
+#   Tridiagonal: [-1, 2, -1] con signo negativo global
+#   Esta matriz aparece en:
+#     - DF de la ecuación de Poisson/calor
+#     - Matriz de rigidez de elementos barra en FEM 1D
+#     - Base de matrices de rigidez de losas simplificadas
+# ======================================================================
+
+N_lap   = 40
+dm      = -2.0 * np.ones(N_lap)
+do      =  1.0 * np.ones(N_lap - 1)
+A_lap   = np.diag(dm) + np.diag(do, 1) + np.diag(do, -1)
+eigvals = np.sort(np.linalg.eigvalsh(A_lap))
+
+# Eigenvalores analíticos para verificación
+k_vals        = np.arange(1, N_lap + 1)
+lam_analiticos = -4.0 * np.sin(k_vals * np.pi / (2 * (N_lap + 1)))**2
+kappa_lap     = abs(eigvals[-1] / eigvals[0])
+kappa_teorico = 4.0 * np.sin(np.pi / (2*(N_lap+1)))**(-2)   # ~N^2*(2/pi)^2
+
+print(f&quot;\n  PARTE 3 — Espectro de la laplaciana 1D (N={N_lap})&quot;)
+print(f&quot;  lambda_min (numérico)  = {eigvals[0]:.8f}&quot;)
+print(f&quot;  lambda_min (analítico) = {lam_analiticos.min():.8f}&quot;)
+print(f&quot;  lambda_max             = {eigvals[-1]:.6f}&quot;)
+print(f&quot;  kappa = |lam_max/lam_min| = {kappa_lap:.2f}&quot;)
+print(f&quot;  kappa teórico (aprox)     = {kappa_teorico:.2f}&quot;)
+print(f&quot;  (escala ~N² → cuadrática con el tamaño de la malla)&quot;)
+
+# ======================================================================
+# PARTE 4: LU DIRECTO vs GRADIENTE CONJUGADO (CG)
+#   Para matrices laplacianas 1D dispersas
+# ======================================================================
+
+Ns_test = [20, 40, 80, 160, 320, 640]
+t_lu    = []; t_cg_arr = []; iter_cg = []
+
+print(f&quot;\n  PARTE 4 — LU directo vs CG (laplaciana 1D)&quot;)
+print(f&quot;  {&#x27;N&#x27;:&gt;6}  {&#x27;t_LU [ms]&#x27;:&gt;10}  {&#x27;t_CG [ms]&#x27;:&gt;10}  {&#x27;iter_CG&#x27;:&gt;8}  {&#x27;error&#x27;:&gt;10}&quot;)
+print(&quot;  &quot; + &quot;-&quot; * 52)
+
+for N in Ns_test:
+    dm_s = -2.0 * np.ones(N); do_s = np.ones(N - 1)
+    A_s  = diags([do_s, dm_s, do_s], [-1, 0, 1], format=&#x27;csc&#x27;)
+    A_d  = A_s.toarray()
+    b_rhs = np.ones(N)
+
+    # LU directo (scipy.linalg.solve)
+    t0 = time.perf_counter()
+    x_lu = linalg.solve(A_d, b_rhs)
+    t_lu.append((time.perf_counter() - t0) * 1e3)
+
+    # Gradiente Conjugado iterativo
+    count = [0]
+    def _cb(xk): count[0] += 1
+
+    t0 = time.perf_counter()
+    x_cg, info = sparse_cg(A_s, b_rhs, callback=_cb, rtol=1e-10)
+    t_cg_arr.append((time.perf_counter() - t0) * 1e3)
+    iter_cg.append(count[0])
+
+    err = np.linalg.norm(x_lu - x_cg) / np.linalg.norm(x_lu)
+    print(f&quot;  {N:6d}  {t_lu[-1]:10.3f}  {t_cg_arr[-1]:10.3f}  &quot;
+          f&quot;{iter_cg[-1]:8d}  {err:10.2e}&quot;)
+
+# ======================================================================
+# 5. FIGURA (2×2)
+# ======================================================================
+
+fig, axes = plt.subplots(2, 2, figsize=(13, 9))
+
+# --- Panel A: kappa(H_N) vs N -----------------------------------------
+ax = axes[0, 0]
+ax.semilogy(list(N_rango), kappas, &#x27;o-&#x27;, color=BLUE, lw=1.5, ms=6,
+            label=&#x27;$\kappa(H_N)$ numérico&#x27;)
+ax.semilogy(list(N_rango), [10**(N - 1) for N in N_rango], &#x27;k--&#x27;,
+            lw=0.9, alpha=0.55, label=&#x27;Referencia $10^{N-1}$&#x27;)
+ax.set_xlabel(&#x27;Dimensión $N$ de la matriz de Hilbert&#x27;)
+ax.set_ylabel(&#x27;Número de condición $\kappa(A)$&#x27;)
+ax.set_title(&#x27;Crecimiento del número de condición\n&#x27;
+             &#x27;Matriz de Hilbert $H_N$ — caso canónico&#x27;)
+ax.legend(fontsize=8); ax.grid(alpha=0.3, which=&#x27;both&#x27;)
+
+# --- Panel B: error relativo en x vs kappa ----------------------------
+ax = axes[0, 1]
+ax.loglog(kappas, err_rel_x, &#x27;o-&#x27;, color=RED, lw=1.5, ms=6,
+          label=&#x27;$\|\delta x\|/\|x\|$ medido&#x27;)
+ax.loglog(kappas, [k * 0.01 for k in kappas], &#x27;k--&#x27;, lw=0.9,
+          label=&#x27;Cota teórica $\kappa \cdot 0.01$&#x27;)
+ax.set_xlabel(&#x27;Número de condición $\kappa(A)$&#x27;)
+ax.set_ylabel(&#x27;Error relativo en la solución $x$&#x27;)
+ax.set_title(&#x27;Amplificación del error por mal condicionamiento\n&#x27;
+             &#x27;Perturbación 1% en $b$ → error en $x$&#x27;)
+ax.legend(fontsize=8); ax.grid(alpha=0.3, which=&#x27;both&#x27;)
+
+# --- Panel C: espectro de la laplaciana 1D ----------------------------
+ax = axes[1, 0]
+ax.bar(range(1, N_lap + 1), eigvals, color=BLUE, alpha=0.7, width=0.8)
+ax.axhline(eigvals[0], color=RED,   lw=1.2, ls=&#x27;--&#x27;,
+           label=f&#x27;$\lambda_{{min}}$ = {eigvals[0]:.4f}&#x27;)
+ax.axhline(eigvals[-1], color=GREEN, lw=1.2, ls=&#x27;--&#x27;,
+           label=f&#x27;$\lambda_{{max}}$ = {eigvals[-1]:.4f}&#x27;)
+ax.set_xlabel(&#x27;Índice del eigenvalor&#x27;)
+ax.set_ylabel(&#x27;Eigenvalor&#x27;)
+ax.set_title(f&#x27;Espectro de la laplaciana 1D ($N={N_lap}$)\n&#x27;
+             f&#x27;$\kappa = |\lambda_{{max}}/\lambda_{{min}}|$ = {kappa_lap:.1f}&#x27;)
+ax.legend(fontsize=8); ax.grid(alpha=0.3, axis=&#x27;y&#x27;)
+
+# --- Panel D: costo LU vs CG ------------------------------------------
+ax = axes[1, 1]
+ax2 = ax.twinx()
+
+ax.semilogy(Ns_test, t_lu,     &#x27;o-&#x27;,  color=BLUE,   lw=1.5, ms=6,
+            label=&#x27;LU directo [ms]&#x27;)
+ax.semilogy(Ns_test, t_cg_arr, &#x27;s--&#x27;, color=RED,    lw=1.5, ms=6,
+            label=&#x27;CG iterativo [ms]&#x27;)
+ax2.plot(Ns_test, iter_cg, &#x27;^:&#x27;,    color=GREEN,  lw=1.3, ms=6,
+         label=&#x27;Iteraciones CG&#x27;)
+
+ax.set_xlabel(&#x27;Dimensión del sistema $N$&#x27;)
+ax.set_ylabel(&#x27;Tiempo de CPU [ms]&#x27;)
+ax2.set_ylabel(&#x27;Iteraciones del gradiente conjugado&#x27;, color=GREEN)
+ax2.tick_params(axis=&#x27;y&#x27;, labelcolor=GREEN)
+ax.set_title(&#x27;Costo computacional: LU vs CG\n&#x27;
+             &#x27;Laplaciana 1D (estructura tridiagonal)&#x27;)
+
+lines1, labels1 = ax.get_legend_handles_labels()
+lines2, labels2 = ax2.get_legend_handles_labels()
+ax.legend(lines1 + lines2, labels1 + labels2, fontsize=8)
+ax.grid(alpha=0.3)
+
+plt.tight_layout()
+out = &#x27;fig_s3_condicionamiento.png&#x27;
+plt.savefig(out)
+print(f&quot;\n  Figura guardada: {os.path.abspath(out)}&quot;)
+# plt.show()
+</textarea>
+  <div class="code-output-wrap" hidden>
+    <div class="code-output-console"></div>
+    <div class="code-output-figures"></div>
+  </div>
+  <div class="code-status"></div>
+</div>
+<div class="code-cell">
+  <div class="code-cell-header">
+    <span class="code-cell-title">Código 5</span>
+    <span class="code-cell-caption">Ejemplo A1 — Condicionamiento en matrices de similitud RAG. Google Colab.</span>
+    <button class="run-btn" type="button">&#9654; Ejecutar</button>
+  </div>
+  <div class="code-banner code-banner-warn">&#9888; Código recuperado de un borrador anterior (semana_3 (1).py, fragmento 4) porque la versión pegada en el <code>.tex</code> perdió la indentación de Python. Ejecuta corriendo bien, pero puede diferir en detalles menores de la versión final — revísalo antes de usarlo en clase.</div>
+  <textarea class="code-input" spellcheck="false" rows="14">import numpy as np
+import matplotlib
+matplotlib.use(&#x27;Agg&#x27;)
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+from scipy import linalg
+import os # Import the os module
+
+mpl.rcParams.update({
+    &quot;font.family&quot;: &quot;serif&quot;, &quot;font.size&quot;: 11, &quot;axes.titlesize&quot;: 12,
+    &quot;axes.labelsize&quot;: 11, &quot;xtick.labelsize&quot;: 10, &quot;ytick.labelsize&quot;: 10,
+    &quot;legend.fontsize&quot;: 9, &quot;axes.linewidth&quot;: 0.8, &quot;lines.linewidth&quot;: 1.4,
+    &quot;figure.dpi&quot;: 150, &quot;savefig.dpi&quot;: 300, &quot;savefig.bbox&quot;: &quot;tight&quot;,
+})
+BLUE=&quot;#003366&quot;; RED=&quot;#C0392B&quot;; GREEN=&quot;#1A7D3A&quot;; ORANGE=&quot;#E67E22&quot;; GRAY=&quot;#555555&quot;
+
+rng = np.random.default_rng(2026)
+
+# ── Parámetros del corpus ──────────────────────────────────────────────
+m_docs   = 60      # número total de documentos
+n_emb    = 128     # dimensión del embedding (ej. sentence-transformers dim//8)
+n_temas  = 6       # temas base del corpus (rango intrínseco)
+
+print(&quot;=&quot; * 60)
+print(&quot;EXTRA 1 — Condicionamiento en matrices de similitud RAG&quot;)
+print(&quot;=&quot; * 60)
+
+# ── Generar corpus con rango controlado ───────────────────────────────
+# Temas base (vectores unitarios aleatorios en R^n_emb)
+temas = rng.standard_normal((n_temas, n_emb))
+temas /= np.linalg.norm(temas, axis=1, keepdims=True)
+
+# Embeddings: combinación de temas + ruido. fracción_dup controla redundancia.
+def generar_corpus(m, temas, ruido_sigma):
+    n_t = len(temas)
+    # Asignar cada doc a un tema con perturbación
+    asignaciones = rng.integers(0, n_t, size=m)
+    X = temas[asignaciones] + ruido_sigma * rng.standard_normal((m, temas.shape[1]))
+    # Normalizar (embeddings coseno)
+    X /= np.linalg.norm(X, axis=1, keepdims=True)
+    return X
+
+# Barrido de sigma (mayor sigma = más diversidad = mejor condicionamiento)
+sigmas   = np.linspace(0.02, 2.0, 30)
+kappas_S = []
+rank_eff  = []
+
+for sig in sigmas:
+    X   = generar_corpus(m_docs, temas, sig)
+    S   = X @ X.T          # matriz de similitud coseno m×m
+    sv  = np.linalg.svd(S, compute_uv=False)
+    kappas_S.append(sv[0] / max(sv[-1], 1e-16))
+    # Rango efectivo: número de sv &gt; 1% del máximo
+    rank_eff.append(np.sum(sv &gt; 0.01 * sv[0]))
+
+kappas_S = np.array(kappas_S)
+rank_eff  = np.array(rank_eff)
+
+# ── Demostración de estabilización con Tikhonov ───────────────────────
+# Problema: dado el sistema de ranking w = S^{-1} q (q = query embedding)
+# Comparar: (1) inversión directa, (2) Tikhonov S + λI, (3) pseudoinversa SVD
+
+sig_demo = 0.1   # corpus casi-redundante (kappa alto)
+X_demo   = generar_corpus(m_docs, temas, sig_demo)
+S_demo   = X_demo @ X_demo.T
+
+# Query embedding (aleatorio normalizado)
+q_vec  = rng.standard_normal(n_emb)
+q_vec /= np.linalg.norm(q_vec)
+q_proj = X_demo @ q_vec   # proyección del query sobre los docs [m]
+
+kappa_demo = np.linalg.cond(S_demo)
+print(f&quot;\n  Corpus demo: sigma={sig_demo}, kappa(S) = {kappa_demo:.2e}&quot;)
+
+# Solución con distintos métodos
+lambdas = np.logspace(-6, 0, 30)
+norm_w  = []   # norma de la solución regularizada
+resid   = []   # residuo ||S w - q_proj||
+
+for lam in lambdas:
+    S_reg = S_demo + lam * np.eye(m_docs)
+    w = np.linalg.solve(S_reg, q_proj)
+    norm_w.append(np.linalg.norm(w))
+    resid.append(np.linalg.norm(S_demo @ w - q_proj))
+
+norm_w = np.array(norm_w); resid = np.array(resid)
+
+# Pseudoinversa con umbral de truncamiento
+U, sv_d, Vt = np.linalg.svd(S_demo)
+sv_max = sv_d[0]
+
+for thresh_pct in [0.1, 1.0, 5.0]:
+    thresh = thresh_pct / 100 * sv_max
+    sv_inv = np.where(sv_d &gt; thresh, 1.0 / sv_d, 0.0)
+    S_pinv = (Vt.T * sv_inv) @ U.T
+    w_pinv = S_pinv @ q_proj
+    r = np.linalg.norm(S_demo @ w_pinv - q_proj)
+    print(f&quot;  Pseudoinversa umbral {thresh_pct:.1f}%: ||w||={np.linalg.norm(w_pinv):.2f}, &quot;
+          f&quot;residuo={r:.4f}&quot;)
+
+# ── FIGURA 4 paneles ──────────────────────────────────────────────────
+fig, axes = plt.subplots(2, 2, figsize=(12, 9))
+
+# Panel A: kappa(S) vs sigma de ruido del corpus
+ax = axes[0, 0]
+ax2 = ax.twinx()
+ax.semilogy(sigmas, kappas_S, &#x27;-&#x27;, color=BLUE, lw=1.5, label=r&#x27;$\kappa(S)$&#x27;)
+ax2.plot(sigmas, rank_eff, &#x27;--&#x27;, color=RED, lw=1.5, label=&#x27;Rango efectivo&#x27;)
+ax.set_xlabel(r&#x27;Diversidad del corpus $\sigma$&#x27;)
+ax.set_ylabel(r&#x27;Número de condición $\kappa(S)$&#x27;, color=BLUE)
+ax2.set_ylabel(&#x27;Rango efectivo (sv &gt; 1% sv_max)&#x27;, color=RED)
+ax.set_title(&#x27;Condicionamiento de $S = XX^T$\nvs diversidad del corpus RAG&#x27;)
+lines1, lab1 = ax.get_legend_handles_labels()
+lines2, lab2 = ax2.get_legend_handles_labels()
+ax.legend(lines1 + lines2, lab1 + lab2, fontsize=8)
+ax.grid(alpha=0.3)
+
+# Panel B: espectro de valores singulares de S (corpus malo vs bueno)
+ax = axes[0, 1]
+for sig_plot, col, lab in [(0.1, RED, r&#x27;$\sigma=0.1$ (redundante)&#x27;),
+                            (1.0, GREEN, r&#x27;$\sigma=1.0$ (diverso)&#x27;),
+                            (2.0, BLUE, r&#x27;$\sigma=2.0$ (muy diverso)&#x27;)]:
+    X_p = generar_corpus(m_docs, temas, sig_plot)
+    S_p = X_p @ X_p.T
+    sv_p = np.linalg.svd(S_p, compute_uv=False)
+    ax.semilogy(range(1, m_docs + 1), sv_p, &#x27;-&#x27;, color=col, lw=1.3, label=lab)
+ax.axhline(1.0, color=&#x27;gray&#x27;, lw=0.7, ls=&#x27;:&#x27;)
+ax.set_xlabel(&#x27;Índice del valor singular&#x27;)
+ax.set_ylabel(r&#x27;Valor singular $\sigma_i(S)$&#x27;)
+ax.set_title(&#x27;Espectro de $S$ según diversidad del corpus\n&#x27; # Replaced \n with \n for JSON compatibility
+             &#x27;Corpus redundante → caída rápida → kappa alto&#x27;)
+ax.legend(fontsize=8); ax.grid(alpha=0.3, which=&#x27;both&#x27;)
+
+# Panel C: curva L (Tikhonov) — norma vs residuo
+ax = axes[1, 0]
+ax.loglog(resid, norm_w, &#x27;o-&#x27;, color=BLUE, lw=1.3, ms=4)
+# Marcar punto de inflexión (esquina de la curva L)
+corner_idx = np.argmin(np.gradient(np.log10(norm_w)) +
+                       np.gradient(np.log10(resid)))
+ax.loglog(resid[corner_idx], norm_w[corner_idx], &#x27;*&#x27;, color=RED,
+          ms=12, zorder=5, label=rf&#x27;Esquina: $\lambda$={lambdas[corner_idx]:.2e}&#x27;)
+ax.set_xlabel(r&#x27;Residuo $||Sw - q||_2$&#x27;)
+ax.set_ylabel(r&#x27;Norma de la solución $||w||_2$&#x27;)
+ax.set_title(&#x27;Curva L de regularización Tikhonov\n&#x27; # Replaced \n with \n for JSON compatibility
+             r&#x27;$S + \lambda I)\,w = q$  — corpus RAG redundante&#x27;)
+ax.legend(fontsize=9); ax.grid(alpha=0.3, which=&#x27;both&#x27;)
+
+# Panel D: pesos de ranking con y sin regularización
+ax = axes[1, 1]
+# Solución sin regularizar (lambda pequeño)
+w_unreg = np.linalg.solve(S_demo + 1e-8 * np.eye(m_docs), q_proj)
+# Solución regularizada (lambda en la esquina de la curva L)
+w_reg   = np.linalg.solve(S_demo + lambdas[corner_idx] * np.eye(m_docs), q_proj)
+# Pseudoinversa (1% umbral)
+sv_inv_1 = np.where(sv_d &gt; 0.01 * sv_max, 1.0 / sv_d, 0.0)
+w_pinv_1 = (Vt.T * sv_inv_1) @ U.T @ q_proj
+
+idx_sort = np.argsort(np.abs(w_reg))[::-1][:20]
+x_pos = np.arange(20)
+ax.bar(x_pos - 0.25, w_unreg[idx_sort], 0.25, color=RED,  alpha=0.8,
+       label=&#x27;Sin regularización&#x27;)
+ax.bar(x_pos,         w_reg[idx_sort],   0.25, color=BLUE, alpha=0.8,
+       label=r&#x27;Tikhonov ($\lambda^*$)&#x27;)
+ax.bar(x_pos + 0.25,  w_pinv_1[idx_sort], 0.25, color=GREEN, alpha=0.8,
+       label=&#x27;Pseudoinversa (1%)&#x27;)
+ax.set_xlabel(&#x27;Documento (top-20 por peso regularizado)&#x27;)
+ax.set_ylabel(r&#x27;Peso de ranking $w_i$&#x27;)
+ax.set_title(&#x27;Pesos de ranking: solución directa vs regularizada\n&#x27; # Replaced \n with \n for JSON compatibility
+             &#x27;La solución sin regularizar es numéricamente espuria&#x27;)
+ax.legend(fontsize=8); ax.grid(alpha=0.3, axis=&#x27;y&#x27;)
+
+plt.tight_layout()
+
+out_dir = &#x27;&#x27;
+out_file = os.path.join(out_dir, &#x27;fig_s3_extra1_rag_condicionamiento.png&#x27;)
+plt.savefig(out_file)
+print(f&quot;\n  Figura guardada: {out_file}&quot;)
+</textarea>
+  <div class="code-output-wrap" hidden>
+    <div class="code-output-console"></div>
+    <div class="code-output-figures"></div>
+  </div>
+  <div class="code-status"></div>
+</div>
+<div class="code-cell">
+  <div class="code-cell-header">
+    <span class="code-cell-title">Código 6</span>
+    <span class="code-cell-caption">Ejemplo A2 — Convergencia DF5 + GCI para losa 2D. Google Colab.</span>
+    <button class="run-btn" type="button">&#9654; Ejecutar</button>
+  </div>
+  <div class="code-banner code-banner-warn">&#9888; Código recuperado de un borrador anterior (semana_3 (1).py, fragmento 5) porque la versión pegada en el <code>.tex</code> perdió la indentación de Python. Ejecuta corriendo bien, pero puede diferir en detalles menores de la versión final — revísalo antes de usarlo en clase.</div>
+  <textarea class="code-input" spellcheck="false" rows="14">import numpy as np
+import matplotlib
+matplotlib.use(&#x27;Agg&#x27;)
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+from scipy.sparse import lil_matrix, csr_matrix
+from scipy.sparse.linalg import spsolve
+
+mpl.rcParams.update({
+    &quot;font.family&quot;: &quot;serif&quot;, &quot;font.size&quot;: 11, &quot;axes.titlesize&quot;: 12,
+    &quot;axes.labelsize&quot;: 11, &quot;xtick.labelsize&quot;: 10, &quot;ytick.labelsize&quot;: 10,
+    &quot;legend.fontsize&quot;: 9, &quot;axes.linewidth&quot;: 0.8, &quot;lines.linewidth&quot;: 1.4,
+    &quot;figure.dpi&quot;: 150, &quot;savefig.dpi&quot;: 300, &quot;savefig.bbox&quot;: &quot;tight&quot;,
+})
+BLUE=&quot;#003366&quot;; RED=&quot;#C0392B&quot;; GREEN=&quot;#1A7D3A&quot;; ORANGE=&quot;#E67E22&quot;; GRAY=&quot;#555555&quot;
+
+L = 1.0   # longitud de la losa [m] (normalizada)
+
+def u_exacta(x, y):
+    return np.sin(np.pi * x / L) * np.sin(np.pi * y / L)
+
+def f_rhs(x, y):
+    return 2.0 * (np.pi / L)**2 * np.sin(np.pi * x / L) * np.sin(np.pi * y / L)
+
+print(&quot;=&quot; * 60)
+print(&quot;EXTRA 2 — Convergencia de malla FEM/DF en losa 2D&quot;)
+print(&quot;=&quot; * 60)
+
+# ══════════════════════════════════════════════════════════════════════
+# MÉTODO 1: Diferencias finitas 5-puntos (Poisson 2D)
+# ══════════════════════════════════════════════════════════════════════
+def resolver_df5(N):
+    &quot;&quot;&quot;
+    Resuelve -nabla^2 u = f en [0,L]^2 con u=0 en bordes.
+    N: número de intervalos en cada dirección (N+1 nodos, N-1 internos).
+    &quot;&quot;&quot;
+    h    = L / N
+    n    = (N - 1)**2   # grados de libertad (nodos internos)
+    K    = lil_matrix((n, n))
+    F    = np.zeros(n)
+
+    def idx(i, j):   # índice global del nodo interior (i,j), i,j ∈ [1, N-1]
+        return (i - 1) * (N - 1) + (j - 1)
+
+    for i in range(1, N):
+        for j in range(1, N):
+            k = idx(i, j)
+            xi = i * h; yj = j * h
+            K[k, k] = 4.0 / h**2
+            if i &gt; 1:   K[k, idx(i-1, j)] = -1.0 / h**2
+            if i &lt; N-1: K[k, idx(i+1, j)] = -1.0 / h**2
+            if j &gt; 1:   K[k, idx(i, j-1)] = -1.0 / h**2
+            if j &lt; N-1: K[k, idx(i, j+1)] = -1.0 / h**2
+            F[k] = f_rhs(xi, yj)
+
+    u_int = spsolve(csr_matrix(K), F)
+
+    # Reconstruir campo completo incluyendo bordes (u=0)
+    u_full = np.zeros((N + 1, N + 1))
+    for i in range(1, N):
+        for j in range(1, N):
+            u_full[i, j] = u_int[idx(i, j)]
+
+    # Error L2 discreto
+    x_arr = np.linspace(0, L, N + 1)
+    y_arr = np.linspace(0, L, N + 1)
+    X, Y  = np.meshgrid(x_arr, y_arr, indexing=&#x27;ij&#x27;)
+    u_ex  = u_exacta(X, Y)
+    err   = np.sqrt(h**2 * np.sum((u_full - u_ex)**2))
+    return u_full, err, h
+
+# ══════════════════════════════════════════════════════════════════════
+# BARRIDO DE REFINAMIENTOS
+# ══════════════════════════════════════════════════════════════════════
+Ns = [4, 8, 16, 32, 64, 128]
+h_vals  = []
+err_df5 = []
+
+print(f&quot;\n  Diferencias finitas 5-puntos:&quot;)
+print(f&quot;  {&#x27;N&#x27;:&gt;5}  {&#x27;h [m]&#x27;:&gt;8}  {&#x27;error L2&#x27;:&gt;12}  {&#x27;orden&#x27;:&gt;8}&quot;)
+print(&quot;  &quot; + &quot;-&quot; * 38)
+
+for k, N in enumerate(Ns):
+    u_f, err, h = resolver_df5(N)
+    h_vals.append(h)
+    err_df5.append(err)
+    if k &gt;= 1:
+        orden = np.log(err_df5[k-1] / err_df5[k]) / np.log(h_vals[k-1] / h_vals[k])
+        print(f&quot;  {N:5d}  {h:8.5f}  {err:12.6e}  {orden:8.4f}&quot;)
+    else:
+        print(f&quot;  {N:5d}  {h:8.5f}  {err:12.6e}  {&#x27;—&#x27;:&gt;8}&quot;)
+
+h_vals  = np.array(h_vals)
+err_df5 = np.array(err_df5)
+
+# ══════════════════════════════════════════════════════════════════════
+# EXTRAPOLACIÓN DE RICHARDSON Y GCI
+# ══════════════════════════════════════════════════════════════════════
+# Usar los tres refinamientos más finos
+phi1, phi2, phi3 = err_df5[-1], err_df5[-2], err_df5[-3]
+r_ref = 2.0   # factor de refinamiento (duplicamos N cada vez)
+p_obs = np.log((phi3 - phi2) / (phi2 - phi1)) / np.log(r_ref)
+phi_rich = phi1 + (phi1 - phi2) / (r_ref**p_obs - 1.0)
+Fs = 1.25
+GCI = Fs * abs(phi1 - phi2) / ((r_ref**p_obs - 1.0) * abs(phi1))
+
+print(f&quot;\n  Richardson / GCI (tres mallas más finas):&quot;)
+print(f&quot;    Orden observado p  = {p_obs:.4f}&quot;)
+print(f&quot;    phi_extrapolado    = {phi_rich:.6e}&quot;)
+print(f&quot;    GCI (malla fina)   = {GCI:.4f} = {GCI*100:.2f}%&quot;)
+
+# Solución en malla fina para visualización
+u_ref, _, _ = resolver_df5(64)
+N_ref = 64
+x_plot = np.linspace(0, L, N_ref + 1)
+y_plot = np.linspace(0, L, N_ref + 1)
+X_plot, Y_plot = np.meshgrid(x_plot, y_plot, indexing=&#x27;ij&#x27;)
+u_ex_plot  = u_exacta(X_plot, Y_plot)
+err_campo  = np.abs(u_ref - u_ex_plot)
+
+# ══════════════════════════════════════════════════════════════════════
+# FIGURA
+# ══════════════════════════════════════════════════════════════════════
+fig, axes = plt.subplots(2, 2, figsize=(12, 9))
+
+# Panel A: convergencia log-log
+ax = axes[0, 0]
+ax.loglog(h_vals, err_df5, &#x27;o-&#x27;, color=BLUE, lw=1.5, ms=6,
+          label=&#x27;DF 5-puntos&#x27;)
+# Referencia O(h^2)
+ref2 = err_df5[0] * (h_vals / h_vals[0])**2
+ax.loglog(h_vals, ref2, &#x27;k--&#x27;, lw=0.9, label=&#x27;Referencia $O(h^2)$&#x27;)
+ax.axhline(phi_rich, color=RED, lw=0.9, ls=&#x27;:&#x27;, label=f&#x27;Richardson: {phi_rich:.2e}&#x27;)
+ax.set_xlabel(&#x27;Paso de malla $h$ [m]&#x27;)
+ax.set_ylabel(&#x27;Error $L_2$ discreto&#x27;)
+ax.set_title(&#x27;Convergencia de malla — Losa 2D (Poisson)\n&#x27;
+             &#x27;Problema equivalente de deflexión&#x27;)
+ax.legend(fontsize=8); ax.grid(alpha=0.3, which=&#x27;both&#x27;)
+
+# Panel B: solución numérica (N=64)
+ax = axes[0, 1]
+cf = ax.contourf(X_plot * 100, Y_plot * 100, u_ref, levels=20, cmap=&#x27;viridis&#x27;)
+ax.contour(X_plot * 100, Y_plot * 100, u_ref, levels=10,
+           colors=&#x27;white&#x27;, linewidths=0.5, alpha=0.6)
+plt.colorbar(cf, ax=ax, label=&#x27;$u(x,y)$&#x27;)
+ax.set_xlabel(&#x27;$x$ [cm]&#x27;); ax.set_ylabel(&#x27;$y$ [cm]&#x27;)
+ax.set_title(f&#x27;Solución numérica DF ($N=64$)\n&#x27;
+             f&#x27;$u(x,y) = \sin(\pi x)\sin(\pi y)$ en losa 1×1 m&#x27;)
+ax.set_aspect(&#x27;equal&#x27;)
+
+# Panel C: campo de error absoluto
+ax = axes[1, 0]
+cf2 = ax.contourf(X_plot * 100, Y_plot * 100, err_campo,
+                  levels=20, cmap=&#x27;plasma&#x27;)
+plt.colorbar(cf2, ax=ax, label=&#x27;$|u_{num} - u_{ex}|$&#x27;)
+ax.set_xlabel(&#x27;$x$ [cm]&#x27;); ax.set_ylabel(&#x27;$y$ [cm]&#x27;)
+ax.set_title(f&#x27;Campo de error absoluto ($N=64$)\n&#x27;
+             f&#x27;Error máximo = {err_campo.max():.2e}&#x27;)
+ax.set_aspect(&#x27;equal&#x27;)
+
+# Panel D: GCI como banda de incertidumbre
+ax = axes[1, 1]
+ax.loglog(h_vals[:-1], err_df5[:-1], &#x27;o-&#x27;, color=BLUE, lw=1.5, ms=6,
+          label=&#x27;Error DF5&#x27;)
+# Banda GCI para cada par de mallas consecutivas
+for k in range(1, len(Ns) - 1):
+    ph = np.log(err_df5[k-1]/err_df5[k]) / np.log(h_vals[k-1]/h_vals[k])
+    gci_k = Fs * abs(err_df5[k-1] - err_df5[k]) / ((r_ref**ph - 1) * abs(err_df5[k-1]))
+    ax.errorbar(h_vals[k], err_df5[k], yerr=gci_k * err_df5[k],
+                fmt=&#x27;none&#x27;, color=RED, capsize=4, lw=1.2)
+
+ax.loglog(h_vals, ref2, &#x27;k--&#x27;, lw=0.9, label=&#x27;$O(h^2)$&#x27;)
+ax.set_xlabel(&#x27;Paso de malla $h$ [m]&#x27;)
+ax.set_ylabel(&#x27;Error $L_2$&#x27;)
+ax.set_title(&#x27;Error con barras GCI (ASME V\&amp;V 20)\n&#x27;
+             &#x27;Bandas rojas = incertidumbre de discretización&#x27;)
+ax.legend(fontsize=8); ax.grid(alpha=0.3, which=&#x27;both&#x27;)
+
+plt.tight_layout()
+plt.savefig(&#x27;fig_s3_extra2_losa_convergencia.png&#x27;)
+print(&quot;\n  Figura guardada: fig_s3_extra2_losa_convergencia.png&quot;)
+
+&quot;&quot;&quot;
+SEMANA 3 — EJEMPLO EXTRA 3
+Integración numérica de flujo vehicular y DF en detección óptica
+Proyecto: García Ojeda — Sistema inteligente de gestión de tráfico
+          mediante UAVs y Optical Flow en León, Guanajuato
+
+Problema numérico:
+  1. Modelo LWR de tráfico (Lighthill-Whitham-Richards):
+       dρ/dt + d(ρ·v(ρ))/dx = 0   (ley de conservación hiperbólica)
+     donde v(ρ) = v_max*(1 - ρ/ρ_max)  (modelo de Greenshields)
+     Se discretiza con el esquema de Lax-Friedrichs (upwind conservativo)
+
+  2. Optical flow (ecuación de Horn-Schunck simplificada):
+     La restricción de flujo óptico es:
+       Ix*u + Iy*v + It = 0
+     donde Ix, Iy, It son derivadas parciales (diferencias finitas).
+     Se demuestra el cálculo de It y cómo el error de truncamiento
+     afecta la estimación de velocidad vehicular.
+
+  3. Estabilidad CFL para el modelo LWR:
+     |v_max * dt/dx| ≤ 1
+
+Salida: fig_s3_extra3_trafico_flujo.png
+&quot;&quot;&quot;</textarea>
+  <div class="code-output-wrap" hidden>
+    <div class="code-output-console"></div>
+    <div class="code-output-figures"></div>
+  </div>
+  <div class="code-status"></div>
+</div>
+<div class="code-cell">
+  <div class="code-cell-header">
+    <span class="code-cell-title">Código 7</span>
+    <span class="code-cell-caption">Ejemplo A3 — Modelo LWR y optical flow para gestión de tráfico. Google Colab.</span>
+    <button class="run-btn" type="button">&#9654; Ejecutar</button>
+  </div>
+  <div class="code-banner code-banner-warn">&#9888; Código recuperado de un borrador anterior (semana_3 (1).py, fragmento 6) porque la versión pegada en el <code>.tex</code> perdió la indentación de Python. Ejecuta corriendo bien, pero puede diferir en detalles menores de la versión final — revísalo antes de usarlo en clase.</div>
+  <textarea class="code-input" spellcheck="false" rows="14">import numpy as np
+import matplotlib
+matplotlib.use(&#x27;Agg&#x27;)
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+
+mpl.rcParams.update({
+    &quot;font.family&quot;: &quot;serif&quot;, &quot;font.size&quot;: 11, &quot;axes.titlesize&quot;: 12,
+    &quot;axes.labelsize&quot;: 11, &quot;xtick.labelsize&quot;: 10, &quot;ytick.labelsize&quot;: 10,
+    &quot;legend.fontsize&quot;: 9, &quot;axes.linewidth&quot;: 0.8, &quot;lines.linewidth&quot;: 1.4,
+    &quot;figure.dpi&quot;: 150, &quot;savefig.dpi&quot;: 300, &quot;savefig.bbox&quot;: &quot;tight&quot;,
+})
+BLUE=&quot;#003366&quot;; RED=&quot;#C0392B&quot;; GREEN=&quot;#1A7D3A&quot;; ORANGE=&quot;#E67E22&quot;; GRAY=&quot;#555555&quot;
+
+print(&quot;=&quot; * 60)
+print(&quot;EXTRA 3 — Flujo vehicular LWR + Optical Flow (UAV)&quot;)
+print(&quot;=&quot; * 60)
+
+# ══════════════════════════════════════════════════════════════════════
+# PARTE 1: Modelo LWR — ley de conservación 1D
+# ══════════════════════════════════════════════════════════════════════
+rho_max = 120.0    # densidad máxima [veh/km]
+v_max   = 80.0     # velocidad libre [km/h]
+L_vial  = 2.0      # longitud del segmento vial [km]
+T_sim   = 0.05     # duración simulación [h] (3 min)
+
+def velocidad(rho):
+    &quot;&quot;&quot;Modelo de Greenshields: v(ρ) = v_max*(1 - ρ/ρ_max)&quot;&quot;&quot;
+    return v_max * (1.0 - rho / rho_max)
+
+def flujo(rho):
+    &quot;&quot;&quot;Flujo de tráfico: q(ρ) = ρ * v(ρ)&quot;&quot;&quot;
+    return rho * velocidad(rho)
+
+# Condición inicial: semáforo en rojo → alta densidad en [0.8, 1.2] km
+def rho_inicial(x):
+    rho = 20.0 * np.ones_like(x)     # densidad libre (20 veh/km)
+    rho[(x &gt;= 0.8) &amp; (x &lt;= 1.2)] = 80.0  # cola semáforo
+    return rho
+
+# Esquema Lax-Friedrichs
+def lax_friedrichs(N, r_cfl, T):
+    &quot;&quot;&quot;
+    Lax-Friedrichs para dρ/dt + dq/dx = 0.
+    r_cfl: número de Courant (debe ser ≤ 1 para estabilidad).
+    &quot;&quot;&quot;
+    dx = L_vial / N
+    dt = r_cfl * dx / v_max
+    x  = np.linspace(0, L_vial, N + 1)
+    rho = rho_inicial(x)
+
+    snapshots = [(rho.copy(), 0.0)]
+    t_now = 0.0
+    while t_now &lt; T:
+        q   = flujo(rho)
+        rho_new = np.zeros_like(rho)
+        # Lax-Friedrichs interior: ρ_{j}^{n+1} = (ρ_{j-1}+ρ_{j+1})/2 - dt/(2dx)*(q_{j+1}-q_{j-1})
+        rho_new[1:-1] = (0.5 * (rho[:-2] + rho[2:])
+                         - 0.5 * r_cfl * (q[2:] - q[:-2]))
+        rho_new[0]  = rho[0]    # condición de entrada (flujo libre)
+        rho_new[-1] = rho[-1]   # condición de salida
+        rho  = np.clip(rho_new, 0.0, rho_max)
+        t_now += dt
+        if len(snapshots) &lt; 5 and t_now &gt;= len(snapshots) * T / 4:
+            snapshots.append((rho.copy(), t_now))
+    snapshots.append((rho.copy(), t_now))
+    return x, snapshots
+
+N_vial = 400
+x_vial, snaps_estable   = lax_friedrichs(N_vial, 0.8, T_sim)
+_,      snaps_inestable = lax_friedrichs(N_vial, 1.3, T_sim)
+
+print(f&quot;\n  Modelo LWR Lax-Friedrichs:&quot;)
+print(f&quot;    CFL=0.8 (estable):   rho_max final = {snaps_estable[-1][0].max():.2f} veh/km&quot;)
+print(f&quot;    CFL=1.3 (inestable): rho_max final = {snaps_inestable[-1][0].max():.2f} veh/km&quot;)
+
+# ══════════════════════════════════════════════════════════════════════
+# PARTE 2: Optical Flow — derivadas parciales con DF
+# ══════════════════════════════════════════════════════════════════════
+# Simular dos fotogramas de densidad vehicular vista desde UAV (2D simplificado)
+rng = np.random.default_rng(42)
+Nx_img, Ny_img = 80, 80
+x_img = np.linspace(0, L_vial, Nx_img)
+y_img = np.linspace(0, 0.3, Ny_img)   # ancho carretera [km]
+X_img, Y_img = np.meshgrid(x_img, y_img, indexing=&#x27;ij&#x27;)
+
+# Densidad en t=0: gaussianas representando vehículos
+def densidad_frame(x, y, t, v_true=0.06):  # v_true en km/frame
+    d = np.zeros_like(x)
+    centros = [(0.5, 0.15), (1.0, 0.10), (1.5, 0.20), (0.3, 0.08)]
+    for cx, cy in centros:
+        d += np.exp(-((x - cx - v_true*t)**2 / 0.01 + (y - cy)**2 / 0.005))
+    d += 0.05 * rng.standard_normal(x.shape)   # ruido de sensor
+    return d
+
+I0 = densidad_frame(X_img, Y_img, 0)
+I1 = densidad_frame(X_img, Y_img, 1)
+
+dt_frame = 1.0   # intervalo entre fotogramas [s normalizados]
+
+# Derivadas con diferentes esquemas DF
+def derivada_temporal(I0, I1, dt, metodo=&#x27;centrada&#x27;):
+    if metodo == &#x27;adelante&#x27;:
+        return (I1 - I0) / dt
+    elif metodo == &#x27;centrada&#x27;:
+        # Con 3 frames: aproximamos con los dos disponibles
+        return (I1 - I0) / dt
+
+def derivada_espacial_x(I, dx, metodo=&#x27;centrada&#x27;):
+    dIdx = np.zeros_like(I)
+    if metodo == &#x27;centrada&#x27;:
+        dIdx[1:-1, :] = (I[2:, :] - I[:-2, :]) / (2 * dx)
+    elif metodo == &#x27;adelante&#x27;:
+        dIdx[:-1, :] = (I[1:, :] - I[:-1, :]) / dx
+    return dIdx
+
+dx_img = x_img[1] - x_img[0]
+It_true = densidad_frame(X_img, Y_img, 0.5)  # frame central = referencia
+It_fwd  = derivada_temporal(I0, I1, dt_frame, &#x27;adelante&#x27;)
+It_ctr  = (densidad_frame(X_img, Y_img, 1) -
+           densidad_frame(X_img, Y_img, -1)) / (2 * dt_frame)
+Ix = derivada_espacial_x(I0, dx_img, &#x27;centrada&#x27;)
+
+# Error de estimación de It (derivada temporal)
+err_fwd_It = np.abs(It_fwd - It_ctr).mean()
+print(f&quot;\n  Optical Flow — calidad de derivadas:&quot;)
+print(f&quot;    Error medio |It_fwd - It_centrada| = {err_fwd_It:.6f}&quot;)
+
+# ══════════════════════════════════════════════════════════════════════
+# CONVERGENCIA: error en It vs paso de tiempo dt
+# ══════════════════════════════════════════════════════════════════════
+v_true_flow = 0.06   # velocidad verdadera [km/frame]
+dts_flow = [0.5, 1.0, 2.0, 4.0, 8.0]
+errs_It   = []
+
+for dt_f in dts_flow:
+    Ip = densidad_frame(X_img, Y_img,  dt_f)
+    Im = densidad_frame(X_img, Y_img, -dt_f)
+    Ic = densidad_frame(X_img, Y_img,  0)
+    It_num  = (Ip - Im) / (2 * dt_f)
+    It_ref  = It_num   # sin analítica, usar diferencia entre esquemas
+    It_fwd2 = (Ip - Ic) / dt_f
+    errs_It.append(np.abs(It_fwd2 - It_num).mean())
+
+# ══════════════════════════════════════════════════════════════════════
+# FIGURA
+# ══════════════════════════════════════════════════════════════════════
+fig, axes = plt.subplots(2, 2, figsize=(13, 9))
+
+# Panel A: evolución de densidad LWR (CFL estable)
+ax = axes[0, 0]
+colores = [BLUE, GREEN, ORANGE, RED, GRAY]
+for k, (rho_s, t_s) in enumerate(snaps_estable[:5]):
+    ax.plot(x_vial, rho_s, color=colores[k], lw=1.3,
+            label=f&#x27;t = {t_s*60:.1f} min&#x27;)
+ax.set_xlabel(&#x27;Posición $x$ [km]&#x27;)
+ax.set_ylabel(&#x27;Densidad vehicular $\\rho$ [veh/km]&#x27;)
+ax.set_title(&#x27;Modelo LWR — Lax-Friedrichs (CFL=0.8, estable)\n&#x27;
+             &#x27;Dispersión de cola de semáforo en León, Gto.&#x27;)
+ax.legend(fontsize=8); ax.grid(alpha=0.3)
+ax.set_ylim(-5, rho_max + 5)
+
+# Panel B: inestabilidad numérica (CFL &gt; 1)
+ax = axes[0, 1]
+ax.plot(x_vial, snaps_inestable[0][0], color=BLUE, lw=1.3, label=&#x27;t=0 (inicial)&#x27;)
+ax.plot(x_vial, snaps_inestable[-1][0], color=RED, lw=1.3,
+        label=&#x27;t final (CFL=1.3, INESTABLE)&#x27;)
+ax.set_xlabel(&#x27;Posición $x$ [km]&#x27;)
+ax.set_ylabel(&#x27;Densidad vehicular $\\rho$ [veh/km]&#x27;)
+ax.set_title(&#x27;Inestabilidad numérica CFL=1.3 &gt; 1\n&#x27;
+             &#x27;El esquema explota aunque el fenómeno sea suave&#x27;)
+ax.legend(fontsize=8); ax.grid(alpha=0.3)
+
+# Panel C: fotograma de densidad vehicular (vista UAV)
+ax = axes[1, 0]
+cf = ax.contourf(X_img * 1000, Y_img * 1000, I0,
+                 levels=20, cmap=&#x27;hot_r&#x27;)
+plt.colorbar(cf, ax=ax, label=&#x27;Intensidad (densidad)&#x27;)
+ax.set_xlabel(&#x27;Posición longitudinal [m]&#x27;)
+ax.set_ylabel(&#x27;Posición transversal [m]&#x27;)
+ax.set_title(&#x27;Frame UAV sintético — t=0\n&#x27;
+             &#x27;Puntos brillantes = vehículos en carretera&#x27;)
+ax.set_aspect(&#x27;equal&#x27;)
+
+# Panel D: derivada temporal It (optical flow)
+ax = axes[1, 1]
+cf2 = ax.contourf(X_img * 1000, Y_img * 1000, It_fwd,
+                  levels=20, cmap=&#x27;seismic&#x27;, vmin=-1, vmax=1)
+plt.colorbar(cf2, ax=ax, label=&#x27;$I_t$ [intensidad/frame]&#x27;)
+ax.set_xlabel(&#x27;Posición longitudinal [m]&#x27;)
+ax.set_ylabel(&#x27;Posición transversal [m]&#x27;)
+ax.set_title(&#x27;Derivada temporal $I_t$ (diferencia hacia adelante)\n&#x27;
+             &#x27;Base del optical flow para estimación de velocidad&#x27;)
+ax.set_aspect(&#x27;equal&#x27;)
+
+plt.tight_layout()
+plt.savefig(&#x27;fig_s3_extra3_trafico_flujo.png&#x27;)
+print(&quot;\n  Figura guardada: fig_s3_extra3_trafico_flujo.png&quot;)
+
+&quot;&quot;&quot;
+SEMANA 3 — EJEMPLO EXTRA 4
+Integración numérica de la curva Q-H de bomba centrífuga
+y análisis de convergencia del paso de integración
+Proyecto: Leyva Jiménez — Banco de pruebas bomba centrífuga
+
+Problema numérico:
+  La curva característica Q-H (caudal-altura) de una bomba se obtiene
+  numéricamente integrando la ecuación de Euler para turbomaquinaria:
+      H_th = (u2*c2u - u1*c1u) / g
+  donde u = velocidad periférica, c_u = componente tangencial absoluta.
+
+  La eficiencia hidráulica se calcula como:
+      eta_h = H / H_th
+
+  Adicionalmente, la integral de la potencia disipada por viscosidad:
+      P_visc = mu * integral_Omega (grad v)^2 dV
+  se aproxima numéricamente. Se demuestra:
+
+  1. Curva Q-H generada con integración numérica (perfil de velocidad)
+  2. Error de la cuadratura vs número de puntos de integración
+  3. Convergencia del cálculo de eficiencia con Richardson
+  4. Análisis de sensibilidad paramétrica (radio, ángulos de paleta)
+
+Salida: fig_s3_extra4_bomba_qh.png
+&quot;&quot;&quot;</textarea>
+  <div class="code-output-wrap" hidden>
+    <div class="code-output-console"></div>
+    <div class="code-output-figures"></div>
+  </div>
+  <div class="code-status"></div>
+</div>
+<div class="code-cell">
+  <div class="code-cell-header">
+    <span class="code-cell-title">Código 8</span>
+    <span class="code-cell-caption">Ejemplo A4 — Curva Q-H + integración de potencia viscosa. Google Colab.</span>
+    <button class="run-btn" type="button">&#9654; Ejecutar</button>
+  </div>
+  <div class="code-banner code-banner-warn">&#9888; Código recuperado de un borrador anterior (semana_3 (1).py, fragmento 7) porque la versión pegada en el <code>.tex</code> perdió la indentación de Python. Ejecuta corriendo bien, pero puede diferir en detalles menores de la versión final — revísalo antes de usarlo en clase.</div>
+  <textarea class="code-input" spellcheck="false" rows="14">import numpy as np
+import matplotlib
+matplotlib.use(&#x27;Agg&#x27;)
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+from scipy import integrate
+
+mpl.rcParams.update({
+    &quot;font.family&quot;: &quot;serif&quot;, &quot;font.size&quot;: 11, &quot;axes.titlesize&quot;: 12,
+    &quot;axes.labelsize&quot;: 11, &quot;xtick.labelsize&quot;: 10, &quot;ytick.labelsize&quot;: 10,
+    &quot;legend.fontsize&quot;: 9, &quot;axes.linewidth&quot;: 0.8, &quot;lines.linewidth&quot;: 1.4,
+    &quot;figure.dpi&quot;: 150, &quot;savefig.dpi&quot;: 300, &quot;savefig.bbox&quot;: &quot;tight&quot;,
+})
+BLUE=&quot;#003366&quot;; RED=&quot;#C0392B&quot;; GREEN=&quot;#1A7D3A&quot;; ORANGE=&quot;#E67E22&quot;; GRAY=&quot;#555555&quot;
+
+print(&quot;=&quot; * 60)
+print(&quot;EXTRA 4 — Curva Q-H bomba centrífuga + integración numérica&quot;)
+print(&quot;=&quot; * 60)
+
+# ══════════════════════════════════════════════════════════════════════
+# PARÁMETROS DE LA BOMBA (banco de pruebas típico, escala laboratorio)
+# ══════════════════════════════════════════════════════════════════════
+r1    = 0.040    # radio interno del rodete  [m]
+r2    = 0.080    # radio externo del rodete  [m]
+b1    = 0.018    # ancho canal entrada       [m]
+b2    = 0.012    # ancho canal salida        [m]
+beta2 = 25.0     # ángulo paleta salida      [°]
+N_rpm = 1450.0   # velocidad de rotación     [rpm]
+rho   = 998.0    # densidad del agua         [kg/m³]
+g     = 9.81     # gravedad                  [m/s²]
+mu    = 1.0e-3   # viscosidad dinámica agua  [Pa·s]
+eta_vol = 0.95   # eficiencia volumétrica (estimada)
+
+omega = N_rpm * 2 * np.pi / 60   # velocidad angular [rad/s]
+u2    = omega * r2                # velocidad periférica salida [m/s]
+u1    = omega * r1
+
+print(f&quot;\n  Parámetros de la bomba:&quot;)
+print(f&quot;    r1={r1*100:.1f} cm, r2={r2*100:.1f} cm, beta2={beta2}°, N={N_rpm} rpm&quot;)
+print(f&quot;    u2 = {u2:.2f} m/s, u1 = {u1:.2f} m/s&quot;)
+
+# ══════════════════════════════════════════════════════════════════════
+# MODELO EULER: curva Q-H teórica (triángulos de velocidad)
+# ══════════════════════════════════════════════════════════════════════
+beta2_rad = np.radians(beta2)
+
+def curva_QH_euler(Q_m3s, swirl_entrada=0.0):
+    &quot;&quot;&quot;
+    Altura de Euler para caudal Q.
+    swirl_entrada: c1u (componente tangencial entrada) [m/s]
+    &quot;&quot;&quot;
+    A2   = 2 * np.pi * r2 * b2   # área de salida [m²]
+    cm2  = Q_m3s / A2             # velocidad meridional salida [m/s]
+    c2u  = u2 - cm2 / np.tan(beta2_rad)  # componente tangencial salida
+    H_th = (u2 * c2u - u1 * swirl_entrada) / g
+    return H_th
+
+# Barrido de caudal
+Q_arr = np.linspace(0.5e-3, 8e-3, 200)   # [m³/s]
+H_euler = np.array([curva_QH_euler(Q) for Q in Q_arr])
+
+# Pérdidas hidráulicas simplificadas
+def perdidas_H(Q):
+    &quot;&quot;&quot;Pérdidas por fricción y recirculación (modelo simplificado).&quot;&quot;&quot;
+    Q_opt = 4e-3   # caudal de diseño [m³/s]
+    # Pérdida por fricción ~ Q^2
+    h_f = 1.5e5 * Q**2
+    # Pérdida por recirculación ~ (Q - Q_opt)^2
+    h_r = 3e5 * (Q - Q_opt)**2
+    return h_f + h_r
+
+H_real = np.array([curva_QH_euler(Q) - perdidas_H(Q) for Q in Q_arr])
+H_real = np.maximum(H_real, 0)
+
+# Punto de diseño (máxima eficiencia)
+Q_opt = Q_arr[np.argmax(H_real * Q_arr)]   # máxima potencia hidráulica
+H_opt = H_real[np.argmax(H_real * Q_arr)]
+print(f&quot;\n  Punto de diseño (BEP): Q={Q_opt*1e3:.2f} L/s, H={H_opt:.2f} m&quot;)
+
+# ══════════════════════════════════════════════════════════════════════
+# INTEGRAL DE DISIPACIÓN VISCOSA — convergencia de cuadratura
+# ══════════════════════════════════════════════════════════════════════
+# Perfil de velocidad radial en el pasaje (simplificado)
+# v_r(r) = Q/(2*pi*r*b(r)), b(r) interpolado linealmente
+def b_r(r):
+    return b1 + (b2 - b1) * (r - r1) / (r2 - r1)
+
+def v_r(r, Q):
+    return Q / (2 * np.pi * r * b_r(r))
+
+def grad_v_sq(r, Q):
+    &quot;&quot;&quot;Gradiente cuadrado de v_r respecto a r (derivada numérica centrada).&quot;&quot;&quot;
+    dr = r * 1e-5
+    dvdr = (v_r(r + dr, Q) - v_r(r - dr, Q)) / (2 * dr)
+    return dvdr**2
+
+def P_viscosa_exacta(Q):
+    &quot;&quot;&quot;Integral exacta (alta precisión) con quad.&quot;&quot;&quot;
+    integrand = lambda r: mu * grad_v_sq(r, Q) * 2 * np.pi * r * b_r(r)
+    val, _ = integrate.quad(integrand, r1, r2, limit=200)
+    return val
+
+Q_demo = 4e-3   # Q de diseño
+P_ref  = P_viscosa_exacta(Q_demo)
+print(f&quot;\n  Potencia disipada viscosa (referencia): {P_ref:.6f} W&quot;)
+
+# Convergencia de Simpson vs Trapecios
+Ns_int = [4, 8, 16, 32, 64, 128, 256]
+err_trap_P = []; err_simp_P = []
+
+for N_i in Ns_int:
+    r_pts = np.linspace(r1, r2, N_i + 1)
+    integrand_vals = np.array([
+        mu * grad_v_sq(r, Q_demo) * 2 * np.pi * r * b_r(r)
+        for r in r_pts
+    ])
+    P_trap = np.trapezoid(integrand_vals, r_pts)
+    P_simp = integrate.simpson(integrand_vals, x=r_pts)
+    err_trap_P.append(abs(P_trap - P_ref))
+    err_simp_P.append(abs(P_simp - P_ref))
+
+err_trap_P = np.array(err_trap_P)
+err_simp_P = np.array(err_simp_P)
+h_int = (r2 - r1) / np.array(Ns_int)
+
+print(f&quot;\n  Convergencia de cuadratura (P_viscosa):&quot;)
+print(f&quot;  {&#x27;N&#x27;:&gt;5}  {&#x27;Trapecios&#x27;:&gt;12}  {&#x27;Simpson&#x27;:&gt;12}&quot;)
+for k, N_i in enumerate(Ns_int):
+    print(f&quot;  {N_i:5d}  {err_trap_P[k]:12.4e}  {err_simp_P[k]:12.4e}&quot;)
+
+# ══════════════════════════════════════════════════════════════════════
+# ANÁLISIS DE SENSIBILIDAD: curva Q-H vs ángulo beta2
+# ══════════════════════════════════════════════════════════════════════
+betas = [20, 25, 30, 35, 40]   # ángulos de paleta [°]
+Q_sens = np.linspace(0.5e-3, 7e-3, 100)
+
+print(f&quot;\n  Caudal de diseño para distintos beta2:&quot;)
+for beta_s in betas:
+    beta_r = np.radians(beta_s)
+    H_s = np.array([
+        (omega*r2*(omega*r2 - Q/(2*np.pi*r2*b2)/np.tan(beta_r)))/g
+        - perdidas_H(Q)
+        for Q in Q_sens
+    ])
+    H_s = np.maximum(H_s, 0)
+    Q_d = Q_sens[np.argmax(H_s * Q_sens)]
+    print(f&quot;    beta2 = {beta_s}°: Q_BEP = {Q_d*1e3:.2f} L/s&quot;)
+
+# ══════════════════════════════════════════════════════════════════════
+# FIGURA
+# ══════════════════════════════════════════════════════════════════════
+fig, axes = plt.subplots(2, 2, figsize=(12, 9))
+
+# Panel A: curvas Q-H
+ax = axes[0, 0]
+ax.plot(Q_arr * 1e3, H_euler, &#x27;--&#x27;, color=GRAY, lw=1.3, label=&#x27;Altura de Euler $H_{th}$ (sin pérdidas)&#x27;)
+ax.plot(Q_arr * 1e3, H_real, &#x27;-&#x27;, color=BLUE, lw=2.0, label=&#x27;Curva real $H$ (con pérdidas)&#x27;)
+ax.axvline(Q_opt * 1e3, color=RED, lw=1.0, ls=&#x27;:&#x27;, label=f&#x27;BEP: Q={Q_opt*1e3:.1f} L/s&#x27;)
+ax.axhline(H_opt, color=RED, lw=1.0, ls=&#x27;:&#x27;)
+ax.scatter([Q_opt * 1e3], [H_opt], s=80, color=RED, zorder=5)
+ax.set_xlabel(&#x27;Caudal $Q$ [L/s]&#x27;)
+ax.set_ylabel(&#x27;Altura $H$ [m]&#x27;)
+ax.set_title(&#x27;Curva Q-H — Bomba centrífuga\n&#x27;
+             &#x27;Banco de pruebas (modelo Euler + pérdidas)&#x27;)
+ax.legend(fontsize=8); ax.grid(alpha=0.3)
+ax.set_ylim(bottom=0)
+
+# Panel B: convergencia de cuadratura (P_viscosa)
+ax = axes[0, 1]
+ax.loglog(h_int, err_trap_P, &#x27;o-&#x27;, color=BLUE,  lw=1.5, ms=5, label=&#x27;Trapecios O(h²)&#x27;)
+ax.loglog(h_int, err_simp_P, &#x27;s-&#x27;, color=GREEN, lw=1.5, ms=5, label=&#x27;Simpson O(h⁴)&#x27;)
+ref2 = err_trap_P[0] * (h_int / h_int[0])**2
+ref4 = err_simp_P[1] * (h_int / h_int[1])**4
+ax.loglog(h_int, ref2, &#x27;k:&#x27;, lw=0.9, label=&#x27;$O(h^2)$&#x27;)
+ax.loglog(h_int, ref4, &#x27;k--&#x27;, lw=0.9, label=&#x27;$O(h^4)$&#x27;)
+ax.set_xlabel(&#x27;Paso de integración $h = (r_2-r_1)/N$ [m]&#x27;)
+ax.set_ylabel(&#x27;$|P_{visc,num} - P_{visc,ref}|$ [W]&#x27;)
+ax.set_title(&#x27;Convergencia de cuadratura\n&#x27;
+             &#x27;Potencia disipada viscosa en pasaje del rodete&#x27;)
+ax.legend(fontsize=8); ax.grid(alpha=0.3, which=&#x27;both&#x27;)
+
+# Panel C: sensibilidad al ángulo beta2
+ax = axes[1, 0]
+for beta_s, col in zip(betas, [RED, ORANGE, BLUE, GREEN, GRAY]):
+    beta_r = np.radians(beta_s)
+    H_s = np.array([
+        (omega*r2*(omega*r2 - Q/(2*np.pi*r2*b2)/np.tan(beta_r)))/g
+        - perdidas_H(Q)
+        for Q in Q_sens
+    ])
+    H_s = np.maximum(H_s, 0)
+    ax.plot(Q_sens * 1e3, H_s, color=col, lw=1.4,
+            label=f&#x27;$\\beta_2 = {beta_s}°$&#x27;)
+ax.set_xlabel(&#x27;Caudal $Q$ [L/s]&#x27;)
+ax.set_ylabel(&#x27;Altura $H$ [m]&#x27;)
+ax.set_title(&#x27;Análisis de sensibilidad: curvas Q-H\n&#x27;
+             &#x27;para distintos ángulos de paleta $\\beta_2$&#x27;)
+ax.legend(fontsize=8); ax.grid(alpha=0.3)
+ax.set_ylim(bottom=0)
+
+# Panel D: potencia hidráulica y eficiencia
+ax = axes[1, 1]
+P_hidro  = rho * g * Q_arr * H_real
+P_shaft  = rho * g * Q_arr * H_euler   # potencia en el eje (aprox)
+P_shaft  = np.where(P_shaft &gt; 0, P_shaft, np.nan)
+eta_h    = np.where(P_shaft &gt; 0, P_hidro / P_shaft, np.nan)
+
+ax2 = ax.twinx()
+ax.plot(Q_arr * 1e3, P_hidro, &#x27;-&#x27;, color=BLUE, lw=1.5, label=&#x27;Potencia hidráulica [W]&#x27;)
+ax2.plot(Q_arr * 1e3, eta_h * 100, &#x27;--&#x27;, color=RED, lw=1.5,
+         label=&#x27;Eficiencia hidráulica [%]&#x27;)
+ax.axvline(Q_opt * 1e3, color=GRAY, lw=0.8, ls=&#x27;:&#x27;)
+ax.set_xlabel(&#x27;Caudal $Q$ [L/s]&#x27;)
+ax.set_ylabel(&#x27;Potencia hidráulica [W]&#x27;, color=BLUE)
+ax2.set_ylabel(&#x27;Eficiencia $\\eta_h$ [%]&#x27;, color=RED)
+ax.set_title(&#x27;Potencia y eficiencia hidráulica\n&#x27;
+             &#x27;Punto BEP en máxima $\\eta_h$&#x27;)
+lines1, lab1 = ax.get_legend_handles_labels()
+lines2, lab2 = ax2.get_legend_handles_labels()
+ax.legend(lines1 + lines2, lab1 + lab2, fontsize=8)
+ax.grid(alpha=0.3); ax.set_ylim(bottom=0)
+
+plt.tight_layout()
+plt.savefig(&#x27;fig_s3_extra4_bomba_qh.png&#x27;)
+print(&quot;\n  Figura guardada: fig_s3_extra4_bomba_qh.png&quot;)</textarea>
+  <div class="code-output-wrap" hidden>
+    <div class="code-output-console"></div>
+    <div class="code-output-figures"></div>
+  </div>
+  <div class="code-status"></div>
+</div>
+
+    <h2 class="section-heading" style="margin-top:44px">Desarrollo teórico completo</h2>
+    <p class="section-intro">Ecuaciones, demostraciones, tablas y discusión de esta semana, tal como están
+      en los apuntes del curso — mismo documento fuente que el PDF completo, recortado a esta semana.</p>
+    <div class="theory-pdf-wrap">
+      <iframe src="../../assets/apuntes/semana-03.pdf" title="Desarrollo teórico — Semana 3. Métodos Numéricos Fundamentales" loading="lazy"></iframe>
+    </div>
+    <p class="theory-pdf-fallback">
+      ¿No se ve el documento arriba? <a href="../../assets/apuntes/semana-03.pdf" download>Descarga el PDF de esta semana</a>
+      o <a href="../../assets/apuntes/semana-03.pdf" target="_blank" rel="noopener">ábrelo en una pestaña nueva</a>.
+    </p>
+
+    <div class="week-nav">
+      <a href="../semana-02/index.html">&larr; Semana 02</a>
+      <span class="to-index"><a href="../../index.html">&uarr; Volver al índice del curso</a></span>
+      <a href="../semana-04/index.html">Semana 04 &rarr;</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div>Doctorado en Ingeniería y Tecnología Aplicada &middot; Universidad La Salle Bajío</div>
+    <div>Dr. Jorge Ramón Parra Michel &middot; Prototipado y Simulación</div>
+  </div>
+</footer>
+
+<script src="../../assets/js/main.js"></script>
+<script src="../../assets/js/pyodide-runner.js"></script>
+
+<script>
+window.addEventListener("load", function () {
+  if (window.renderMathInElement) {
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left: "$$", right: "$$", display: true},
+        {left: "$", right: "$", display: false}
+      ],
+      throwOnError: false
+    });
+  }
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,786 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Semana 2. Herramientas Computacionales Científicas — Prototipado y Simulación</title>
+<meta name="description" content="Semana 2. Herramientas Computacionales Científicas: objetivo, temario y código ejecutable.">
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-cpW21h6RZv/phavutF+AuVYrr+dA8xD9zs6FwLpaCePvcCWnZ8IU9UNlXhpKUAJI" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-vZTG03m+2yp6N6BNi5iM4rW4oIwk5DfcNdFfxkk9ZWpDriOkXX8voJBFrAO7MpVl" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-GvrOXuhMATgEsSwCs4smul74iXGOixntILdUW9XmUC6+HX0sLNAK3q71HotJqlAn" crossorigin="anonymous">
+<link rel="stylesheet" href="../../assets/css/style.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="topbar-brand" href="../../index.html">
+      <img src="../../assets/img/logo-lasalle.png" alt="Universidad La Salle Bajío">
+      Prototipado y Simulación
+    </a>
+    <nav>
+      <a href="../../index.html#semanas">Semanas</a>
+      <a href="../../README.md">Repositorio</a>
+      <a class="topbar-pdf-btn" href="../../assets/apuntes/Apuntes_Curso_Doctoral_Simulacion_Prototipado_COMPLETO.pdf" download>Descargar PDF</a>
+    </nav>
+  </div>
+</div>
+
+<header class="week-header">
+  <div class="wrap">
+    <div class="breadcrumb"><a href="../../index.html">Inicio</a> &rsaquo; Semana 02</div>
+    <p class="num">Semana 02</p>
+    <h1>Herramientas Computacionales Científicas</h1>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <div class="callout">
+      <h3>Objetivo de la cátedra</h3>
+      <p>Implementar herramientas computacionales fundamentales para análisis numérico, álgebra lineal aplicada, visualización científica y automatización de cálculos, orientadas al desarrollo de simulaciones doctorales reproducibles y verificables.</p>
+    </div>
+    
+    
+    <div class="callout resultado">
+      <h3>Resultado de aprendizaje esperado</h3>
+      <p>Al finalizar la sesión, el estudiante será capaz de: (i) construir un proyecto computacional reproducible con control de versiones, entorno congelado y semilla aleatoria explícita; (ii) operar arreglos multidimensionales y matrices dispersas con criterios de costo computacional y estabilidad numérica; (iii) producir visualizaciones científicas con tipografía consistente, escala adecuada y exportación vectorial; (iv) automatizar flujos de cálculo mediante <code>argparse</code>, archivos de configuración y orquestadores; y (v) seleccionar entre Python y MATLAB con criterios técnicos en lugar de inercia personal, asumiendo que la herramienta es un medio, no una identidad académica.</p>
+    </div>
+    <h2 class="section-heading" style="margin-top:36px">Temario</h2>
+    <ul class="temario"><li>Introducción a Python/MATLAB científico.</li><li>Manejo de arreglos y matrices.</li><li>Visualización científica.</li><li>Scripts reproducibles.</li><li>Introducción a notebooks científicos.</li><li>Librerías científicas.</li><li>Automatización de cálculos.</li><li>Buenas prácticas computacionales.</li></ul>
+    <h2 class="section-heading" style="margin-top:44px">Figuras de la semana</h2>
+    <p class="section-intro">7 imagen(es) referenciadas en los apuntes de esta semana.
+      Colócalas en <code>assets/img/semana-02/</code> con el nombre exacto indicado debajo
+      de cada recuadro; mientras no estén, se muestra un marcador en su lugar.</p>
+    <div class="gallery">
+    <figure>
+      <img src="../../assets/img/semana-02/fig_s2_buena_vs_mala_grafica.png" alt="fig_s2_buena_vs_mala_grafica.png" data-fallback-name="fig_s2_buena_vs_mala_grafica.png" loading="lazy">
+      <figcaption>fig_s2_buena_vs_mala_grafica.png</figcaption>
+    </figure><figure>
+      <img src="../../assets/img/semana-02/fig_s2_ciclo_git.png" alt="fig_s2_ciclo_git.png" data-fallback-name="fig_s2_ciclo_git.png" loading="lazy">
+      <figcaption>fig_s2_ciclo_git.png</figcaption>
+    </figure><figure>
+      <img src="../../assets/img/semana-02/fig_s2_jax_fit.png" alt="fig_s2_jax_fit.png" data-fallback-name="fig_s2_jax_fit.png" loading="lazy">
+      <figcaption>fig_s2_jax_fit.png</figcaption>
+    </figure><figure>
+      <img src="../../assets/img/semana-02/fig_s2_pandas_pipeline.png" alt="fig_s2_pandas_pipeline.png" data-fallback-name="fig_s2_pandas_pipeline.png" loading="lazy">
+      <figcaption>fig_s2_pandas_pipeline.png</figcaption>
+    </figure><figure>
+      <img src="../../assets/img/semana-02/fig_s2_pila_computacional.png" alt="fig_s2_pila_computacional.png" data-fallback-name="fig_s2_pila_computacional.png" loading="lazy">
+      <figcaption>fig_s2_pila_computacional.png</figcaption>
+    </figure><figure>
+      <img src="../../assets/img/semana-02/fig_s2_svd_pca.png" alt="fig_s2_svd_pca.png" data-fallback-name="fig_s2_svd_pca.png" loading="lazy">
+      <figcaption>fig_s2_svd_pca.png</figcaption>
+    </figure><figure>
+      <img src="../../assets/img/semana-02/fig_s2_van_der_pol.png" alt="fig_s2_van_der_pol.png" data-fallback-name="fig_s2_van_der_pol.png" loading="lazy">
+      <figcaption>fig_s2_van_der_pol.png</figcaption>
+    </figure>
+  </div>
+    <h2 class="section-heading" style="margin-top:44px">Código de la semana (ejecutable)</h2>
+    <div class="pyodide-banner">
+      &#9432; El código corre por completo en tu navegador (Python vía WebAssembly, sin servidor). La
+      primera vez que pulses <strong>Ejecutar</strong> en esta página se descarga el runtime — tarda unos
+      segundos. Puedes editar el código antes de correrlo.
+    </div>
+    <div class="code-cell">
+  <div class="code-cell-header">
+    <span class="code-cell-title">Código 1</span>
+    <span class="code-cell-caption">Vectorización vs bucle explícito en NumPy.</span>
+    
+  </div>
+  <div class="code-banner code-banner-error">&#9888; Este bloque quedó con la indentación de Python incompleta en el documento fuente (se aplanó al pegarlo en el <code>.tex</code>) y todavía no se pudo ejecutar. Sube el script original de esta semana para corregirlo — ver el README.</div>
+  <textarea class="code-input" spellcheck="false" rows="14">import numpy as np
+import time
+
+N = 10_000_000
+x = np.linspace(-3.0, 3.0, N)
+
+# Version 1: bucle for explicito (lento)
+t0 = time.perf_counter()
+y_loop = np.empty(N)
+for i in range(N):
+y_loop[i] = np.sin(x[i]) * np.exp(-x[i]**2)
+t_loop = time.perf_counter() - t0
+
+# Version 2: vectorizada (rapida)
+t0 = time.perf_counter()
+y_vec = np.sin(x) * np.exp(-x**2)
+t_vec = time.perf_counter() - t0
+
+print(f&quot;Bucle:       {t_loop:8.4f} s&quot;)
+print(f&quot;Vectorizado: {t_vec:8.4f} s&quot;)
+print(f&quot;Speedup:     {t_loop/t_vec:6.1f}x&quot;)
+print(f&quot;Coinciden:   {np.allclose(y_loop, y_vec)}&quot;)</textarea>
+  <div class="code-output-wrap" hidden>
+    <div class="code-output-console"></div>
+    <div class="code-output-figures"></div>
+  </div>
+  <div class="code-status"></div>
+</div>
+<div class="code-cell">
+  <div class="code-cell-header">
+    <span class="code-cell-title">Código 2</span>
+    <span class="code-cell-caption">Plantilla de configuración de Matplotlib para figuras científicas.</span>
+    <button class="run-btn" type="button">&#9654; Ejecutar</button>
+  </div>
+  
+  <textarea class="code-input" spellcheck="false" rows="14">import matplotlib.pyplot as plt
+import matplotlib as mpl
+
+# ---- Configuracion global para figuras de publicacion ----
+mpl.rcParams.update({
+    &quot;font.family&quot;:       &quot;serif&quot;,
+    &quot;font.size&quot;:         11,
+    &quot;axes.titlesize&quot;:    12,
+    &quot;axes.labelsize&quot;:    11,
+    &quot;xtick.labelsize&quot;:   10,
+    &quot;ytick.labelsize&quot;:   10,
+    &quot;legend.fontsize&quot;:   10,
+    &quot;axes.linewidth&quot;:    0.8,
+    &quot;lines.linewidth&quot;:   1.4,
+    &quot;figure.dpi&quot;:        150,
+    &quot;savefig.dpi&quot;:       300,
+    &quot;savefig.bbox&quot;:      &quot;tight&quot;,
+    &quot;savefig.format&quot;:    &quot;pdf&quot;,
+    &quot;text.usetex&quot;:       False,   # True si hay LaTeX instalado
+    &quot;mathtext.fontset&quot;:  &quot;cm&quot;,
+})</textarea>
+  <div class="code-output-wrap" hidden>
+    <div class="code-output-console"></div>
+    <div class="code-output-figures"></div>
+  </div>
+  <div class="code-status"></div>
+</div>
+<div class="code-cell code-cell-nonpy">
+  <div class="code-cell-header">
+    <span class="code-cell-title">Código 3 &middot; bash</span>
+    <span class="code-cell-caption">Estructura mínima de directorio para un proyecto doctoral reproducible.</span>
+  </div>
+  <div class="code-banner code-banner-info">Listado de referencia (bash), no es código Python — no tiene botón de ejecución.</div>
+  <textarea class="code-input" spellcheck="false" rows="10" readonly>mi_proyecto/
+|-- README.md                 # objetivo, instalacion, ejecucion
+|-- LICENSE                   # licencia explicita (MIT, BSD, GPL, CC-BY)
+|-- environment.yml           # conda env o requirements.txt
+|-- .gitignore                # excluye datos crudos pesados, __pycache__
+|-- src/                      # codigo fuente Python/MATLAB
+|   |-- __init__.py
+|   |-- modelo.py
+|   |-- solver.py
+|   `-- utils.py
+|-- scripts/                  # entradas de linea de comandos
+|   |-- run_experiment.py
+|   `-- make_figures.py
+|-- config/                   # parametros por experimento (yaml/json)
+|   |-- exp_001.yaml
+|   `-- exp_002.yaml
+|-- data/
+|   |-- raw/                  # datos crudos (read-only, idealmente con DOI)
+|   `-- processed/            # derivados, regenerables
+|-- results/                  # salidas: figuras, tablas, logs
+|-- tests/                    # pruebas unitarias (pytest)
+`-- notebooks/                # exploracion, NUNCA es la fuente de verdad</textarea>
+</div>
+<div class="code-cell">
+  <div class="code-cell-header">
+    <span class="code-cell-title">Código 4</span>
+    <span class="code-cell-caption">Plantilla de script reproducible con argparse y registro de parámetros.</span>
+    
+  </div>
+  <div class="code-banner code-banner-error">&#9888; Este bloque quedó con la indentación de Python incompleta en el documento fuente (se aplanó al pegarlo en el <code>.tex</code>) y todavía no se pudo ejecutar. Sube el script original de esta semana para corregirlo — ver el README.</div>
+  <textarea class="code-input" spellcheck="false" rows="14">&quot;&quot;&quot;
+run_diffusion.py
+Simulacion 1D de difusion termica con parametros configurables
+desde linea de comandos y registro automatico de configuracion.
+
+Uso:
+python run_diffusion.py --alpha 1e-4 --N 151 --r 0.45 \
+--tsteps 800 --seed 42 \
+--outdir results/exp_001
+&quot;&quot;&quot;
+import argparse
+import json
+import os
+import sys
+import time
+from pathlib import Path
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+
+def parse_args():
+p = argparse.ArgumentParser(description=&quot;Difusion 1D explicita.&quot;)
+p.add_argument(&quot;--L&quot;,      type=float, default=1.0,   help=&quot;Longitud [m]&quot;)
+p.add_argument(&quot;--alpha&quot;,  type=float, default=1e-4,  help=&quot;Difusividad [m^2/s]&quot;)
+p.add_argument(&quot;--N&quot;,      type=int,   default=151,   help=&quot;Nodos espaciales&quot;)
+p.add_argument(&quot;--r&quot;,      type=float, default=0.45,  help=&quot;Numero de Fourier &lt;= 0.5&quot;)
+p.add_argument(&quot;--tsteps&quot;, type=int,   default=800,   help=&quot;Pasos temporales&quot;)
+p.add_argument(&quot;--T0&quot;,     type=float, default=25.0,  help=&quot;Temperatura ambiente [C]&quot;)
+p.add_argument(&quot;--A&quot;,      type=float, default=80.0,  help=&quot;Amplitud gaussiana [C]&quot;)
+p.add_argument(&quot;--seed&quot;,   type=int,   default=42,    help=&quot;Semilla aleatoria&quot;)
+p.add_argument(&quot;--outdir&quot;, type=str,   default=&quot;results/run_default&quot;)
+return p.parse_args()
+
+
+def main():
+args = parse_args()
+outdir = Path(args.outdir)
+outdir.mkdir(parents=True, exist_ok=True)
+
+# ---- Snapshot de configuracion ----
+cfg = vars(args).copy()
+cfg[&quot;timestamp&quot;]   = time.strftime(&quot;%Y-%m-%dT%H:%M:%S&quot;)
+cfg[&quot;numpy&quot;]       = np.__version__
+cfg[&quot;python&quot;]      = sys.version.split()[0]
+with open(outdir / &quot;config.json&quot;, &quot;w&quot;) as f:
+json.dump(cfg, f, indent=2)
+
+# ---- Verificacion de estabilidad ----
+if args.r &gt; 0.5:
+sys.exit(f&quot;ERROR: r = {args.r} &gt; 0.5; el esquema explicito sera inestable.&quot;)
+
+# ---- Simulacion ----
+np.random.seed(args.seed)
+x = np.linspace(0.0, args.L, args.N)
+dx = x[1] - x[0]
+dt = args.r * dx**2 / args.alpha
+
+T = args.T0 + args.A * np.exp(-((x - 0.5*args.L)**2) / (2*0.06**2))
+T[0] = T[-1] = args.T0
+
+snapshots, times = [T.copy()], [0.0]
+for n in range(1, args.tsteps + 1):
+T[1:-1] = T[1:-1] + args.r * (T[2:] - 2*T[1:-1] + T[:-2])
+T[0] = T[-1] = args.T0
+if n in (50, 150, 300, args.tsteps):
+snapshots.append(T.copy())
+times.append(n * dt)
+
+# ---- Salida tabular ----
+np.savez(outdir / &quot;fields.npz&quot;, x=x, T=np.stack(snapshots), t=np.array(times))
+
+# ---- Figura ----
+fig, ax = plt.subplots(figsize=(7, 4))
+for Tk, tk in zip(snapshots, times):
+ax.plot(x, Tk, label=f&quot;t = {tk:6.2f} s&quot;)
+ax.set_xlabel(&quot;x [m]&quot;)
+ax.set_ylabel(&quot;T [degC]&quot;)
+ax.set_title(&quot;Conduccion transitoria 1D&quot;)
+ax.grid(True, alpha=0.3)
+ax.legend()
+fig.tight_layout()
+fig.savefig(outdir / &quot;perfiles.pdf&quot;)
+
+print(f&quot;[OK] resultados en {outdir.resolve()}&quot;)
+
+
+if __name__ == &quot;__main__&quot;:
+main()</textarea>
+  <div class="code-output-wrap" hidden>
+    <div class="code-output-console"></div>
+    <div class="code-output-figures"></div>
+  </div>
+  <div class="code-status"></div>
+</div>
+<div class="code-cell">
+  <div class="code-cell-header">
+    <span class="code-cell-title">Código 5</span>
+    <span class="code-cell-caption">Derivación simbólica del Jacobiano y exportación a función numérica.</span>
+    <button class="run-btn" type="button">&#9654; Ejecutar</button>
+  </div>
+  
+  <textarea class="code-input" spellcheck="false" rows="14">import sympy as sp
+
+I, R, h, As, t, m, cp, Tinf = sp.symbols(&quot;I R h As t m cp Tinf&quot;, positive=True)
+
+# Modelo concentrado de calentamiento (Semana 1, Ejemplo 3)
+tau = m*cp / (h*As)
+Tss = Tinf + I**2*R / (h*As)
+T = Tinf + I**2*R/(h*As) * (1 - sp.exp(-t/tau))
+
+# Jacobiano respecto a (I, R, h)
+J = sp.Matrix([T]).jacobian([I, R, h])
+J_simpl = sp.simplify(J)
+sp.pprint(J_simpl)
+
+# Exportar a funcion numerica vectorizada
+T_num = sp.lambdify((I, R, h, As, t, m, cp, Tinf), T, modules=&quot;numpy&quot;)
+J_num = sp.lambdify((I, R, h, As, t, m, cp, Tinf), J_simpl, modules=&quot;numpy&quot;)
+
+# Evaluacion numerica
+print(T_num(400.0, 1e-4, 25.0, 0.5, 60.0, 2.0, 900.0, 25.0))</textarea>
+  <div class="code-output-wrap" hidden>
+    <div class="code-output-console"></div>
+    <div class="code-output-figures"></div>
+  </div>
+  <div class="code-status"></div>
+</div>
+<div class="code-cell code-cell-nonpy">
+  <div class="code-cell-header">
+    <span class="code-cell-title">Código 6 &middot; bash</span>
+    <span class="code-cell-caption">Makefile para automatizar tres experimentos con dependencias declaradas.</span>
+  </div>
+  <div class="code-banner code-banner-info">Listado de referencia (bash), no es código Python — no tiene botón de ejecución.</div>
+  <textarea class="code-input" spellcheck="false" rows="10" readonly># Makefile - Proyecto Difusion 1D
+PYTHON  := python
+SRC     := scripts/run_diffusion.py
+RESULTS := results
+
+EXPS := exp_001 exp_002 exp_003
+
+.PHONY: all clean figures
+
+all: $(EXPS:%=$(RESULTS)/%/perfiles.pdf) figures
+
+$(RESULTS)/exp_001/perfiles.pdf:
+$(PYTHON) $(SRC) --alpha 1e-4 --r 0.45 --outdir $(RESULTS)/exp_001
+
+$(RESULTS)/exp_002/perfiles.pdf:
+$(PYTHON) $(SRC) --alpha 5e-5 --r 0.40 --outdir $(RESULTS)/exp_002
+
+$(RESULTS)/exp_003/perfiles.pdf:
+$(PYTHON) $(SRC) --alpha 2e-4 --r 0.45 --outdir $(RESULTS)/exp_003
+
+figures: $(EXPS:%=$(RESULTS)/%/perfiles.pdf)
+$(PYTHON) scripts/make_figures.py --indirs $(EXPS:%=$(RESULTS)/%)
+
+clean:
+rm -rf $(RESULTS)/exp_*</textarea>
+</div>
+<div class="code-cell code-cell-nonpy">
+  <div class="code-cell-header">
+    <span class="code-cell-title">Código 7 &middot; bash</span>
+    <span class="code-cell-caption">Comandos esenciales de Git para investigación reproducible.</span>
+  </div>
+  <div class="code-banner code-banner-info">Listado de referencia (bash), no es código Python — no tiene botón de ejecución.</div>
+  <textarea class="code-input" spellcheck="false" rows="10" readonly># Inicializacion
+git init
+git add README.md environment.yml .gitignore
+git commit -m &quot;init: estructura inicial del proyecto&quot;
+
+# Flujo diario
+git status                   # que ha cambiado
+git diff src/modelo.py       # ver cambios concretos
+git add src/modelo.py
+git commit -m &quot;fix: corregir signo en termino de conveccion&quot;
+
+# Marcar version reproducible
+git tag -a v1.0-paper -m &quot;Version usada en el manuscrito enviado a OLE&quot;
+git push --tags origin main
+
+# Reproducir un resultado pasado
+git checkout v1.0-paper      # vuelve al estado exacto del commit</textarea>
+</div>
+<div class="code-cell">
+  <div class="code-cell-header">
+    <span class="code-cell-title">Código 8</span>
+    <span class="code-cell-caption">SVD para reducción de dimensionalidad sobre datos sintéticos con ruido.</span>
+    <button class="run-btn" type="button">&#9654; Ejecutar</button>
+  </div>
+  
+  <textarea class="code-input" spellcheck="false" rows="14">&quot;&quot;&quot;
+Ejemplo 1: SVD aplicada a un conjunto de mediciones sinteticas.
+Se construyen m=200 senales, cada una en n=64 puntos, generadas
+como combinacion lineal de 3 modos fundamentales mas ruido gaussiano.
+El objetivo es recuperar el rango efectivo de los datos.
+&quot;&quot;&quot;
+import numpy as np
+import matplotlib.pyplot as plt
+
+rng = np.random.default_rng(2026)
+m, n = 200, 64
+t = np.linspace(0, 1, n)
+
+# Modos fundamentales: rango intrinseco r=3
+phi1 = np.sin(2*np.pi*1*t)
+phi2 = np.sin(2*np.pi*3*t) * 0.6
+phi3 = np.cos(2*np.pi*5*t) * 0.3
+Phi  = np.stack([phi1, phi2, phi3], axis=1)        # n x 3
+
+# Coeficientes aleatorios para cada medicion
+C = rng.normal(size=(m, 3))
+
+# Datos sin ruido + ruido gaussiano
+X_clean = C @ Phi.T                                # m x n
+sigma_noise = 0.15
+X = X_clean + sigma_noise * rng.normal(size=(m, n))
+
+# Centrado (paso obligatorio para PCA)
+X_mean = X.mean(axis=0)
+Xc = X - X_mean
+
+# SVD
+U, S, Vt = np.linalg.svd(Xc, full_matrices=False)
+
+# Varianza explicada acumulada
+var_exp = S**2 / np.sum(S**2)
+var_cum = np.cumsum(var_exp)
+
+# Reconstruccion truncada con k=3 componentes
+k = 3
+X_rec = U[:, :k] @ np.diag(S[:k]) @ Vt[:k, :] + X_mean
+
+err_rec = np.linalg.norm(X - X_rec) / np.linalg.norm(X)
+print(f&quot;sigma_1..sigma_5 = {S[:5]}&quot;)
+print(f&quot;Varianza explicada k=3: {var_cum[2]*100:.2f}%&quot;)
+print(f&quot;Error relativo de reconstruccion: {err_rec:.4f}&quot;)
+
+# ---- Visualizacion ----
+fig, axes = plt.subplots(1, 3, figsize=(13, 4))
+
+ax = axes[0]
+ax.semilogy(np.arange(1, len(S)+1), S, &#x27;o-&#x27;, ms=4)
+ax.axvline(k+0.5, color=&#x27;r&#x27;, ls=&#x27;--&#x27;, lw=0.8, label=f&#x27;corte k={k}&#x27;)
+ax.set_xlabel(&#x27;indice del modo&#x27;)
+ax.set_ylabel(r&#x27;$\sigma_i$&#x27;)
+ax.set_title(&#x27;Valores singulares&#x27;)
+ax.grid(True, which=&#x27;both&#x27;, alpha=0.3); ax.legend()
+
+ax = axes[1]
+ax.plot(np.arange(1, len(S)+1), var_cum*100, &#x27;o-&#x27;, ms=4)
+ax.axhline(99, color=&#x27;r&#x27;, ls=&#x27;--&#x27;, lw=0.8, label=&#x27;99%&#x27;)
+ax.set_xlabel(&#x27;numero de componentes retenidas&#x27;)
+ax.set_ylabel(&#x27;varianza acumulada [%]&#x27;)
+ax.set_title(&#x27;Curva de varianza&#x27;)
+ax.grid(True, alpha=0.3); ax.legend()
+
+ax = axes[2]
+idx = 0
+ax.plot(t, X[idx], &#x27;k.&#x27;, ms=3, label=&#x27;medicion ruidosa&#x27;)
+ax.plot(t, X_clean[idx], &#x27;b-&#x27;, lw=1.2, label=&#x27;senal real&#x27;)
+ax.plot(t, X_rec[idx], &#x27;r--&#x27;, lw=1.2, label=f&#x27;recon. SVD k={k}&#x27;)
+ax.set_xlabel(&#x27;t&#x27;); ax.set_ylabel(&#x27;amplitud&#x27;)
+ax.set_title(f&#x27;Reconstruccion medicion #{idx}&#x27;)
+ax.grid(True, alpha=0.3); ax.legend()
+
+plt.tight_layout()
+plt.savefig(&quot;Figuras/fig_s2_svd_pca.pdf&quot;)
+plt.show()</textarea>
+  <div class="code-output-wrap" hidden>
+    <div class="code-output-console"></div>
+    <div class="code-output-figures"></div>
+  </div>
+  <div class="code-status"></div>
+</div>
+<div class="code-cell">
+  <div class="code-cell-header">
+    <span class="code-cell-title">Código 9</span>
+    <span class="code-cell-caption">Comparación de métodos en solve_ivp para el oscilador de Van der Pol.</span>
+    
+  </div>
+  <div class="code-banner code-banner-error">&#9888; Este bloque quedó con la indentación de Python incompleta en el documento fuente (se aplanó al pegarlo en el <code>.tex</code>) y todavía no se pudo ejecutar. Sube el script original de esta semana para corregirlo — ver el README.</div>
+  <textarea class="code-input" spellcheck="false" rows="14">&quot;&quot;&quot;
+Ejemplo 2: integracion del oscilador de Van der Pol.
+Se comparan tres metodos de solve_ivp: RK45 (explicito no rigido),
+LSODA (auto-detecta rigidez) y BDF (implicito para rigidez).
+Se reporta el numero de evaluaciones de f y el tiempo de pared.
+&quot;&quot;&quot;
+import time
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.integrate import solve_ivp
+
+
+def van_der_pol(t, y, mu):
+x, v = y
+return [v, mu*(1 - x**2)*v - x]
+
+
+t_span = (0.0, 100.0)
+y0 = [2.0, 0.0]
+mu_values = [1.0, 10.0, 100.0]   # tres regimenes de rigidez
+metodos = [&quot;RK45&quot;, &quot;LSODA&quot;, &quot;BDF&quot;]
+
+print(f&quot;{&#x27;mu&#x27;:&gt;6} {&#x27;metodo&#x27;:&gt;8} {&#x27;nfev&#x27;:&gt;8} {&#x27;njev&#x27;:&gt;6} {&#x27;tiempo[s]&#x27;:&gt;10} {&#x27;status&#x27;:&gt;6}&quot;)
+fig, axes = plt.subplots(1, 3, figsize=(13, 4))
+for ax, mu in zip(axes, mu_values):
+for met in metodos:
+t0 = time.perf_counter()
+sol = solve_ivp(van_der_pol, t_span, y0, args=(mu,),
+method=met, rtol=1e-6, atol=1e-9,
+dense_output=True)
+dt = time.perf_counter() - t0
+njev = getattr(sol, &quot;njev&quot;, 0)
+print(f&quot;{mu:6.0f} {met:&gt;8} {sol.nfev:8d} {njev:6d} {dt:10.4f} {sol.status:&gt;6d}&quot;)
+
+tt = np.linspace(*t_span, 4000)
+yy = sol.sol(tt)
+ax.plot(tt, yy[0], lw=1.0, label=met)
+
+ax.set_title(f&quot;mu = {mu:.0f}&quot;)
+ax.set_xlabel(&quot;t&quot;); ax.set_ylabel(&quot;x(t)&quot;)
+ax.grid(True, alpha=0.3); ax.legend(fontsize=8)
+
+plt.tight_layout()
+plt.savefig(&quot;Figuras/fig_s2_van_der_pol.pdf&quot;)
+plt.show()</textarea>
+  <div class="code-output-wrap" hidden>
+    <div class="code-output-console"></div>
+    <div class="code-output-figures"></div>
+  </div>
+  <div class="code-status"></div>
+</div>
+<div class="code-cell">
+  <div class="code-cell-header">
+    <span class="code-cell-title">Código 10</span>
+    <span class="code-cell-caption">Pipeline mínimo de limpieza y análisis con pandas.</span>
+    <button class="run-btn" type="button">&#9654; Ejecutar</button>
+  </div>
+  
+  <textarea class="code-input" spellcheck="false" rows="14">&quot;&quot;&quot;
+Ejemplo 3: pipeline pandas sobre dataset sintetico de mediciones
+de temperatura en N=10 termopares durante 1 hora, con perdidas
+aleatorias (NaN) y outliers.
+&quot;&quot;&quot;
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# ---- Generacion de dataset sintetico ----
+rng = np.random.default_rng(123)
+n_pts = 3600                                # 1 muestra/s durante 1 hora
+t = pd.date_range(&quot;2026-05-21 08:00&quot;, periods=n_pts, freq=&quot;1s&quot;)
+n_tc = 10
+T_base = 25 + 30*np.exp(-np.linspace(0, 3, n_pts))   # transitorio
+data = T_base[:, None] + rng.normal(0, 0.4, size=(n_pts, n_tc))
+
+# Inyectar NaN (perdidas de senal) y outliers (chispas EMI)
+mask_nan = rng.random((n_pts, n_tc)) &lt; 0.005
+data[mask_nan] = np.nan
+mask_out = rng.random((n_pts, n_tc)) &lt; 0.001
+data[mask_out] += rng.normal(0, 50, mask_out.sum())
+
+df = pd.DataFrame(data,
+index=t,
+columns=[f&quot;TC_{i:02d}&quot; for i in range(n_tc)])
+
+# ---- Diagnostico ----
+print(&quot;Shape:&quot;, df.shape)
+print(&quot;NaN por columna:&quot;, df.isna().sum().to_dict())
+print(&quot;Resumen descriptivo:&quot;)
+print(df.describe().T[[&quot;mean&quot;, &quot;std&quot;, &quot;min&quot;, &quot;max&quot;]])
+
+# ---- Limpieza ----
+# 1) eliminar outliers via mediana movil + filtro de Hampel
+median  = df.rolling(&quot;60s&quot;, center=True).median()
+mad     = (df - median).abs().rolling(&quot;60s&quot;, center=True).median()
+score   = (df - median).abs() / (1.4826*mad + 1e-9)
+df_clean = df.where(score &lt; 3.5)
+
+# 2) imputar NaN por interpolacion temporal
+df_clean = df_clean.interpolate(method=&quot;time&quot;, limit=10)
+
+# 3) resampleo a 10 s con promedio
+df_10s = df_clean.resample(&quot;10s&quot;).mean()
+
+# ---- Visualizacion ----
+fig, axes = plt.subplots(2, 1, figsize=(9, 6), sharex=True)
+axes[0].plot(df.index, df[&quot;TC_00&quot;], &#x27;r.&#x27;, ms=2, alpha=0.5, label=&quot;crudo&quot;)
+axes[0].set_ylabel(&quot;T [degC]&quot;); axes[0].legend()
+axes[0].set_title(&quot;TC_00: senal cruda con outliers&quot;)
+axes[1].plot(df_10s.index, df_10s.mean(axis=1), &#x27;b-&#x27;, lw=1.0, label=&quot;media 10 canales&quot;)
+axes[1].fill_between(df_10s.index,
+df_10s.mean(axis=1) - df_10s.std(axis=1),
+df_10s.mean(axis=1) + df_10s.std(axis=1),
+alpha=0.25, label=&quot;+/- 1 sigma entre canales&quot;)
+axes[1].set_ylabel(&quot;T [degC]&quot;); axes[1].set_xlabel(&quot;tiempo&quot;)
+axes[1].legend(); axes[1].set_title(&quot;Promedio inter-canales limpio (resampleo 10 s)&quot;)
+
+plt.tight_layout()
+plt.savefig(&quot;Figuras/fig_s2_pandas_pipeline.pdf&quot;)
+plt.show()</textarea>
+  <div class="code-output-wrap" hidden>
+    <div class="code-output-console"></div>
+    <div class="code-output-figures"></div>
+  </div>
+  <div class="code-status"></div>
+</div>
+<div class="code-cell">
+  <div class="code-cell-header">
+    <span class="code-cell-title">Código 11</span>
+    <span class="code-cell-caption">Diferenciación automática con JAX para ajuste no lineal.</span>
+    
+  </div>
+  <div class="code-banner code-banner-error">&#9888; Este bloque quedó con la indentación de Python incompleta en el documento fuente (se aplanó al pegarlo en el <code>.tex</code>) y todavía no se pudo ejecutar. Sube el script original de esta semana para corregirlo — ver el README.</div>
+  <textarea class="code-input" spellcheck="false" rows="14">&quot;&quot;&quot;
+Ejemplo 4: ajuste no lineal con JAX y diferenciacion automatica.
+Modelo: f(x;theta) = theta0 * exp(-theta1 * x) * cos(theta2*x + theta3)
+&quot;&quot;&quot;
+import jax
+import jax.numpy as jnp
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.optimize import minimize
+
+rng = np.random.default_rng(7)
+theta_true = jnp.array([2.0, 0.3, 4.0, 0.5])
+
+x = jnp.linspace(0, 6, 80)
+
+def f(theta, x):
+return theta[0] * jnp.exp(-theta[1]*x) * jnp.cos(theta[2]*x + theta[3])
+
+y_clean = f(theta_true, x)
+y = y_clean + 0.1 * rng.normal(size=len(x))
+
+# Funcion de perdida y su gradiente automatico
+def loss(theta, x, y):
+return 0.5 * jnp.sum((f(theta, x) - y)**2)
+
+grad_loss = jax.grad(loss)
+
+# Wrappers para scipy.optimize
+def loss_np(theta):
+return float(loss(jnp.array(theta), x, jnp.array(y)))
+def grad_np(theta):
+return np.array(grad_loss(jnp.array(theta), x, jnp.array(y)))
+
+theta0 = np.array([1.0, 0.1, 3.0, 0.0])
+res = minimize(loss_np, theta0, jac=grad_np, method=&quot;L-BFGS-B&quot;,
+options={&quot;gtol&quot;: 1e-9, &quot;disp&quot;: True})
+
+print(&quot;theta verdadero:  &quot;, np.asarray(theta_true))
+print(&quot;theta estimado:   &quot;, res.x)
+print(&quot;error parametrico:&quot;, np.linalg.norm(res.x - np.asarray(theta_true)))
+
+plt.figure(figsize=(8, 4))
+plt.plot(x, y, &#x27;k.&#x27;, ms=4, label=&#x27;datos ruidosos&#x27;)
+plt.plot(x, np.asarray(f(theta_true, x)), &#x27;b-&#x27;, lw=1.0, label=&#x27;modelo real&#x27;)
+plt.plot(x, np.asarray(f(jnp.array(res.x), x)), &#x27;r--&#x27;, lw=1.2, label=&#x27;ajuste L-BFGS-B&#x27;)
+plt.xlabel(&#x27;x&#x27;); plt.ylabel(&#x27;f(x)&#x27;)
+plt.title(&#x27;Ajuste no lineal con gradientes via AD (JAX)&#x27;)
+plt.grid(True, alpha=0.3); plt.legend()
+plt.tight_layout()
+plt.savefig(&quot;Figuras/fig_s2_jax_fit.pdf&quot;); plt.show()</textarea>
+  <div class="code-output-wrap" hidden>
+    <div class="code-output-console"></div>
+    <div class="code-output-figures"></div>
+  </div>
+  <div class="code-status"></div>
+</div>
+<div class="code-cell">
+  <div class="code-cell-header">
+    <span class="code-cell-title">Código 12</span>
+    <span class="code-cell-caption">Módulo y prueba unitaria con pytest para integrador de calor 1D.</span>
+    
+  </div>
+  <div class="code-banner code-banner-error">&#9888; Este bloque quedó con la indentación de Python incompleta en el documento fuente (se aplanó al pegarlo en el <code>.tex</code>) y todavía no se pudo ejecutar. Sube el script original de esta semana para corregirlo — ver el README.</div>
+  <textarea class="code-input" spellcheck="false" rows="14"># src/diffusion1d.py
+import numpy as np
+
+def step_diffusion(T, r):
+&quot;&quot;&quot;Un paso explicito de difusion 1D con fronteras Dirichlet fijas.
+
+Parameters
+----------
+T : ndarray, shape (N,)
+Campo de temperatura actual [degC].
+r : float
+Numero de Fourier alpha*dt/dx^2, debe cumplir r &lt;= 0.5.
+
+Returns
+-------
+Tnew : ndarray, shape (N,)
+Campo en el paso siguiente con fronteras preservadas.
+&quot;&quot;&quot;
+if not (0 &lt; r &lt;= 0.5):
+raise ValueError(f&quot;r={r} fuera del intervalo de estabilidad (0, 0.5]&quot;)
+Tnew = T.copy()
+Tnew[1:-1] = T[1:-1] + r*(T[2:] - 2*T[1:-1] + T[:-2])
+return Tnew</textarea>
+  <div class="code-output-wrap" hidden>
+    <div class="code-output-console"></div>
+    <div class="code-output-figures"></div>
+  </div>
+  <div class="code-status"></div>
+</div>
+<div class="code-cell">
+  <div class="code-cell-header">
+    <span class="code-cell-title">Código 13</span>
+    <span class="code-cell-caption">Suite de pruebas pytest asociada.</span>
+    
+  </div>
+  <div class="code-banner code-banner-error">&#9888; Este bloque quedó con la indentación de Python incompleta en el documento fuente (se aplanó al pegarlo en el <code>.tex</code>) y todavía no se pudo ejecutar. Sube el script original de esta semana para corregirlo — ver el README.</div>
+  <textarea class="code-input" spellcheck="false" rows="14"># tests/test_diffusion1d.py
+import numpy as np
+import pytest
+from src.diffusion1d import step_diffusion
+
+def test_estabilidad_rechaza_r_grande():
+with pytest.raises(ValueError):
+step_diffusion(np.zeros(10), r=0.6)
+
+def test_campo_constante_es_invariante():
+T = np.full(50, 100.0)
+T_new = step_diffusion(T, r=0.4)
+assert np.allclose(T_new, T)
+
+def test_fronteras_preservadas():
+T = np.linspace(0, 1, 20)
+T_new = step_diffusion(T, r=0.4)
+assert T_new[0]  == T[0]
+assert T_new[-1] == T[-1]
+
+def test_orden_convergencia_temporal():
+&quot;&quot;&quot;En estado estable lineal, residuo numerico O(h^2).&quot;&quot;&quot;
+N = 101
+x = np.linspace(0, 1, N)
+T = x.copy()                   # solucion exacta de Laplace 1D
+T_new = step_diffusion(T, r=0.4)
+err = np.max(np.abs(T_new - T))
+assert err &lt; 1e-12             # campo lineal: residuo a precision maquina</textarea>
+  <div class="code-output-wrap" hidden>
+    <div class="code-output-console"></div>
+    <div class="code-output-figures"></div>
+  </div>
+  <div class="code-status"></div>
+</div>
+
+    <h2 class="section-heading" style="margin-top:44px">Desarrollo teórico completo</h2>
+    <p class="section-intro">Ecuaciones, demostraciones, tablas y discusión de esta semana, tal como están
+      en los apuntes del curso — mismo documento fuente que el PDF completo, recortado a esta semana.</p>
+    <div class="theory-pdf-wrap">
+      <iframe src="../../assets/apuntes/semana-02.pdf" title="Desarrollo teórico — Semana 2. Herramientas Computacionales Científicas" loading="lazy"></iframe>
+    </div>
+    <p class="theory-pdf-fallback">
+      ¿No se ve el documento arriba? <a href="../../assets/apuntes/semana-02.pdf" download>Descarga el PDF de esta semana</a>
+      o <a href="../../assets/apuntes/semana-02.pdf" target="_blank" rel="noopener">ábrelo en una pestaña nueva</a>.
+    </p>
+
+    <div class="week-nav">
+      <a href="../semana-01/index.html">&larr; Semana 01</a>
+      <span class="to-index"><a href="../../index.html">&uarr; Volver al índice del curso</a></span>
+      <a href="../semana-03/index.html">Semana 03 &rarr;</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div>Doctorado en Ingeniería y Tecnología Aplicada &middot; Universidad La Salle Bajío</div>
+    <div>Dr. Jorge Ramón Parra Michel &middot; Prototipado y Simulación</div>
+  </div>
+</footer>
+
+<script src="../../assets/js/main.js"></script>
+<script src="../../assets/js/pyodide-runner.js"></script>
+
+<script>
+window.addEventListener("load", function () {
+  if (window.renderMathInElement) {
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left: "$$", right: "$$", display: true},
+        {left: "$", right: "$", display: false}
+      ],
+      throwOnError: false
+    });
+  }
+});
+</script>
+
+</body>
+</html>

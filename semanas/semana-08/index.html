@@ -1,0 +1,596 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Semana 8. Método de Elementos Finitos I — Prototipado y Simulación</title>
+<meta name="description" content="Semana 8. Método de Elementos Finitos I: objetivo, temario y código ejecutable.">
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-cpW21h6RZv/phavutF+AuVYrr+dA8xD9zs6FwLpaCePvcCWnZ8IU9UNlXhpKUAJI" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-vZTG03m+2yp6N6BNi5iM4rW4oIwk5DfcNdFfxkk9ZWpDriOkXX8voJBFrAO7MpVl" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-GvrOXuhMATgEsSwCs4smul74iXGOixntILdUW9XmUC6+HX0sLNAK3q71HotJqlAn" crossorigin="anonymous">
+<link rel="stylesheet" href="../../assets/css/style.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="topbar-brand" href="../../index.html">
+      <img src="../../assets/img/logo-lasalle.png" alt="Universidad La Salle Bajío">
+      Prototipado y Simulación
+    </a>
+    <nav>
+      <a href="../../index.html#semanas">Semanas</a>
+      <a href="../../README.md">Repositorio</a>
+      <a class="topbar-pdf-btn" href="../../assets/apuntes/Apuntes_Curso_Doctoral_Simulacion_Prototipado_COMPLETO.pdf" download>Descargar PDF</a>
+    </nav>
+  </div>
+</div>
+
+<header class="week-header">
+  <div class="wrap">
+    <div class="breadcrumb"><a href="../../index.html">Inicio</a> &rsaquo; Semana 08</div>
+    <p class="num">Semana 08</p>
+    <h1>Método de Elementos Finitos I</h1>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <div class="callout">
+      <h3>Objetivo de la cátedra</h3>
+      <p>Comprender la formulación matemática y
+computacional del método de elementos finitos (FEM): la transición de un
+problema de valores en la frontera continuo a un sistema algebraico discreto,
+el papel de la discretización espacial y las funciones de forma, el ensamble
+matricial y la imposición de condiciones de frontera. El eje aplicado es el
+módulo <span class="smallcaps">Static Structural</span> de <span class="smallcaps">ANSYS Workbench</span>; la generación de
+malla se ilustra primero en Python (Google Colab) para hacer explícitas las
+decisiones de mallado que en ANSYS quedan ocultas tras la automatización.</p>
+    </div>
+    
+    
+    
+    <h2 class="section-heading" style="margin-top:36px">Temario</h2>
+    <ul class="temario"><li>Introducción al FEM.</li><li>Discretización espacial.</li><li>Generación de mallas.</li><li>Elementos y nodos.</li><li>Funciones de forma.</li><li>Ensamble matricial.</li><li>Condiciones de frontera.</li></ul>
+    <h2 class="section-heading" style="margin-top:44px">Figuras de la semana</h2>
+    <p class="section-intro">15 imagen(es) referenciadas en los apuntes de esta semana.
+      Colócalas en <code>assets/img/semana-08/</code> con el nombre exacto indicado debajo
+      de cada recuadro; mientras no estén, se muestra un marcador en su lugar.</p>
+    <div class="gallery">
+    <figure>
+      <img src="../../assets/img/semana-08/ansys_01_geometria.png" alt="ansys_01_geometria.png" data-fallback-name="ansys_01_geometria.png" loading="lazy">
+      <figcaption>ansys_01_geometria.png</figcaption>
+    </figure><figure>
+      <img src="../../assets/img/semana-08/ansys_02_midside.png" alt="ansys_02_midside.png" data-fallback-name="ansys_02_midside.png" loading="lazy">
+      <figcaption>ansys_02_midside.png</figcaption>
+    </figure><figure>
+      <img src="../../assets/img/semana-08/ansys_03_method.png" alt="ansys_03_method.png" data-fallback-name="ansys_03_method.png" loading="lazy">
+      <figcaption>ansys_03_method.png</figcaption>
+    </figure><figure>
+      <img src="../../assets/img/semana-08/ansys_04_bias.png" alt="ansys_04_bias.png" data-fallback-name="ansys_04_bias.png" loading="lazy">
+      <figcaption>ansys_04_bias.png</figcaption>
+    </figure><figure>
+      <img src="../../assets/img/semana-08/ansys_05_metric.png" alt="ansys_05_metric.png" data-fallback-name="ansys_05_metric.png" loading="lazy">
+      <figcaption>ansys_05_metric.png</figcaption>
+    </figure><figure>
+      <img src="../../assets/img/semana-08/ansys_06_bc.png" alt="ansys_06_bc.png" data-fallback-name="ansys_06_bc.png" loading="lazy">
+      <figcaption>ansys_06_bc.png</figcaption>
+    </figure><figure>
+      <img src="../../assets/img/semana-08/ansys_07_schematic.png" alt="ansys_07_schematic.png" data-fallback-name="ansys_07_schematic.png" loading="lazy">
+      <figcaption>ansys_07_schematic.png</figcaption>
+    </figure><figure>
+      <img src="../../assets/img/semana-08/s8_calidad.png" alt="s8_calidad.png" data-fallback-name="s8_calidad.png" loading="lazy">
+      <figcaption>s8_calidad.png</figcaption>
+    </figure><figure>
+      <img src="../../assets/img/semana-08/s8_elementos_dof.png" alt="s8_elementos_dof.png" data-fallback-name="s8_elementos_dof.png" loading="lazy">
+      <figcaption>s8_elementos_dof.png</figcaption>
+    </figure><figure>
+      <img src="../../assets/img/semana-08/s8_funciones_forma.png" alt="s8_funciones_forma.png" data-fallback-name="s8_funciones_forma.png" loading="lazy">
+      <figcaption>s8_funciones_forma.png</figcaption>
+    </figure><figure>
+      <img src="../../assets/img/semana-08/s8_geometria.png" alt="s8_geometria.png" data-fallback-name="s8_geometria.png" loading="lazy">
+      <figcaption>s8_geometria.png</figcaption>
+    </figure><figure>
+      <img src="../../assets/img/semana-08/s8_malla_bias.png" alt="s8_malla_bias.png" data-fallback-name="s8_malla_bias.png" loading="lazy">
+      <figcaption>s8_malla_bias.png</figcaption>
+    </figure><figure>
+      <img src="../../assets/img/semana-08/s8_malla_libre_tri.png" alt="s8_malla_libre_tri.png" data-fallback-name="s8_malla_libre_tri.png" loading="lazy">
+      <figcaption>s8_malla_libre_tri.png</figcaption>
+    </figure><figure>
+      <img src="../../assets/img/semana-08/s8_malla_mapeada.png" alt="s8_malla_mapeada.png" data-fallback-name="s8_malla_mapeada.png" loading="lazy">
+      <figcaption>s8_malla_mapeada.png</figcaption>
+    </figure><figure>
+      <img src="../../assets/img/semana-08/s8_malla_quad.png" alt="s8_malla_quad.png" data-fallback-name="s8_malla_quad.png" loading="lazy">
+      <figcaption>s8_malla_quad.png</figcaption>
+    </figure>
+  </div>
+    <h2 class="section-heading" style="margin-top:44px">Código de la semana (ejecutable)</h2>
+    <div class="pyodide-banner">
+      &#9432; El código corre por completo en tu navegador (Python vía WebAssembly, sin servidor). La
+      primera vez que pulses <strong>Ejecutar</strong> en esta página se descarga el runtime — tarda unos
+      segundos. Puedes editar el código antes de correrlo.
+    </div>
+    <div class="code-cell">
+  <div class="code-cell-header">
+    <span class="code-cell-title">Semana08_mallado_2D.py</span>
+    <span class="code-cell-caption">Generación y comparación de mallas 2D (Semana 8).</span>
+    
+  </div>
+  <div class="code-banner code-banner-info">&#9432; Requiere <code>gmsh</code>, una librería binaria compilada que no existe en el navegador (Pyodide/WebAssembly). Este bloque corre bien en tu computadora (ver README) pero no tiene botón de ejecución aquí para no hacerte esperar una descarga que va a fallar.</div>
+  <textarea class="code-input" spellcheck="false" rows="14"># -*- coding: utf-8 -*-
+&quot;&quot;&quot;Semana8.ipynb
+
+Automatically generated by Colab.
+
+Original file is located at
+    https://colab.research.google.com/drive/17-7v-IIrOuRYc7olqaeHKnMIZluJ72DC
+&quot;&quot;&quot;
+
+# !apt-get -qq install -y libglu1-mesa  # (comando de shell de Colab, no es Python)
+
+# !pip -q install gmsh  # (comando de shell de Colab, no es Python)
+
+# -*- coding: utf-8 -*-
+&quot;&quot;&quot;
+============================================================================
+Semana 8 - Metodo de Elementos Finitos I
+Demostracion de generacion de mallas 2D con contorno curvo.
+Curso: Prototipado y Simulacion (DITA) - Universidad La Salle Bajio
+
+Objetivo del script:
+    A partir de UNA geometria 2D con curvas (placa cuadrada con barreno
+    circular central, benchmark de concentracion de esfuerzos), generar y
+    comparar las estrategias de mallado que ofrece un preprocesador tipo
+    ANSYS Workbench (Static Structural):
+        - Malla libre triangular (Frontal-Delaunay)  -&gt; Patch Conforming
+        - Malla de cuadrilateros (recombinacion)      -&gt; Quad Dominant
+        - Malla mapeada estructurada (transfinita)    -&gt; Mapped / Sweep
+        - Malla mapeada con sesgo radial (bias)       -&gt; Bias Factor
+        - Elementos lineales vs cuadraticos (nodos/GDL)
+        - Funciones de forma N_i
+        - Metricas de calidad (skewness, aspect ratio) y conteo de GDL
+
+Ejecucion en Google Colab:
+#     !apt-get -qq install -y libglu1-mesa  # (comando de shell de Colab, no es Python)
+#     !pip -q install gmsh  # (comando de shell de Colab, no es Python)
+    Luego ejecutar este archivo por celdas (marcadas con # %%).
+
+Convenciones de reproducibilidad del curso:
+    matplotlib &#x27;Agg&#x27;, figuras 300 dpi en ./Figuras, semilla fija,
+    valores citados en el texto provienen de la corrida real.
+============================================================================
+&quot;&quot;&quot;
+
+# %% Celda 0 - Configuracion global -----------------------------------------
+import os
+import numpy as np
+import matplotlib
+matplotlib.use(&quot;Agg&quot;)                         # render sin pantalla (headless)
+import matplotlib.pyplot as plt
+from matplotlib.collections import PolyCollection, LineCollection
+import gmsh
+
+SEED = 8
+rng = np.random.default_rng(SEED)             # reproducibilidad
+os.makedirs(&quot;Figuras&quot;, exist_ok=True)
+
+plt.rcParams.update({
+    &quot;figure.dpi&quot;: 120, &quot;savefig.dpi&quot;: 300,
+    &quot;font.family&quot;: &quot;serif&quot;, &quot;font.size&quot;: 10,
+    &quot;axes.grid&quot;: False, &quot;mathtext.fontset&quot;: &quot;cm&quot;,
+})
+
+# Parametros geometricos de la placa perforada [mm]
+W = 50.0          # lado de la placa (dominio cuadrado)
+A_HOLE = 10.0     # radio del barreno central
+# Material de referencia (Al 6061-T6, usado en el hilo DIC-FEA del curso)
+E_MAT, NU_MAT = 68.9e3, 0.33   # MPa, adimensional
+
+RESULTS = {}      # acumulador de salidas numericas para el reporte final
+
+
+# %% Celda 1 - Utilidades de extraccion y calidad de malla -------------------
+def extract_mesh_2d():
+    &quot;&quot;&quot;Devuelve coordenadas y conectividad (solo nodos de esquina) de la
+    malla 2D activa en gmsh, separando triangulos y cuadrilateros.&quot;&quot;&quot;
+    ntags, ncoords, _ = gmsh.model.mesh.getNodes()
+    ncoords = np.array(ncoords).reshape(-1, 3)
+    tag2idx = {int(t): i for i, t in enumerate(ntags)}
+    xy = ncoords[:, :2]
+
+    tris, quads = [], []
+    etypes, _, enodes = gmsh.model.mesh.getElements(dim=2)
+    for et, nod in zip(etypes, enodes):
+        props = gmsh.model.mesh.getElementProperties(et)
+        nn = props[3]                          # nodos por elemento
+        conn = np.array(nod).reshape(-1, nn)
+        corners = 3 if props[0].startswith(&quot;Triangle&quot;) else 4
+        for row in conn:
+            idx = [tag2idx[int(t)] for t in row[:corners]]
+            (tris if corners == 3 else quads).append(idx)
+    return xy, tris, quads
+
+
+def polygon_angles(pts):
+    &quot;&quot;&quot;Angulos internos (grados) de un poligono convexo ordenado.&quot;&quot;&quot;
+    n = len(pts)
+    ang = []
+    for i in range(n):
+        a = pts[(i - 1) % n] - pts[i]
+        b = pts[(i + 1) % n] - pts[i]
+        c = np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b) + 1e-30)
+        ang.append(np.degrees(np.arccos(np.clip(c, -1, 1))))
+    return np.array(ang)
+
+
+def equiangular_skewness(pts, ideal):
+    &quot;&quot;&quot;Skewness equiangular (0 = ideal, 1 = degenerado). ideal=60 tri, 90 quad.&quot;&quot;&quot;
+    ang = polygon_angles(pts)
+    tmax, tmin = ang.max(), ang.min()
+    return max((tmax - ideal) / (180 - ideal), (ideal - tmin) / ideal)
+
+
+def aspect_ratio(pts):
+    &quot;&quot;&quot;Relacion de aspecto = arista mayor / arista menor.&quot;&quot;&quot;
+    n = len(pts)
+    L = [np.linalg.norm(pts[(i + 1) % n] - pts[i]) for i in range(n)]
+    return max(L) / (min(L) + 1e-30)
+
+
+def mesh_quality(xy, tris, quads):
+    &quot;&quot;&quot;Estadisticos de skewness y aspect ratio de la malla.&quot;&quot;&quot;
+    sk, ar = [], []
+    for e in tris:
+        p = xy[e]; sk.append(equiangular_skewness(p, 60)); ar.append(aspect_ratio(p))
+    for e in quads:
+        p = xy[e]; sk.append(equiangular_skewness(p, 90)); ar.append(aspect_ratio(p))
+    sk, ar = np.array(sk), np.array(ar)
+    return dict(n_nodes=len(xy), n_elem=len(tris) + len(quads),
+                n_tri=len(tris), n_quad=len(quads),
+                sk_max=sk.max(), sk_mean=sk.mean(),
+                ar_max=ar.max(), ar_mean=ar.mean(),
+                skew=sk, ndof=2 * len(xy))
+
+
+def plot_mesh(xy, tris, quads, title, fname, color_by_skew=False):
+    fig, ax = plt.subplots(figsize=(5.2, 5.0))
+    polys, vals = [], []
+    for e in tris + quads:
+        p = xy[e]; polys.append(p)
+        if color_by_skew:
+            ideal = 60 if len(e) == 3 else 90
+            vals.append(equiangular_skewness(p, ideal))
+    if color_by_skew:
+        pc = PolyCollection(polys, array=np.array(vals), cmap=&quot;RdYlGn_r&quot;,
+                            edgecolors=&quot;k&quot;, linewidths=0.25)
+        pc.set_clim(0, 0.9)
+        ax.add_collection(pc)
+        cb = fig.colorbar(pc, ax=ax, fraction=0.046, pad=0.04)
+        cb.set_label(&quot;Skewness equiangular&quot;)
+    else:
+        pc = PolyCollection(polys, facecolors=&quot;#cfe3f7&quot;,
+                            edgecolors=&quot;#1f4e79&quot;, linewidths=0.4)
+        ax.add_collection(pc)
+    ax.set_aspect(&quot;equal&quot;); ax.autoscale_view()
+    ax.set_title(title, fontsize=10)
+    ax.set_xlabel(&quot;x [mm]&quot;); ax.set_ylabel(&quot;y [mm]&quot;)
+    fig.tight_layout(); fig.savefig(f&quot;Figuras/{fname}.png&quot;); plt.close(fig)
+
+
+# %% Celda 2 - Geometria base: placa con barreno (contorno curvo) ------------
+def build_plate(lc, order=1, quad=False, algo=6):
+    &quot;&quot;&quot;Placa WxW con barreno circular central de radio A_HOLE (kernel OCC).
+       lc: tamano de elemento; order: 1|2; quad: recombinar; algo: alg. 2D.&quot;&quot;&quot;
+    gmsh.initialize()
+    gmsh.option.setNumber(&quot;General.Terminal&quot;, 0)
+    gmsh.model.add(&quot;placa&quot;)
+    occ = gmsh.model.occ
+    rect = occ.addRectangle(-W/2, -W/2, 0, W, W)
+    disk = occ.addDisk(0, 0, 0, A_HOLE, A_HOLE)
+    occ.cut([(2, rect)], [(2, disk)])
+    occ.synchronize()
+    gmsh.option.setNumber(&quot;Mesh.MeshSizeMin&quot;, lc)
+    gmsh.option.setNumber(&quot;Mesh.MeshSizeMax&quot;, lc)
+    gmsh.option.setNumber(&quot;Mesh.Algorithm&quot;, algo)
+    if quad:
+        gmsh.option.setNumber(&quot;Mesh.RecombineAll&quot;, 1)
+        gmsh.option.setNumber(&quot;Mesh.RecombinationAlgorithm&quot;, 1)  # Blossom
+    gmsh.option.setNumber(&quot;Mesh.ElementOrder&quot;, order)
+    gmsh.model.mesh.generate(2)
+    xy, tris, quads = extract_mesh_2d()
+    q = mesh_quality(xy, tris, quads)
+    gmsh.finalize()
+    return xy, tris, quads, q
+
+
+# Geometria (croquis) para figura de referencia
+def plot_geometry():
+    th = np.linspace(0, 2*np.pi, 200)
+    fig, ax = plt.subplots(figsize=(5.2, 5.0))
+    ax.plot([-W/2, W/2, W/2, -W/2, -W/2],
+            [-W/2, -W/2, W/2, W/2, -W/2], &quot;-&quot;, color=&quot;#1f4e79&quot;, lw=1.6)
+    ax.plot(A_HOLE*np.cos(th), A_HOLE*np.sin(th), &quot;-&quot;, color=&quot;#c0392b&quot;, lw=1.6)
+    ax.annotate(&quot;&quot;, xy=(W/2, -W/2-4), xytext=(-W/2, -W/2-4),
+                arrowprops=dict(arrowstyle=&quot;&lt;-&gt;&quot;, color=&quot;k&quot;))
+    ax.text(0, -W/2-7, f&quot;W = {W:.0f} mm&quot;, ha=&quot;center&quot;)
+    ax.annotate(&quot;&quot;, xy=(A_HOLE, 0), xytext=(0, 0),
+                arrowprops=dict(arrowstyle=&quot;-&gt;&quot;, color=&quot;#c0392b&quot;))
+    ax.text(A_HOLE/2, 1.5, f&quot;a = {A_HOLE:.0f} mm&quot;, color=&quot;#c0392b&quot;)
+    ax.text(0, W/2+3, &quot;Contorno curvo (barreno)&quot;, ha=&quot;center&quot;,
+            color=&quot;#c0392b&quot;, fontsize=9)
+    ax.set_aspect(&quot;equal&quot;); ax.set_xlim(-W/2-10, W/2+10); ax.set_ylim(-W/2-12, W/2+8)
+    ax.set_xlabel(&quot;x [mm]&quot;); ax.set_ylabel(&quot;y [mm]&quot;)
+    ax.set_title(&quot;Geometria base: placa con barreno (benchmark $K_t$)&quot;, fontsize=10)
+    fig.tight_layout(); fig.savefig(&quot;Figuras/s8_geometria.png&quot;); plt.close(fig)
+
+
+plot_geometry()
+
+# Malla libre triangular
+xy, t, q, Q_TRI = build_plate(lc=2.5, order=1, quad=False, algo=6)
+plot_mesh(xy, t, q, &quot;Malla libre triangular (Frontal-Delaunay)&quot;, &quot;s8_malla_libre_tri&quot;)
+RESULTS[&quot;tri&quot;] = Q_TRI
+
+# Malla de cuadrilateros (recombinada)
+xy, t, q, Q_QUAD = build_plate(lc=2.5, order=1, quad=True, algo=8)
+plot_mesh(xy, t, q, &quot;Malla de cuadrilateros (recombinacion Blossom)&quot;, &quot;s8_malla_quad&quot;)
+RESULTS[&quot;quad&quot;] = Q_QUAD
+
+
+# %% Celda 3 - Malla mapeada (transfinita) y sesgo (bias) --------------------
+def bias_to_progression(bias_factor, n_nodes):
+    &quot;&quot;&quot;Convierte el Bias Factor de ANSYS (razon arista mayor/menor total)
+       al coeficiente de Progression de gmsh (razon entre elementos
+       consecutivos). n_nodes = nodos sobre la arista -&gt; (n_nodes-1) elementos.
+       ANSYS: BF = r^(nEl-1)  =&gt;  r = BF^(1/(nEl-1)).&quot;&quot;&quot;
+    n_el = n_nodes - 1
+    if bias_factor &lt;= 1.0 or n_el &lt; 2:
+        return 1.0
+    return bias_factor ** (1.0 / (n_el - 1))
+
+
+def build_annular_sector(nr, nt, order=1, bias=1.0, b=W/2):
+    &quot;&quot;&quot;Sector anular de 90 grados entre r=A_HOLE y r=b, malla transfinita
+       (estructurada) de cuadrilateros. bias = Bias Factor estilo ANSYS
+       (razon arista mayor/menor). Se convierte a Progression de gmsh.&quot;&quot;&quot;
+    r_prog = bias_to_progression(bias, nr)
+    gmsh.initialize()
+    gmsh.option.setNumber(&quot;General.Terminal&quot;, 0)
+    gmsh.model.add(&quot;anillo&quot;)
+    geo = gmsh.model.geo
+    a = A_HOLE
+    c  = geo.addPoint(0, 0, 0)
+    p1 = geo.addPoint(a, 0, 0)      # inicio arco interno
+    p2 = geo.addPoint(0, a, 0)      # fin arco interno
+    p3 = geo.addPoint(0, b, 0)      # fin arco externo
+    p4 = geo.addPoint(b, 0, 0)      # inicio arco externo
+    l_rad1 = geo.addLine(p1, p4)                 # radial inferior (a -&gt; b)
+    a_ext  = geo.addCircleArc(p4, c, p3)         # arco externo
+    l_rad2 = geo.addLine(p3, p2)                 # radial superior (b -&gt; a)
+    a_int  = geo.addCircleArc(p2, c, p1)         # arco interno
+    cl = geo.addCurveLoop([l_rad1, a_ext, l_rad2, a_int])
+    s  = geo.addPlaneSurface([cl])
+    geo.synchronize()
+    # Transfinito: nt nodos circunferenciales, nr radiales con progresion=bias
+    for arc in (a_ext, a_int):
+        geo.mesh.setTransfiniteCurve(arc, nt)
+    geo.mesh.setTransfiniteCurve(l_rad1, nr, &quot;Progression&quot;, r_prog)
+    geo.mesh.setTransfiniteCurve(l_rad2, nr, &quot;Progression&quot;, -r_prog)  # sentido inverso
+    geo.mesh.setTransfiniteSurface(s)
+    geo.mesh.setRecombine(2, s)                  # cuadrilateros
+    geo.synchronize()
+    gmsh.option.setNumber(&quot;Mesh.ElementOrder&quot;, order)
+    gmsh.model.mesh.generate(2)
+    xy, tris, quads = extract_mesh_2d()
+    Q = mesh_quality(xy, tris, quads)
+    gmsh.finalize()
+    return xy, tris, quads, Q
+
+
+# Mapeada uniforme
+xy, t, q, Q_MAP = build_annular_sector(nr=12, nt=16, bias=1.0)
+plot_mesh(xy, t, q, &quot;Malla mapeada estructurada (transfinita, bias=1.0)&quot;,
+          &quot;s8_malla_mapeada&quot;)
+RESULTS[&quot;map&quot;] = Q_MAP
+
+# Mapeada con sesgo radial -&gt; comparacion 2 paneles
+xyb, tb, qb, Q_BIAS = build_annular_sector(nr=12, nt=16, bias=6.0)
+RESULTS[&quot;bias&quot;] = Q_BIAS
+
+fig, axs = plt.subplots(1, 2, figsize=(9.4, 4.6))
+for ax, (X, TT, QQ, ttl) in zip(
+        axs, [(xy, t, q, &quot;bias = 1.0 (uniforme)&quot;),
+              (xyb, tb, qb, &quot;bias = 6.0 (denso hacia el barreno)&quot;)]):
+    polys = [X[e] for e in TT + QQ]
+    ax.add_collection(PolyCollection(polys, facecolors=&quot;#cfe3f7&quot;,
+                      edgecolors=&quot;#1f4e79&quot;, linewidths=0.4))
+    ax.set_aspect(&quot;equal&quot;); ax.autoscale_view()
+    ax.set_title(ttl, fontsize=10); ax.set_xlabel(&quot;x [mm]&quot;); ax.set_ylabel(&quot;y [mm]&quot;)
+fig.suptitle(&quot;Efecto del sesgo (Bias Factor) sobre la distribucion radial de nodos&quot;,
+             fontsize=11)
+fig.tight_layout(); fig.savefig(&quot;Figuras/s8_malla_bias.png&quot;); plt.close(fig)
+
+
+# %% Celda 4 - Elementos: nodos y grados de libertad (lineal vs cuadratico) --
+def draw_element(ax, corners, mids, title):
+    poly = plt.Polygon(corners, closed=True, fill=True,
+                       facecolor=&quot;#eef3fb&quot;, edgecolor=&quot;#1f4e79&quot;, lw=1.5)
+    ax.add_patch(poly)
+    ax.scatter(*corners.T, s=70, color=&quot;#1f4e79&quot;, zorder=3, label=&quot;nodo esquina&quot;)
+    for i, p in enumerate(corners):
+        ax.annotate(f&quot;{i+1}&quot;, p, textcoords=&quot;offset points&quot;,
+                    xytext=(6, 6), fontsize=9, color=&quot;#1f4e79&quot;)
+    if len(mids):
+        ax.scatter(*np.array(mids).T, s=55, marker=&quot;s&quot;, color=&quot;#c0392b&quot;,
+                   zorder=3, label=&quot;nodo intermedio&quot;)
+    ndof = 2 * (len(corners) + len(mids))
+    ax.set_title(f&quot;{title}\n{len(corners)+len(mids)} nodos, {ndof} GDL&quot;, fontsize=9)
+    ax.set_aspect(&quot;equal&quot;); ax.axis(&quot;off&quot;)
+
+
+tri = np.array([[0, 0], [1, 0], [0.0, 1.0]])
+quad = np.array([[0, 0], [1, 0], [1, 1], [0, 1]])
+def edge_mids(c):
+    return [ (c[i] + c[(i+1) % len(c)]) / 2 for i in range(len(c)) ]
+
+fig, axs = plt.subplots(1, 4, figsize=(11.5, 3.4), constrained_layout=True)
+draw_element(axs[0], tri,  [],              &quot;Tri3 (lineal)&quot;)
+draw_element(axs[1], tri,  edge_mids(tri),  &quot;Tri6 (cuadratico)&quot;)
+draw_element(axs[2], quad, [],              &quot;Quad4 (lineal)&quot;)
+draw_element(axs[3], quad, edge_mids(quad), &quot;Quad8 (cuadratico)&quot;)
+for ax in axs:
+    ax.margins(0.2)
+axs[1].legend(loc=&quot;lower center&quot;, bbox_to_anchor=(1.05, -0.22),
+              ncol=2, fontsize=9, frameon=False)
+fig.suptitle(&quot;Nodos y grados de libertad por elemento &quot;
+             &quot;(estructural 2D: $u_x,u_y$ por nodo)&quot;, fontsize=10)
+fig.savefig(&quot;Figuras/s8_elementos_dof.png&quot;); plt.close(fig)
+
+
+# %% Celda 5 - Funciones de forma N_i ----------------------------------------
+xi = np.linspace(-1, 1, 200)
+# 1D lineal
+N1L, N2L = (1 - xi) / 2, (1 + xi) / 2
+# 1D cuadratico (Lagrange)
+N1Q = xi * (xi - 1) / 2
+N2Q = (1 - xi**2)
+N3Q = xi * (xi + 1) / 2
+# 2D bilineal Q4: N1 = 1/4 (1-xi)(1-eta)
+g = np.linspace(-1, 1, 60); XX, YY = np.meshgrid(g, g)
+N1_2D = 0.25 * (1 - XX) * (1 - YY)
+
+fig = plt.figure(figsize=(11, 3.4))
+ax1 = fig.add_subplot(1, 3, 1)
+ax1.plot(xi, N1L, label=&quot;$N_1$&quot;); ax1.plot(xi, N2L, label=&quot;$N_2$&quot;)
+ax1.set_title(&quot;Lineal 1D&quot;); ax1.set_xlabel(r&quot;$\xi$&quot;); ax1.legend(fontsize=8)
+ax1.axhline(0, color=&quot;k&quot;, lw=0.4); ax1.axhline(1, color=&quot;k&quot;, lw=0.3, ls=&quot;:&quot;)
+ax2 = fig.add_subplot(1, 3, 2)
+for N, lb in [(N1Q, &quot;$N_1$&quot;), (N2Q, &quot;$N_2$&quot;), (N3Q, &quot;$N_3$&quot;)]:
+    ax2.plot(xi, N, label=lb)
+ax2.set_title(&quot;Cuadratica 1D&quot;); ax2.set_xlabel(r&quot;$\xi$&quot;); ax2.legend(fontsize=8)
+ax2.axhline(0, color=&quot;k&quot;, lw=0.4)
+ax3 = fig.add_subplot(1, 3, 3, projection=&quot;3d&quot;)
+ax3.plot_surface(XX, YY, N1_2D, cmap=&quot;viridis&quot;, edgecolor=&quot;none&quot;)
+ax3.set_title(r&quot;Bilineal Q4: $N_1(\xi,\eta)$&quot;)
+ax3.set_xlabel(r&quot;$\xi$&quot;); ax3.set_ylabel(r&quot;$\eta$&quot;)
+fig.suptitle(&quot;Funciones de forma: particion de la unidad $\\sum_i N_i = 1$&quot;,
+             fontsize=10)
+fig.tight_layout(); fig.savefig(&quot;Figuras/s8_funciones_forma.png&quot;); plt.close(fig)
+
+# Verificacion numerica: particion de la unidad
+part_unity_1D = np.allclose(N1Q + N2Q + N3Q, 1.0)
+part_unity_2D = np.isclose(N1_2D.sum() /  # promedio ~0.25 en Q4 -&gt; suma total nodos=1
+                           N1_2D.size, 0.25, atol=1e-9)
+RESULTS[&quot;part_unity&quot;] = bool(part_unity_1D)
+
+
+# %% Celda 6 - Convergencia (conteo de GDL y calidad) ------------------------
+lcs = [5.0, 3.0, 2.0, 1.2]
+conv = []
+for lc in lcs:
+    _, _, _, Qc = build_plate(lc=lc, order=1, quad=False, algo=6)
+    conv.append((lc, Qc[&quot;n_nodes&quot;], Qc[&quot;n_elem&quot;], Qc[&quot;ndof&quot;], Qc[&quot;sk_mean&quot;]))
+RESULTS[&quot;conv&quot;] = conv
+
+# Histograma de skewness por estrategia + curva GDL vs lc
+fig, axs = plt.subplots(1, 2, figsize=(10, 4.2))
+bins = np.linspace(0, 0.9, 19)
+axs[0].hist(RESULTS[&quot;tri&quot;][&quot;skew&quot;],  bins, alpha=0.6, label=&quot;Triangular libre&quot;)
+axs[0].hist(RESULTS[&quot;quad&quot;][&quot;skew&quot;], bins, alpha=0.6, label=&quot;Cuadrilateros&quot;)
+axs[0].hist(RESULTS[&quot;map&quot;][&quot;skew&quot;],  bins, alpha=0.6, label=&quot;Mapeada&quot;)
+axs[0].set_xlabel(&quot;Skewness equiangular&quot;); axs[0].set_ylabel(&quot;N.\u00b0 de elementos&quot;)
+axs[0].set_title(&quot;Distribucion de calidad por estrategia&quot;); axs[0].legend(fontsize=8)
+lc_arr = [c[0] for c in conv]; dof_arr = [c[3] for c in conv]
+axs[1].loglog(lc_arr, dof_arr, &quot;o-&quot;, color=&quot;#1f4e79&quot;)
+axs[1].invert_xaxis()
+axs[1].set_xlabel(&quot;Tamano de elemento $h$ [mm]&quot;)
+axs[1].set_ylabel(&quot;Grados de libertad (GDL)&quot;)
+axs[1].set_title(&quot;Costo computacional vs refinamiento&quot;)
+for lc, dof in zip(lc_arr, dof_arr):
+    axs[1].annotate(f&quot;{dof}&quot;, (lc, dof), textcoords=&quot;offset points&quot;,
+                    xytext=(4, 5), fontsize=8)
+fig.tight_layout(); fig.savefig(&quot;Figuras/s8_calidad.png&quot;); plt.close(fig)
+
+
+# %% Celda 7 - Reporte numerico (valores para el documento LaTeX) ------------
+def line(): print(&quot;-&quot; * 70)
+line(); print(&quot;SEMANA 8 - RESULTADOS NUMERICOS DE MALLADO&quot;); line()
+print(f&quot;Geometria: placa {W:.0f}x{W:.0f} mm, barreno r={A_HOLE:.0f} mm&quot;)
+print(f&quot;Material de referencia: Al 6061-T6, E={E_MAT/1e3:.1f} GPa, nu={NU_MAT}&quot;)
+line()
+hdr = (f&quot;{&#x27;Estrategia&#x27;:&lt;22}{&#x27;Nodos&#x27;:&gt;7}{&#x27;Elem&#x27;:&gt;7}{&#x27;GDL&#x27;:&gt;7}&quot;
+       f&quot;{&#x27;Sk_max&#x27;:&gt;9}{&#x27;Sk_med&#x27;:&gt;9}{&#x27;AR_max&#x27;:&gt;10}&quot;)
+print(hdr)
+for key, name in [(&quot;tri&quot;, &quot;Triangular libre&quot;), (&quot;quad&quot;, &quot;Cuadrilateros&quot;),
+                  (&quot;map&quot;, &quot;Mapeada uniforme&quot;), (&quot;bias&quot;, &quot;Mapeada + bias 6.0&quot;)]:
+    Q = RESULTS[key]
+    print(f&quot;{name:&lt;22}{Q[&#x27;n_nodes&#x27;]:&gt;7}{Q[&#x27;n_elem&#x27;]:&gt;7}{Q[&#x27;ndof&#x27;]:&gt;7}&quot;
+          f&quot;{Q[&#x27;sk_max&#x27;]:&gt;9.3f}{Q[&#x27;sk_mean&#x27;]:&gt;9.3f}{Q[&#x27;ar_max&#x27;]:&gt;10.2f}&quot;)
+line()
+print(&quot;Estudio de refinamiento (malla triangular libre):&quot;)
+print(f&quot;{&#x27;h [mm]&#x27;:&gt;8}{&#x27;Nodos&#x27;:&gt;8}{&#x27;Elem&#x27;:&gt;8}{&#x27;GDL&#x27;:&gt;8}{&#x27;Sk_med&#x27;:&gt;9}&quot;)
+for lc, nn, ne, nd, skm in conv:
+    print(f&quot;{lc:&gt;8.1f}{nn:&gt;8}{ne:&gt;8}{nd:&gt;8}{skm:&gt;9.3f}&quot;)
+line()
+print(f&quot;Funciones de forma 1D cuadraticas, particion de la unidad: {part_unity_1D}&quot;)
+print(f&quot;Suma N_i(Q4) consistente (=1 por nodo):                    {part_unity_2D}&quot;)
+line()
+print(&quot;Figuras generadas en ./Figuras :&quot;)
+for f in sorted(os.listdir(&quot;Figuras&quot;)):
+    print(&quot;   &quot;, f)
+line()</textarea>
+  <div class="code-output-wrap" hidden>
+    <div class="code-output-console"></div>
+    <div class="code-output-figures"></div>
+  </div>
+  <div class="code-status"></div>
+</div>
+
+    <h2 class="section-heading" style="margin-top:44px">Desarrollo teórico completo</h2>
+    <p class="section-intro">Ecuaciones, demostraciones, tablas y discusión de esta semana, tal como están
+      en los apuntes del curso — mismo documento fuente que el PDF completo, recortado a esta semana.</p>
+    <div class="theory-pdf-wrap">
+      <iframe src="../../assets/apuntes/semana-08.pdf" title="Desarrollo teórico — Semana 8. Método de Elementos Finitos I" loading="lazy"></iframe>
+    </div>
+    <p class="theory-pdf-fallback">
+      ¿No se ve el documento arriba? <a href="../../assets/apuntes/semana-08.pdf" download>Descarga el PDF de esta semana</a>
+      o <a href="../../assets/apuntes/semana-08.pdf" target="_blank" rel="noopener">ábrelo en una pestaña nueva</a>.
+    </p>
+
+    <div class="week-nav">
+      <a href="../semana-07/index.html">&larr; Semana 07</a>
+      <span class="to-index"><a href="../../index.html">&uarr; Volver al índice del curso</a></span>
+      <a href="../semana-09-10/index.html">Semana 09–10 &rarr;</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div>Doctorado en Ingeniería y Tecnología Aplicada &middot; Universidad La Salle Bajío</div>
+    <div>Dr. Jorge Ramón Parra Michel &middot; Prototipado y Simulación</div>
+  </div>
+</footer>
+
+<script src="../../assets/js/main.js"></script>
+<script src="../../assets/js/pyodide-runner.js"></script>
+
+<script>
+window.addEventListener("load", function () {
+  if (window.renderMathInElement) {
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left: "$$", right: "$$", display: true},
+        {left: "$", right: "$", display: false}
+      ],
+      throwOnError: false
+    });
+  }
+});
+</script>
+
+</body>
+</html>

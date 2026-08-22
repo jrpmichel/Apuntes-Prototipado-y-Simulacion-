@@ -1,0 +1,1250 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Semana 7. Cadenas de Markov y Sistemas Dinámicos — Prototipado y Simulación</title>
+<meta name="description" content="Semana 7. Cadenas de Markov y Sistemas Dinámicos: objetivo, temario y código ejecutable.">
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-cpW21h6RZv/phavutF+AuVYrr+dA8xD9zs6FwLpaCePvcCWnZ8IU9UNlXhpKUAJI" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-vZTG03m+2yp6N6BNi5iM4rW4oIwk5DfcNdFfxkk9ZWpDriOkXX8voJBFrAO7MpVl" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-GvrOXuhMATgEsSwCs4smul74iXGOixntILdUW9XmUC6+HX0sLNAK3q71HotJqlAn" crossorigin="anonymous">
+<link rel="stylesheet" href="../../assets/css/style.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="topbar-brand" href="../../index.html">
+      <img src="../../assets/img/logo-lasalle.png" alt="Universidad La Salle Bajío">
+      Prototipado y Simulación
+    </a>
+    <nav>
+      <a href="../../index.html#semanas">Semanas</a>
+      <a href="../../README.md">Repositorio</a>
+      <a class="topbar-pdf-btn" href="../../assets/apuntes/Apuntes_Curso_Doctoral_Simulacion_Prototipado_COMPLETO.pdf" download>Descargar PDF</a>
+    </nav>
+  </div>
+</div>
+
+<header class="week-header">
+  <div class="wrap">
+    <div class="breadcrumb"><a href="../../index.html">Inicio</a> &rsaquo; Semana 07</div>
+    <p class="num">Semana 07</p>
+    <h1>Cadenas de Markov y Sistemas Dinámicos</h1>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <div class="callout">
+      <h3>Objetivo de la cátedra</h3>
+      <p>Formular, analizar y simular sistemas cuya evolución es estocástica y depende únicamente de su estado presente. El estudiante debe ser capaz de construir la matriz de transición (tiempo discreto) o la matriz generadora (tiempo continuo) de un proceso de su propio proyecto, calcular su distribución estacionaria, sus tiempos característicos (recurrencia, primer paso, vida media hasta la falla) y su régimen transitorio, simular trayectorias por métodos exactos, reconocer la transición de fase en procesos espaciales, y comprender cómo el límite determinista de un proceso de Markov produce un sistema dinámico de ecuaciones diferenciales.</p>
+    </div>
+    <div class="callout proposito">
+      <h3>Propósito del tema</h3>
+      <p>La Semana 6 convirtió cada resultado determinista en una distribución de probabilidad, pero esa distribución era <em>estática</em>: describía la incertidumbre de un número en un instante. Esta semana introduce el <em>tiempo</em> y el <em>estado</em>. Un proceso de Markov es la mínima estructura matemática que describe cómo un sistema salta entre configuraciones cuando el futuro depende del presente pero no de la trayectoria que llevó hasta él. Con tres objetos — la matriz de transición, la distribución estacionaria y los tiempos de primer paso — se responde a preguntas que ningún cálculo determinista puede contestar: ¿qué fracción del tiempo estará un equipo fuera de servicio?, ¿cuánto vivirá en promedio antes de fallar?, ¿cuándo un incendio deja de ser local y cruza todo el dominio?, ¿se extinguirá un brote o se volverá epidemia? La misma maquinaria, llevada al límite, reproduce los sistemas dinámicos deterministas de las semanas anteriores: una cadena de Markov es un sistema dinámico al que se le ha devuelto el azar que la idealización determinista le había quitado.</p>
+    </div>
+    
+    <div class="callout resultado">
+      <h3>Resultado de aprendizaje esperado</h3>
+      <p>Al término de la semana el estudiante podrá: (i)&nbsp;identificar si un fenómeno de su proyecto admite una representación markoviana y definir su espacio de estados, su matriz de transición $P$ o su generador $Q$; (ii)&nbsp;calcular la distribución estacionaria, la disponibilidad de régimen permanente, los tiempos medios de recurrencia y el tiempo medio hasta la absorción mediante la matriz fundamental; (iii)&nbsp;simular trayectorias del proceso con un método exacto y reproducible en Google Colab, validando los resultados analíticos contra la simulación; (iv)&nbsp;reconocer y cuantificar la transición de fase de un proceso espacial (percolación) y el umbral epidémico de un proceso de propagación; y (v)&nbsp;estimar una matriz de transición a partir de datos observados con su incertidumbre asociada, cerrando el ciclo entre modelo, simulación y evidencia.</p>
+    </div>
+    <h2 class="section-heading" style="margin-top:36px">Temario</h2>
+    <ul class="temario"><li>Procesos estocásticos y propiedad de Markov.</li><li>Matrices de transición: evolución, Chapman–Kolmogorov y potencias.</li><li>Clasificación de estados, distribución estacionaria y teorema ergódico.</li><li>Cadenas absorbentes, tiempos de primer paso y matriz fundamental.</li><li>Cadenas de tiempo continuo: matriz generadora y ecuaciones de Kolmogorov.</li><li>Simulación estocástica exacta: algoritmo de Gillespie.</li><li>Sistemas dinámicos discretos y espaciales: autómatas celulares y percolación (incendios forestales).</li><li>Del proceso estocástico al sistema dinámico determinista: límite de campo medio (modelado epidemiológico).</li><li>Teoría espectral, tiempo de mezcla y caminatas aleatorias (PageRank); sistemas de confiabilidad.</li><li>Interpretación estadística: estimación de la matriz de transición por máxima verosimilitud.</li></ul>
+    <h2 class="section-heading" style="margin-top:44px">Figuras de la semana</h2>
+    <p class="section-intro">6 imagen(es) referenciadas en los apuntes de esta semana.
+      Colócalas en <code>assets/img/semana-07/</code> con el nombre exacto indicado debajo
+      de cada recuadro; mientras no estén, se muestra un marcador en su lugar.</p>
+    <div class="gallery">
+    <figure>
+      <img src="../../assets/img/semana-07/fig_s7_ej1_sensor_markov.png" alt="fig_s7_ej1_sensor_markov.png" data-fallback-name="fig_s7_ej1_sensor_markov.png" loading="lazy">
+      <figcaption>fig_s7_ej1_sensor_markov.png</figcaption>
+    </figure><figure>
+      <img src="../../assets/img/semana-07/fig_s7_ej2_bomba_confiabilidad.png" alt="fig_s7_ej2_bomba_confiabilidad.png" data-fallback-name="fig_s7_ej2_bomba_confiabilidad.png" loading="lazy">
+      <figcaption>fig_s7_ej2_bomba_confiabilidad.png</figcaption>
+    </figure><figure>
+      <img src="../../assets/img/semana-07/fig_s7_ej3_opgw_ctmc.png" alt="fig_s7_ej3_opgw_ctmc.png" data-fallback-name="fig_s7_ej3_opgw_ctmc.png" loading="lazy">
+      <figcaption>fig_s7_ej3_opgw_ctmc.png</figcaption>
+    </figure><figure>
+      <img src="../../assets/img/semana-07/fig_s7_ej4_incendio_percolacion.png" alt="fig_s7_ej4_incendio_percolacion.png" data-fallback-name="fig_s7_ej4_incendio_percolacion.png" loading="lazy">
+      <figcaption>fig_s7_ej4_incendio_percolacion.png</figcaption>
+    </figure><figure>
+      <img src="../../assets/img/semana-07/fig_s7_ej5_sir_estocastico.png" alt="fig_s7_ej5_sir_estocastico.png" data-fallback-name="fig_s7_ej5_sir_estocastico.png" loading="lazy">
+      <figcaption>fig_s7_ej5_sir_estocastico.png</figcaption>
+    </figure><figure>
+      <img src="../../assets/img/semana-07/fig_s7_ej6_pagerank_rag.png" alt="fig_s7_ej6_pagerank_rag.png" data-fallback-name="fig_s7_ej6_pagerank_rag.png" loading="lazy">
+      <figcaption>fig_s7_ej6_pagerank_rag.png</figcaption>
+    </figure>
+  </div>
+    <h2 class="section-heading" style="margin-top:44px">Código de la semana (ejecutable)</h2>
+    <div class="pyodide-banner">
+      &#9432; El código corre por completo en tu navegador (Python vía WebAssembly, sin servidor). La
+      primera vez que pulses <strong>Ejecutar</strong> en esta página se descarga el runtime — tarda unos
+      segundos. Puedes editar el código antes de correrlo.
+    </div>
+    <div class="code-cell">
+  <div class="code-cell-header">
+    <span class="code-cell-title">Código 1</span>
+    <span class="code-cell-caption">Semana 7 – Código 1: Deriva de calibración (DTMC 2 estados). Ejecutar en Google Colab.</span>
+    <button class="run-btn" type="button">&#9654; Ejecutar</button>
+  </div>
+  
+  <textarea class="code-input" spellcheck="false" rows="14"># -*- coding: utf-8 -*-
+&quot;&quot;&quot;Semana7.ipynb
+
+Automatically generated by Colab.
+
+Original file is located at
+    https://colab.research.google.com/drive/10ewz3vuWLykqOrC02ByHK1RHvq3Gnbcq
+&quot;&quot;&quot;
+
+&quot;&quot;&quot;
+Semana 7 - Ejemplo 1: Deriva de calibracion de un sensor como cadena de
+Markov de tiempo discreto (DTMC) de dos estados.
+
+Estados:
+    0 = &quot;en calibracion&quot;   (dentro de tolerancia metrologica)
+    1 = &quot;fuera de calibracion&quot; (excede el error maximo permisible, EMP)
+
+El tiempo avanza en pasos de inspeccion (p.ej. semanas). En cada paso el
+sensor puede derivar (0 -&gt; 1) con probabilidad a, o ser recalibrado/recuperado
+(1 -&gt; 0) con probabilidad b. La cadena es irreducible y aperiodica, por lo que
+posee una distribucion estacionaria unica.
+
+Objetos de calculo:
+    - Matriz de transicion P y su potencia n-esima P^n (Chapman-Kolmogorov).
+    - Distribucion estacionaria pi (pi P = pi).
+    - Brecha espectral (1 - |lambda_2|) y tiempo de mezcla.
+    - Tiempo medio de recurrencia y tiempo medio de primer paso 0 -&gt; 1
+      (intervalo optimo de recalibracion).
+    - Interpretacion estadistica: estimacion de P por maxima verosimilitud
+      (MLE) a partir de una trayectoria simulada, con su intervalo de Wald.
+&quot;&quot;&quot;
+
+import numpy as np
+import matplotlib
+matplotlib.use(&#x27;Agg&#x27;)                 # backend sin pantalla (Colab/headless)
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+import os
+
+mpl.rcParams.update({
+    &#x27;font.size&#x27;: 10, &#x27;axes.titlesize&#x27;: 11, &#x27;axes.labelsize&#x27;: 10,
+    &#x27;figure.dpi&#x27;: 110, &#x27;savefig.dpi&#x27;: 300, &#x27;axes.grid&#x27;: True,
+    &#x27;grid.alpha&#x27;: 0.3, &#x27;mathtext.fontset&#x27;: &#x27;cm&#x27;,
+})
+os.makedirs(&#x27;Figuras&#x27;, exist_ok=True)
+rng = np.random.default_rng(20260207)
+
+# ------------------------------------------------------------------
+# 1. Parametros del modelo (probabilidades por paso de inspeccion)
+# ------------------------------------------------------------------
+a = 0.08      # P(en-cal -&gt; fuera-cal): probabilidad de deriva por semana
+b = 0.50      # P(fuera-cal -&gt; en-cal): probabilidad de deteccion+recalibracion
+P = np.array([[1 - a, a],
+              [b,     1 - b]])
+estados = [&#x27;en calibracion&#x27;, &#x27;fuera de calibracion&#x27;]
+
+# Verificacion: cada fila es una distribucion de probabilidad
+assert np.allclose(P.sum(axis=1), 1.0), &quot;Filas de P deben sumar 1&quot;
+
+# ------------------------------------------------------------------
+# 2. Distribucion estacionaria (cerrada para 2 estados) y por algebra
+# ------------------------------------------------------------------
+# Cerrada: pi0 = b/(a+b), pi1 = a/(a+b)
+pi_closed = np.array([b, a]) / (a + b)
+
+# Generica: vector propio izquierdo de autovalor 1
+w, V = np.linalg.eig(P.T)
+idx = np.argmin(np.abs(w - 1.0))
+pi_eig = np.real(V[:, idx])
+pi_eig = pi_eig / pi_eig.sum()
+
+# ------------------------------------------------------------------
+# 3. Evolucion transitoria pi_n = pi_0 P^n desde estado &quot;en calibracion&quot;
+# ------------------------------------------------------------------
+n_max = 40
+pi0 = np.array([1.0, 0.0])             # arranca en calibracion con certeza
+pi_n = np.zeros((n_max + 1, 2))
+pi_n[0] = pi0
+Pn = np.eye(2)
+for n in range(1, n_max + 1):
+    Pn = Pn @ P
+    pi_n[n] = pi0 @ Pn
+
+# ------------------------------------------------------------------
+# 4. Analisis espectral: brecha espectral y tiempo de mezcla
+# ------------------------------------------------------------------
+eigvals = np.sort(np.abs(np.linalg.eigvals(P)))[::-1]   # [1, |lambda2|]
+lam2 = eigvals[1]                       # = |1 - a - b|
+gap = 1.0 - lam2                        # brecha espectral = a + b
+# Distancia en variacion total a la estacionaria; cota |lambda2|^n
+tv = 0.5 * np.abs(pi_n - pi_closed).sum(axis=1)
+# tiempo de mezcla empirico: primer n con TV &lt; 0.01
+t_mix = int(np.argmax(tv &lt; 0.01))
+
+# ------------------------------------------------------------------
+# 5. Tiempos caracteristicos
+# ------------------------------------------------------------------
+# Tiempo medio de recurrencia del estado i: m_ii = 1/pi_i
+m_rec = 1.0 / pi_closed
+# Tiempo medio de primer paso 0 -&gt; 1 (geometrico con prob a): 1/a
+T_drift = 1.0 / a                       # semanas esperadas hasta salir de tolerancia
+# Tiempo medio de primer paso 1 -&gt; 0: 1/b
+T_recover = 1.0 / b
+
+# ------------------------------------------------------------------
+# 6. Interpretacion estadistica: simular trayectoria y re-estimar P (MLE)
+# ------------------------------------------------------------------
+def simula_cadena(P, n_pasos, s0, rng):
+    s = np.empty(n_pasos + 1, dtype=int)
+    s[0] = s0
+    for t in range(n_pasos):
+        s[t + 1] = rng.choice(2, p=P[s[t]])
+    return s
+
+N_sim = 5000
+traj = simula_cadena(P, N_sim, 0, rng)
+# conteo de transiciones n_ij
+C = np.zeros((2, 2))
+for t in range(N_sim):
+    C[traj[t], traj[t + 1]] += 1
+P_mle = C / C.sum(axis=1, keepdims=True)        # estimador MLE
+# error estandar de Wald para p_ij: sqrt(p_ij(1-p_ij)/n_i)
+n_i = C.sum(axis=1)
+se_mle = np.sqrt(P_mle * (1 - P_mle) / n_i[:, None])
+
+# ------------------------------------------------------------------
+# 7. Salida de consola (todas las cifras citadas en el LaTeX)
+# ------------------------------------------------------------------
+print(&quot;=== Ejemplo 1: deriva de calibracion (DTMC 2 estados) ===&quot;)
+print(f&quot;P =\n{P}&quot;)
+print(f&quot;pi (cerrada)   = {pi_closed}&quot;)
+print(f&quot;pi (autovector)= {pi_eig}&quot;)
+print(f&quot;Fraccion estacionaria fuera de calibracion = {pi_closed[1]*100:.2f} %&quot;)
+print(f&quot;|lambda_2| = {lam2:.4f}   brecha espectral = {gap:.4f}&quot;)
+print(f&quot;Tiempo de mezcla (TV&lt;0.01) = {t_mix} pasos&quot;)
+print(f&quot;Tiempo medio recurrencia [en-cal, fuera-cal] = {m_rec} semanas&quot;)
+print(f&quot;Tiempo medio de deriva 0-&gt;1 = {T_drift:.2f} semanas (intervalo de recalibracion)&quot;)
+print(f&quot;Tiempo medio de recuperacion 1-&gt;0 = {T_recover:.2f} semanas&quot;)
+print(f&quot;P_MLE (N={N_sim}) =\n{P_mle}&quot;)
+print(f&quot;Error estandar Wald =\n{se_mle}&quot;)
+
+# ------------------------------------------------------------------
+# 8. Figura de 4 paneles
+# ------------------------------------------------------------------
+fig, ax = plt.subplots(2, 2, figsize=(11, 8))
+
+# Panel 1: evolucion de pi_n (probabilidad de cada estado)
+ax[0, 0].plot(pi_n[:, 0], &#x27;o-&#x27;, ms=3, label=r&#x27;$\pi_n(\mathrm{en\ cal.})$&#x27;)
+ax[0, 0].plot(pi_n[:, 1], &#x27;s-&#x27;, ms=3, label=r&#x27;$\pi_n(\mathrm{fuera\ cal.})$&#x27;)
+ax[0, 0].axhline(pi_closed[0], ls=&#x27;--&#x27;, color=&#x27;C0&#x27;, alpha=0.6)
+ax[0, 0].axhline(pi_closed[1], ls=&#x27;--&#x27;, color=&#x27;C1&#x27;, alpha=0.6)
+ax[0, 0].set_xlabel(&#x27;paso $n$ (semanas)&#x27;); ax[0, 0].set_ylabel(r&#x27;$\pi_n$&#x27;)
+ax[0, 0].set_title(r&#x27;Evoluci\&#x27;on $\pi_n=\pi_0 P^n$ hacia la estacionaria&#x27;)
+ax[0, 0].legend(fontsize=8)
+
+# Panel 2: convergencia a la estacionaria (TV) en escala log + cota |l2|^n
+n_ax = np.arange(n_max + 1)
+ax[0, 1].semilogy(n_ax, tv + 1e-16, &#x27;o-&#x27;, ms=3, label=&#x27;TV empirica&#x27;)
+ax[0, 1].semilogy(n_ax, lam2**n_ax, &#x27;--&#x27;, label=r&#x27;cota $|\lambda_2|^n$&#x27;)
+ax[0, 1].axhline(0.01, color=&#x27;k&#x27;, ls=&#x27;:&#x27;, alpha=0.7, label=&#x27;umbral 0.01&#x27;)
+ax[0, 1].set_xlabel(&#x27;paso $n$&#x27;); ax[0, 1].set_ylabel(&#x27;dist. variacion total&#x27;)
+ax[0, 1].set_title(f&#x27;Mezcla geometrica  ($t_{{mix}}={t_mix}$)&#x27;)
+ax[0, 1].legend(fontsize=8)
+
+# Panel 3: distribucion estacionaria y tiempos caracteristicos
+xb = np.arange(2)
+ax[1, 0].bar(xb, pi_closed, color=[&#x27;C0&#x27;, &#x27;C1&#x27;], alpha=0.8)
+for k, v in enumerate(pi_closed):
+    ax[1, 0].text(k, v + 0.01, f&#x27;{v:.3f}&#x27;, ha=&#x27;center&#x27;, fontsize=9)
+ax[1, 0].set_xticks(xb); ax[1, 0].set_xticklabels([&#x27;en cal.&#x27;, &#x27;fuera cal.&#x27;])
+ax[1, 0].set_ylabel(r&#x27;$\pi_i$&#x27;); ax[1, 0].set_ylim(0, 1)
+ax[1, 0].set_title(f&#x27;Estacionaria | recalibrar cada {T_drift:.0f} sem.&#x27;)
+
+# Panel 4: sensibilidad de la fraccion fuera-cal vs prob. de recalibracion b
+b_vec = np.linspace(0.05, 0.95, 200)
+pi1_vec = a / (a + b_vec)
+ax[1, 1].plot(b_vec, pi1_vec * 100, &#x27;-&#x27;)
+ax[1, 1].axvline(b, color=&#x27;C1&#x27;, ls=&#x27;--&#x27;, alpha=0.7, label=f&#x27;$b={b}$&#x27;)
+ax[1, 1].plot(b, pi_closed[1] * 100, &#x27;o&#x27;, color=&#x27;C3&#x27;, ms=7)
+ax[1, 1].set_xlabel(&#x27;prob. de recalibracion $b$&#x27;)
+ax[1, 1].set_ylabel(r&#x27;% tiempo fuera de calibracion&#x27;)
+ax[1, 1].set_title(&#x27;Sensibilidad de la indisponibilidad metrologica&#x27;)
+ax[1, 1].legend(fontsize=8)
+
+fig.suptitle(&#x27;Ejemplo 1 - Deriva de calibracion como cadena de Markov de 2 estados&#x27;,
+             fontsize=12, y=1.00)
+fig.tight_layout()
+fig.savefig(&#x27;Figuras/fig_s7_ej1_sensor_markov.png&#x27;, bbox_inches=&#x27;tight&#x27;)
+# plt.show()
+print(&quot;\nFigura guardada: Figuras/fig_s7_ej1_sensor_markov.png&quot;)
+
+&quot;&quot;&quot;
+Semana 7 - Ejemplo 2: Confiabilidad y disponibilidad de un banco de pruebas de
+bomba centrifuga como cadena de Markov de tiempo discreto de tres estados con
+reparacion.
+
+Estados (paso = jornada de operacion, 1 dia):
+    O = operativo (nominal)
+    D = degradado (vibracion/cavitacion incipiente; aun funcional)
+    F = falla     (fuera de servicio)
+
+Conceptos:
+    - Distribucion estacionaria pi -&gt; disponibilidad de regimen permanente.
+    - Cadena absorbente: tiempo medio hasta la primera falla (MTTF) por medio
+      de la matriz fundamental N = (I - Q)^{-1}, con Q el bloque transitorio.
+    - Validacion Monte Carlo del MTTF (histograma del tiempo a la absorcion).
+    - Sensibilidad de la disponibilidad frente a la tasa de reparacion.
+&quot;&quot;&quot;
+</textarea>
+  <div class="code-output-wrap" hidden>
+    <div class="code-output-console"></div>
+    <div class="code-output-figures"></div>
+  </div>
+  <div class="code-status"></div>
+</div>
+<div class="code-cell">
+  <div class="code-cell-header">
+    <span class="code-cell-title">Código 2</span>
+    <span class="code-cell-caption">Semana 7 – Código 2: Confiabilidad de un banco de pruebas (DTMC con reparación). Ejecutar en Google Colab.</span>
+    <button class="run-btn" type="button">&#9654; Ejecutar</button>
+  </div>
+  
+  <textarea class="code-input" spellcheck="false" rows="14">import numpy as np
+import matplotlib
+matplotlib.use(&#x27;Agg&#x27;)
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+import os
+
+mpl.rcParams.update({
+    &#x27;font.size&#x27;: 10, &#x27;axes.titlesize&#x27;: 11, &#x27;axes.labelsize&#x27;: 10,
+    &#x27;figure.dpi&#x27;: 110, &#x27;savefig.dpi&#x27;: 300, &#x27;axes.grid&#x27;: True,
+    &#x27;grid.alpha&#x27;: 0.3, &#x27;mathtext.fontset&#x27;: &#x27;cm&#x27;,
+})
+os.makedirs(&#x27;Figuras&#x27;, exist_ok=True)
+rng = np.random.default_rng(20260208)
+
+# ------------------------------------------------------------------
+# 1. Matriz de transicion (orden de estados: O, D, F)
+# ------------------------------------------------------------------
+#        -&gt;O    -&gt;D    -&gt;F
+P = np.array([
+    [0.95,  0.04,  0.01],   # desde O: se mantiene, se degrada o falla subito
+    [0.30,  0.65,  0.05],   # desde D: se repara a O, sigue degradado o falla
+    [0.50,  0.00,  0.50],   # desde F: se repara a O o sigue en falla
+])
+nombres = [&#x27;Operativo&#x27;, &#x27;Degradado&#x27;, &#x27;Falla&#x27;]
+assert np.allclose(P.sum(axis=1), 1.0)
+
+# ------------------------------------------------------------------
+# 2. Distribucion estacionaria -&gt; disponibilidad
+# ------------------------------------------------------------------
+w, V = np.linalg.eig(P.T)
+pi = np.real(V[:, np.argmin(np.abs(w - 1.0))])
+pi = pi / pi.sum()
+A_full = pi[0]                 # disponibilidad estricta (solo O)
+A_func = pi[0] + pi[1]         # disponibilidad funcional (O o D)
+
+# ------------------------------------------------------------------
+# 3. Cadena absorbente para el MTTF: F como estado absorbente
+#    Transitorios T = {O, D}; bloque Q (T-&gt;T); matriz fundamental N=(I-Q)^-1
+#    Tiempo esperado a la absorcion: t = N 1
+# ------------------------------------------------------------------
+Q = P[np.ix_([0, 1], [0, 1])]        # bloque entre estados transitorios
+I2 = np.eye(2)
+N = np.linalg.inv(I2 - Q)
+t_abs = N @ np.ones(2)               # [desde O, desde D]
+MTTF_O = t_abs[0]                    # dias esperados hasta primera falla desde O
+
+# Tasa de falla de regimen y MTBF aproximado (frecuencia de entradas a F)
+# flujo estacionario hacia F = sum_i pi_i P[i,F]
+flujo_F = pi @ P[:, 2]
+MTBF = 1.0 / flujo_F                 # dias entre fallas en regimen permanente
+
+# ------------------------------------------------------------------
+# 4. Evolucion transitoria desde O (probabilidad de cada estado)
+# ------------------------------------------------------------------
+n_max = 60
+prob = np.zeros((n_max + 1, 3))
+v = np.array([1.0, 0.0, 0.0])
+prob[0] = v
+for n in range(1, n_max + 1):
+    v = v @ P
+    prob[n] = v
+
+# ------------------------------------------------------------------
+# 5. Validacion Monte Carlo del MTTF (tiempo a la absorcion desde O)
+# ------------------------------------------------------------------
+def tiempo_a_falla(P, rng, s0=0, estado_falla=2, t_max=100000):
+    s, t = s0, 0
+    while s != estado_falla and t &lt; t_max:
+        s = rng.choice(3, p=P[s])
+        t += 1
+    return t
+
+M = 20000
+ttf = np.array([tiempo_a_falla(P, rng) for _ in range(M)])
+MTTF_mc = ttf.mean()
+MTTF_se = ttf.std(ddof=1) / np.sqrt(M)
+
+# ------------------------------------------------------------------
+# 6. Sensibilidad: disponibilidad vs probabilidad de reparacion D-&gt;O
+# ------------------------------------------------------------------
+def disponibilidad(p_DO):
+    Pm = P.copy()
+    # redistribuir fila D manteniendo P[D,F]=0.05 fijo
+    Pm[1, 0] = p_DO
+    Pm[1, 1] = 1.0 - p_DO - 0.05
+    if Pm[1, 1] &lt; 0:
+        return np.nan
+    w, V = np.linalg.eig(Pm.T)
+    p = np.real(V[:, np.argmin(np.abs(w - 1.0))]); p = p / p.sum()
+    return p[0] + p[1]
+pDO_vec = np.linspace(0.05, 0.90, 200)
+A_vec = np.array([disponibilidad(x) for x in pDO_vec])
+
+# ------------------------------------------------------------------
+# 7. Salida de consola
+# ------------------------------------------------------------------
+print(&quot;=== Ejemplo 2: confiabilidad banco/bomba (DTMC 3 estados) ===&quot;)
+print(f&quot;pi (O,D,F) = {pi}&quot;)
+print(f&quot;Disponibilidad estricta (solo O) = {A_full*100:.2f} %&quot;)
+print(f&quot;Disponibilidad funcional (O o D) = {A_func*100:.2f} %&quot;)
+print(f&quot;Indisponibilidad (F)             = {pi[2]*100:.2f} %&quot;)
+print(f&quot;MTTF desde O (matriz fundamental)= {MTTF_O:.2f} dias&quot;)
+print(f&quot;MTTF desde O (Monte Carlo M={M}) = {MTTF_mc:.2f} +/- {MTTF_se:.2f} dias&quot;)
+print(f&quot;MTBF de regimen permanente       = {MTBF:.2f} dias&quot;)
+print(f&quot;Matriz fundamental N =\n{N}&quot;)
+
+# ------------------------------------------------------------------
+# 8. Figura de 4 paneles
+# ------------------------------------------------------------------
+fig, ax = plt.subplots(2, 2, figsize=(11, 8))
+col = [&#x27;C2&#x27;, &#x27;C1&#x27;, &#x27;C3&#x27;]
+
+# Panel 1: evolucion transitoria de probabilidades
+for k in range(3):
+    ax[0, 0].plot(prob[:, k], color=col[k], label=nombres[k])
+    ax[0, 0].axhline(pi[k], color=col[k], ls=&#x27;--&#x27;, alpha=0.5)
+ax[0, 0].set_xlabel(&#x27;jornada $n$&#x27;); ax[0, 0].set_ylabel(&#x27;probabilidad&#x27;)
+ax[0, 0].set_title(&#x27;Probabilidad de estado partiendo de Operativo&#x27;)
+ax[0, 0].legend(fontsize=8)
+
+# Panel 2: distribucion estacionaria + disponibilidad
+xb = np.arange(3)
+ax[0, 1].bar(xb, pi, color=col, alpha=0.85)
+for k, vv in enumerate(pi):
+    ax[0, 1].text(k, vv + 0.01, f&#x27;{vv:.3f}&#x27;, ha=&#x27;center&#x27;, fontsize=9)
+ax[0, 1].set_xticks(xb); ax[0, 1].set_xticklabels(nombres, fontsize=8)
+ax[0, 1].set_ylabel(r&#x27;$\pi_i$&#x27;)
+ax[0, 1].set_title(f&#x27;Estacionaria | Disp. funcional = {A_func*100:.1f}%&#x27;)
+
+# Panel 3: histograma Monte Carlo del tiempo a la primera falla
+ax[1, 0].hist(ttf, bins=60, density=True, color=&#x27;C0&#x27;, alpha=0.7,
+              label=f&#x27;MC ($M={M}$)&#x27;)
+ax[1, 0].axvline(MTTF_O, color=&#x27;C3&#x27;, ls=&#x27;--&#x27;, lw=2,
+                 label=f&#x27;MTTF teorico = {MTTF_O:.0f} d&#x27;)
+ax[1, 0].set_xlabel(&#x27;dias hasta primera falla&#x27;); ax[1, 0].set_ylabel(&#x27;densidad&#x27;)
+ax[1, 0].set_title(&#x27;Tiempo a la absorcion (cola exponencial)&#x27;)
+ax[1, 0].legend(fontsize=8)
+
+# Panel 4: sensibilidad de disponibilidad vs reparacion D-&gt;O
+ax[1, 1].plot(pDO_vec, A_vec * 100, &#x27;-&#x27;)
+ax[1, 1].axvline(P[1, 0], color=&#x27;C1&#x27;, ls=&#x27;--&#x27;, alpha=0.7,
+                 label=f&#x27;actual $P_{{DO}}={P[1,0]}$&#x27;)
+ax[1, 1].plot(P[1, 0], A_func * 100, &#x27;o&#x27;, color=&#x27;C3&#x27;, ms=7)
+ax[1, 1].set_xlabel(r&#x27;prob. de reparacion $P_{D\to O}$&#x27;)
+ax[1, 1].set_ylabel(&#x27;disponibilidad funcional [%]&#x27;)
+ax[1, 1].set_title(&#x27;Sensibilidad de la disponibilidad&#x27;)
+ax[1, 1].legend(fontsize=8)
+
+fig.suptitle(&#x27;Ejemplo 2 - Confiabilidad de un banco de pruebas: cadena de Markov con reparacion&#x27;,
+             fontsize=12, y=1.00)
+fig.tight_layout()
+fig.savefig(&#x27;Figuras/fig_s7_ej2_bomba_confiabilidad.png&#x27;, bbox_inches=&#x27;tight&#x27;)
+# plt.show()
+print(&quot;\nFigura guardada: Figuras/fig_s7_ej2_bomba_confiabilidad.png&quot;)
+
+&quot;&quot;&quot;
+Semana 7 - Ejemplo 3: Confiabilidad de un cable OPGW como cadena de Markov de
+tiempo continuo (CTMC) con matriz generadora Q.
+
+A diferencia del Ejemplo 2 (tiempo discreto), aqui el tiempo es continuo y las
+transiciones se rigen por TASAS (eventos por ano). Estados:
+    N = normal
+    T = sobrecarga termica (corriente elevada; reversible por enfriamiento)
+    H = hielo / galloping  (sobrecarga mecanica; reversible)
+    F = falla (rotura/cortocircuito; requiere reparacion)
+
+Formalismo:
+    - Matriz generadora Q (filas suman 0); q_ij = tasa i-&gt;j (i != j),
+      q_ii = -sum_{j!=i} q_ij.
+    - Distribucion estacionaria: pi Q = 0, sum(pi)=1.
+    - Probabilidades transitorias: P(t) = exp(Q t)  (exponencial matricial).
+    - MTTF desde N por matriz fundamental del subgenerador transitorio:
+      m = -(Q_T)^{-1} 1,  con Q_T el bloque entre estados no absorbentes.
+    - Horas/ano esperadas en cada estado = 8760 * pi.
+&quot;&quot;&quot;
+</textarea>
+  <div class="code-output-wrap" hidden>
+    <div class="code-output-console"></div>
+    <div class="code-output-figures"></div>
+  </div>
+  <div class="code-status"></div>
+</div>
+<div class="code-cell">
+  <div class="code-cell-header">
+    <span class="code-cell-title">Código 3</span>
+    <span class="code-cell-caption">Semana 7 – Código 3: Confiabilidad de un OPGW (CTMC, matriz generadora). Ejecutar en Google Colab.</span>
+    <button class="run-btn" type="button">&#9654; Ejecutar</button>
+  </div>
+  
+  <textarea class="code-input" spellcheck="false" rows="14">import numpy as np
+from scipy.linalg import expm
+import matplotlib
+matplotlib.use(&#x27;Agg&#x27;)
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+import os
+
+mpl.rcParams.update({
+    &#x27;font.size&#x27;: 10, &#x27;axes.titlesize&#x27;: 11, &#x27;axes.labelsize&#x27;: 10,
+    &#x27;figure.dpi&#x27;: 110, &#x27;savefig.dpi&#x27;: 300, &#x27;axes.grid&#x27;: True,
+    &#x27;grid.alpha&#x27;: 0.3, &#x27;mathtext.fontset&#x27;: &#x27;cm&#x27;,
+})
+os.makedirs(&#x27;Figuras&#x27;, exist_ok=True)
+
+# ------------------------------------------------------------------
+# 1. Tasas de transicion (1/ano). Orden de estados: N, T, H, F
+# ------------------------------------------------------------------
+lam_NT, mu_TN, lam_TF = 2.0, 50.0, 0.5     # normal&lt;-&gt;termica, termica-&gt;falla
+lam_NH, mu_HN, lam_HF = 1.0, 20.0, 0.3     # normal&lt;-&gt;hielo,    hielo-&gt;falla
+mu_FN = 12.0                               # reparacion falla-&gt;normal (MTTR ~ 1 mes)
+
+Q = np.zeros((4, 4))
+# fila N
+Q[0, 1] = lam_NT; Q[0, 2] = lam_NH
+# fila T
+Q[1, 0] = mu_TN;  Q[1, 3] = lam_TF
+# fila H
+Q[2, 0] = mu_HN;  Q[2, 3] = lam_HF
+# fila F
+Q[3, 0] = mu_FN
+# diagonal
+for i in range(4):
+    Q[i, i] = -Q[i].sum()
+nombres = [&#x27;Normal&#x27;, &#x27;Termica&#x27;, &#x27;Hielo&#x27;, &#x27;Falla&#x27;]
+assert np.allclose(Q.sum(axis=1), 0.0)
+
+# ------------------------------------------------------------------
+# 2. Distribucion estacionaria: pi Q = 0  (sistema [Q^T; 1^T] pi = [0;1])
+# ------------------------------------------------------------------
+Aeq = np.vstack([Q.T, np.ones(4)])
+beq = np.array([0, 0, 0, 0, 1.0])
+pi, *_ = np.linalg.lstsq(Aeq, beq, rcond=None)
+A_disp = pi[0] + pi[1] + pi[2]      # disponibilidad = todo menos F
+U_indisp = pi[3]                    # indisponibilidad
+
+# ------------------------------------------------------------------
+# 3. Probabilidades transitorias P(t) = exp(Q t) desde N
+# ------------------------------------------------------------------
+t_grid = np.linspace(0, 0.5, 300)          # anos (~6 meses)
+P0 = np.array([1.0, 0, 0, 0])
+Pt = np.array([P0 @ expm(Q * t) for t in t_grid])
+
+# ------------------------------------------------------------------
+# 4. MTTF desde N: F absorbente. Subgenerador transitorio Q_T sobre {N,T,H}
+# ------------------------------------------------------------------
+idxT = [0, 1, 2]
+Q_T = Q[np.ix_(idxT, idxT)].copy()
+# en la cadena absorbente, F no devuelve flujo: las tasas i-&gt;F se quedan como
+# fuga (ya estan en la diagonal de Q_T porque q_ii incluye lam_iF)
+m_abs = -np.linalg.solve(Q_T, np.ones(3))  # tiempos medios a la absorcion
+MTTF_N = m_abs[0]                            # anos hasta primera falla desde N
+
+# ------------------------------------------------------------------
+# 5. Horas por ano en cada estado
+# ------------------------------------------------------------------
+horas = pi * 8760.0
+
+# ------------------------------------------------------------------
+# 6. Sensibilidad: indisponibilidad vs tasa de reparacion mu_FN (MTTR)
+# ------------------------------------------------------------------
+def indisp(muFN):
+    Qm = Q.copy()
+    Qm[3, 0] = muFN
+    Qm[3, 3] = -muFN
+    Am = np.vstack([Qm.T, np.ones(4)])
+    p, *_ = np.linalg.lstsq(Am, beq, rcond=None)
+    return p[3]
+muFN_vec = np.linspace(4, 60, 200)         # 1/ano  (MTTR de 3 meses a 6 dias)
+U_vec = np.array([indisp(x) for x in muFN_vec])
+
+# ------------------------------------------------------------------
+# 7. Salida de consola
+# ------------------------------------------------------------------
+print(&quot;=== Ejemplo 3: OPGW como CTMC (matriz generadora) ===&quot;)
+print(f&quot;Q (1/ano) =\n{Q}&quot;)
+print(f&quot;pi (N,T,H,F) = {pi}&quot;)
+print(f&quot;Disponibilidad  = {A_disp*100:.4f} %&quot;)
+print(f&quot;Indisponibilidad (F) = {U_indisp*100:.4f} %  -&gt;  {U_indisp*8760:.2f} h/ano&quot;)
+print(f&quot;Horas/ano por estado [N,T,H,F] = {horas}&quot;)
+print(f&quot;MTTF desde N = {MTTF_N:.3f} anos  ({MTTF_N*12:.2f} meses)&quot;)
+print(f&quot;Fraccion de tiempo en sobrecarga termica = {pi[1]*100:.3f} %  ({horas[1]:.1f} h/ano)&quot;)
+
+# ------------------------------------------------------------------
+# 8. Figura de 4 paneles
+# ------------------------------------------------------------------
+fig, ax = plt.subplots(2, 2, figsize=(11, 8))
+col = [&#x27;C2&#x27;, &#x27;C1&#x27;, &#x27;C0&#x27;, &#x27;C3&#x27;]
+
+# Panel 1: P(t) transitorio desde N
+for k in range(4):
+    ax[0, 0].plot(t_grid * 12, Pt[:, k], color=col[k], label=nombres[k])
+    ax[0, 0].axhline(pi[k], color=col[k], ls=&#x27;--&#x27;, alpha=0.4)
+ax[0, 0].set_xlabel(&#x27;tiempo [meses]&#x27;); ax[0, 0].set_ylabel(&#x27;probabilidad&#x27;)
+ax[0, 0].set_title(r&#x27;Transitorio $P(t)=\exp(Qt)$ desde Normal&#x27;)
+ax[0, 0].legend(fontsize=8); ax[0, 0].set_yscale(&#x27;log&#x27;); ax[0, 0].set_ylim(1e-4, 1.2)
+
+# Panel 2: distribucion estacionaria
+xb = np.arange(4)
+ax[0, 1].bar(xb, pi, color=col, alpha=0.85)
+for k, vv in enumerate(pi):
+    ax[0, 1].text(k, vv * 1.15 + 1e-4, f&#x27;{vv:.4f}&#x27;, ha=&#x27;center&#x27;, fontsize=8)
+ax[0, 1].set_xticks(xb); ax[0, 1].set_xticklabels(nombres, fontsize=8)
+ax[0, 1].set_ylabel(r&#x27;$\pi_i$&#x27;); ax[0, 1].set_yscale(&#x27;log&#x27;)
+ax[0, 1].set_title(f&#x27;Estacionaria | Disponibilidad = {A_disp*100:.3f}%&#x27;)
+
+# Panel 3: horas por ano en cada estado
+ax[1, 0].bar(xb, horas, color=col, alpha=0.85)
+for k, vv in enumerate(horas):
+    ax[1, 0].text(k, vv * 1.15 + 1, f&#x27;{vv:.0f} h&#x27;, ha=&#x27;center&#x27;, fontsize=8)
+ax[1, 0].set_xticks(xb); ax[1, 0].set_xticklabels(nombres, fontsize=8)
+ax[1, 0].set_ylabel(&#x27;horas/ano&#x27;); ax[1, 0].set_yscale(&#x27;log&#x27;)
+ax[1, 0].set_title(&#x27;Tiempo esperado por estado (8760 h/ano)&#x27;)
+
+# Panel 4: indisponibilidad vs tasa de reparacion
+ax[1, 1].plot(muFN_vec, U_vec * 8760, &#x27;-&#x27;)
+ax[1, 1].axvline(mu_FN, color=&#x27;C3&#x27;, ls=&#x27;--&#x27;, alpha=0.7, label=f&#x27;$\\mu_{{FN}}={mu_FN}$/ano&#x27;)
+ax[1, 1].plot(mu_FN, U_indisp * 8760, &#x27;o&#x27;, color=&#x27;C3&#x27;, ms=7)
+ax[1, 1].set_xlabel(r&#x27;tasa de reparacion $\mu_{F\to N}$ [1/ano]&#x27;)
+ax[1, 1].set_ylabel(&#x27;indisponibilidad [h/ano]&#x27;)
+ax[1, 1].set_title(&#x27;Sensibilidad a la rapidez de reparacion&#x27;)
+ax[1, 1].legend(fontsize=8)
+
+fig.suptitle(&#x27;Ejemplo 3 - Confiabilidad de un OPGW: cadena de Markov de tiempo continuo&#x27;,
+             fontsize=12, y=1.00)
+fig.tight_layout()
+fig.savefig(&#x27;Figuras/fig_s7_ej3_opgw_ctmc.png&#x27;, bbox_inches=&#x27;tight&#x27;)
+# plt.show()
+print(&quot;\nFigura guardada: Figuras/fig_s7_ej3_opgw_ctmc.png&quot;)
+
+&quot;&quot;&quot;
+Semana 7 - Ejemplo 4: Propagacion de incendio forestal como automata celular
+probabilistico (campo de Markov espacial) y su transicion de percolacion.
+
+Modelo (variante estocastica tipo SIR sobre reticula):
+    - Reticula L x L de celdas; cada celda con arbol con densidad d.
+    - Una celda &quot;ardiendo&quot; propaga el fuego a cada vecino verde (4-vecindad)
+      con probabilidad p, e inmediatamente pasa a &quot;quemada&quot; (no reignita).
+    - El proceso es un campo de Markov: el estado futuro de una celda depende
+      solo de su estado y el de sus vecinos inmediatos.
+
+Para d=1 este proceso es equivalente a percolacion de enlaces en la red
+cuadrada, con umbral critico p_c = 0.5. Barriendo p alrededor de p_c se observa
+la transicion de fase: aparicion subita de un incendio que cruza el dominio.
+
+Anclaje (Garcia Ojeda, monitoreo por UAV): a partir de imageneria aerea se
+estiman densidad d y probabilidad de propagacion p; el modelo predice la
+probabilidad de un &quot;gran incendio&quot; y la fraccion quemada esperada.
+&quot;&quot;&quot;
+</textarea>
+  <div class="code-output-wrap" hidden>
+    <div class="code-output-console"></div>
+    <div class="code-output-figures"></div>
+  </div>
+  <div class="code-status"></div>
+</div>
+<div class="code-cell">
+  <div class="code-cell-header">
+    <span class="code-cell-title">Código 4</span>
+    <span class="code-cell-caption">Semana 7 – Código 4: Incendio forestal (autómata celular y percolación). Ejecutar en Google Colab.</span>
+    <button class="run-btn" type="button">&#9654; Ejecutar</button>
+  </div>
+  
+  <textarea class="code-input" spellcheck="false" rows="14">import numpy as np
+import matplotlib
+matplotlib.use(&#x27;Agg&#x27;)
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+from matplotlib.colors import ListedColormap
+import os
+
+mpl.rcParams.update({
+    &#x27;font.size&#x27;: 10, &#x27;axes.titlesize&#x27;: 11, &#x27;axes.labelsize&#x27;: 10,
+    &#x27;figure.dpi&#x27;: 110, &#x27;savefig.dpi&#x27;: 300, &#x27;mathtext.fontset&#x27;: &#x27;cm&#x27;,
+})
+os.makedirs(&#x27;Figuras&#x27;, exist_ok=True)
+rng = np.random.default_rng(20260209)
+
+# Codigo de estados de celda
+VACIO, VERDE, ARDIENDO, QUEMADA = 0, 1, 2, 3
+
+def simula_incendio(L, d, p, rng, ignicion=&#x27;centro&#x27;):
+    &quot;&quot;&quot;Una realizacion del automata. Devuelve la malla final y si el fuego
+    alcanzo el borde (percolacion). Propagacion por frontera (BFS estocastico).&quot;&quot;&quot;
+    bosque = (rng.random((L, L)) &lt; d).astype(np.int8)   # 1=arbol, 0=vacio
+    estado = np.where(bosque == 1, VERDE, VACIO).astype(np.int8)
+    if ignicion == &#x27;centro&#x27;:
+        focos = [(L // 2, L // 2)]
+    else:  # borde superior completo
+        focos = [(0, j) for j in range(L) if estado[0, j] == VERDE]
+    frontera = []
+    for (i, j) in focos:
+        if estado[i, j] == VERDE:
+            estado[i, j] = ARDIENDO
+            frontera.append((i, j))
+    alcanzo_borde = False
+    while frontera:
+        nueva = []
+        for (i, j) in frontera:
+            for di, dj in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+                ni, nj = i + di, j + dj
+                if 0 &lt;= ni &lt; L and 0 &lt;= nj &lt; L and estado[ni, nj] == VERDE:
+                    if rng.random() &lt; p:                 # ignicion estocastica
+                        estado[ni, nj] = ARDIENDO
+                        nueva.append((ni, nj))
+                        if ni == 0 or ni == L - 1 or nj == 0 or nj == L - 1:
+                            alcanzo_borde = True
+            estado[i, j] = QUEMADA
+        frontera = nueva
+    n_arboles = (bosque == 1).sum()
+    n_quemadas = (estado == QUEMADA).sum()
+    frac_quemada = n_quemadas / max(n_arboles, 1)
+    return estado, frac_quemada, alcanzo_borde
+
+# ------------------------------------------------------------------
+# 1. Una realizacion ilustrativa (p moderada, densidad alta)
+# ------------------------------------------------------------------
+L_demo, d_demo, p_demo = 120, 1.0, 0.55
+estado_demo, frac_demo, _ = simula_incendio(L_demo, d_demo, p_demo, rng)
+
+# ------------------------------------------------------------------
+# 2. Barrido en p: fraccion quemada y probabilidad de percolacion
+# ------------------------------------------------------------------
+L, d, R = 80, 1.0, 60                 # tamano, densidad, replicas por p
+p_vals = np.linspace(0.30, 0.75, 19)
+frac_mean = np.zeros_like(p_vals)
+frac_std = np.zeros_like(p_vals)
+prob_perc = np.zeros_like(p_vals)
+frac_pc_samples = None
+for k, p in enumerate(p_vals):
+    fr = np.empty(R); pc = np.empty(R)
+    for r in range(R):
+        _, f, b = simula_incendio(L, d, p, rng, ignicion=&#x27;centro&#x27;)
+        fr[r] = f; pc[r] = b
+    frac_mean[k] = fr.mean(); frac_std[k] = fr.std()
+    prob_perc[k] = pc.mean()
+
+# estimacion empirica de p_c: p donde P(percola) cruza 0.5
+i_cross = np.argmax(prob_perc &gt;= 0.5)
+if 0 &lt; i_cross &lt; len(p_vals):
+    x0, x1 = p_vals[i_cross - 1], p_vals[i_cross]
+    y0, y1 = prob_perc[i_cross - 1], prob_perc[i_cross]
+    p_c_emp = x0 + (0.5 - y0) * (x1 - x0) / (y1 - y0)
+else:
+    p_c_emp = p_vals[i_cross]
+
+# distribuciones de fraccion quemada en sub/super-critico
+def muestras_frac(p, R2=200):
+    return np.array([simula_incendio(L, d, p, rng)[1] for _ in range(R2)])
+frac_sub = muestras_frac(0.45)
+frac_sup = muestras_frac(0.65)
+
+# ------------------------------------------------------------------
+# 3. Salida de consola
+# ------------------------------------------------------------------
+print(&quot;=== Ejemplo 4: incendio forestal (automata celular probabilistico) ===&quot;)
+print(f&quot;Realizacion demo: L={L_demo}, d={d_demo}, p={p_demo} -&gt; fraccion quemada={frac_demo:.3f}&quot;)
+print(f&quot;Barrido: L={L}, d={d}, R={R} replicas/p&quot;)
+print(f&quot;p_c teorico (percolacion de enlaces, red cuadrada) = 0.5&quot;)
+print(f&quot;p_c empirico (cruce P_perc=0.5)                    = {p_c_emp:.4f}&quot;)
+print(f&quot;Fraccion quemada media en p=0.45 (subcritico) = {frac_sub.mean():.4f}&quot;)
+print(f&quot;Fraccion quemada media en p=0.65 (supercritico)= {frac_sup.mean():.4f}&quot;)
+
+# ------------------------------------------------------------------
+# 4. Figura de 4 paneles
+# ------------------------------------------------------------------
+fig, ax = plt.subplots(2, 2, figsize=(11, 8))
+
+# Panel 1: realizacion (mapa de estados)
+cmap = ListedColormap([&#x27;white&#x27;, &#x27;forestgreen&#x27;, &#x27;orangered&#x27;, &#x27;dimgray&#x27;])
+ax[0, 0].imshow(estado_demo, cmap=cmap, vmin=0, vmax=3, interpolation=&#x27;nearest&#x27;)
+ax[0, 0].set_title(f&#x27;Realizacion ($L={L_demo}$, $p={p_demo}$): &#x27;
+                   f&#x27;{frac_demo*100:.0f}% quemado&#x27;)
+ax[0, 0].set_xticks([]); ax[0, 0].set_yticks([])
+
+# Panel 2: fraccion quemada vs p (con banda)
+ax[0, 1].plot(p_vals, frac_mean, &#x27;o-&#x27;, ms=4)
+ax[0, 1].fill_between(p_vals, frac_mean - frac_std, frac_mean + frac_std,
+                      alpha=0.25)
+ax[0, 1].axvline(0.5, color=&#x27;k&#x27;, ls=&#x27;:&#x27;, alpha=0.7, label=r&#x27;$p_c=0.5$ teorico&#x27;)
+ax[0, 1].set_xlabel(&#x27;prob. de propagacion $p$&#x27;)
+ax[0, 1].set_ylabel(&#x27;fraccion quemada&#x27;)
+ax[0, 1].set_title(&#x27;Parametro de orden: tamano del incendio&#x27;)
+ax[0, 1].grid(alpha=0.3); ax[0, 1].legend(fontsize=8)
+
+# Panel 3: probabilidad de percolacion (cruzar el dominio)
+ax[1, 0].plot(p_vals, prob_perc, &#x27;s-&#x27;, ms=4, color=&#x27;C3&#x27;)
+ax[1, 0].axvline(p_c_emp, color=&#x27;C3&#x27;, ls=&#x27;--&#x27;, alpha=0.7,
+                 label=f&#x27;$p_c$ emp. $={p_c_emp:.3f}$&#x27;)
+ax[1, 0].axhline(0.5, color=&#x27;k&#x27;, ls=&#x27;:&#x27;, alpha=0.5)
+ax[1, 0].set_xlabel(&#x27;prob. de propagacion $p$&#x27;)
+ax[1, 0].set_ylabel(&#x27;P(fuego alcanza el borde)&#x27;)
+ax[1, 0].set_title(&#x27;Transicion de fase (percolacion)&#x27;)
+ax[1, 0].grid(alpha=0.3); ax[1, 0].legend(fontsize=8)
+
+# Panel 4: distribucion de fraccion quemada sub/super critico
+ax[1, 1].hist(frac_sub, bins=30, density=True, alpha=0.6,
+              color=&#x27;C0&#x27;, label=&#x27;$p=0.45$ (subcritico)&#x27;)
+ax[1, 1].hist(frac_sup, bins=30, density=True, alpha=0.6,
+              color=&#x27;C3&#x27;, label=&#x27;$p=0.65$ (supercritico)&#x27;)
+ax[1, 1].set_xlabel(&#x27;fraccion quemada&#x27;); ax[1, 1].set_ylabel(&#x27;densidad&#x27;)
+ax[1, 1].set_title(&#x27;Bimodalidad cerca del umbral&#x27;)
+ax[1, 1].grid(alpha=0.3); ax[1, 1].legend(fontsize=8)
+
+fig.suptitle(&#x27;Ejemplo 4 - Incendio forestal: automata celular probabilistico y percolacion&#x27;,
+             fontsize=12, y=1.00)
+fig.tight_layout()
+fig.savefig(&#x27;Figuras/fig_s7_ej4_incendio_percolacion.png&#x27;, bbox_inches=&#x27;tight&#x27;)
+# plt.show()
+print(&quot;\nFigura guardada: Figuras/fig_s7_ej4_incendio_percolacion.png&quot;)
+
+&quot;&quot;&quot;
+Semana 7 - Ejemplo 5: Modelo epidemiologico SIR como cadena de Markov de tiempo
+continuo (CTMC) y su limite determinista (sistema dinamico de EDO).
+
+Estados del sistema: (S, I, R) con S+I+R = N constante.
+Eventos (reacciones) y sus tasas (propensiones):
+    - Infeccion:  S + I -&gt; 2I   con tasa  beta * S * I / N
+    - Recuperacion:    I -&gt; R    con tasa  gamma * I
+Numero reproductivo basico: R0 = beta / gamma.
+
+Se comparan dos descripciones del mismo proceso:
+    1. Estocastica exacta (algoritmo de Gillespie / SSA): captura extincion
+       temprana, variabilidad y tamano final aleatorio.
+    2. Determinista (EDO de campo medio): limite N -&gt; inf; es el &quot;sistema
+       dinamico&quot; continuo subyacente.
+
+Resultados clave:
+    - Probabilidad de brote mayor vs menor (extincion estocastica).
+    - Distribucion del tamano final (bimodal para R0 &gt; 1).
+    - Comparacion de la prob. de brote mayor con la teoria 1 - (1/R0)^{I0}.
+&quot;&quot;&quot;
+</textarea>
+  <div class="code-output-wrap" hidden>
+    <div class="code-output-console"></div>
+    <div class="code-output-figures"></div>
+  </div>
+  <div class="code-status"></div>
+</div>
+<div class="code-cell">
+  <div class="code-cell-header">
+    <span class="code-cell-title">Código 5</span>
+    <span class="code-cell-caption">Semana 7 – Código 5: SIR estocástico (Gillespie) y EDO determinista. Ejecutar en Google Colab.</span>
+    <button class="run-btn" type="button">&#9654; Ejecutar</button>
+  </div>
+  
+  <textarea class="code-input" spellcheck="false" rows="14">import numpy as np
+from scipy.integrate import solve_ivp
+import matplotlib
+matplotlib.use(&#x27;Agg&#x27;)
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+import os
+
+mpl.rcParams.update({
+    &#x27;font.size&#x27;: 10, &#x27;axes.titlesize&#x27;: 11, &#x27;axes.labelsize&#x27;: 10,
+    &#x27;figure.dpi&#x27;: 110, &#x27;savefig.dpi&#x27;: 300, &#x27;axes.grid&#x27;: True,
+    &#x27;grid.alpha&#x27;: 0.3, &#x27;mathtext.fontset&#x27;: &#x27;cm&#x27;,
+})
+os.makedirs(&#x27;Figuras&#x27;, exist_ok=True)
+rng = np.random.default_rng(20260210)
+
+# ------------------------------------------------------------------
+# 1. Parametros
+# ------------------------------------------------------------------
+N = 1000               # poblacion total
+I0 = 5                 # infectados iniciales
+beta = 0.60            # tasa de contacto efectivo [1/dia]
+gamma = 0.25           # tasa de recuperacion [1/dia]
+R0 = beta / gamma      # numero reproductivo basico
+print(&quot;=== Ejemplo 5: SIR estocastico (CTMC) vs determinista (EDO) ===&quot;)
+print(f&quot;N={N}, I0={I0}, beta={beta}, gamma={gamma}, R0={R0:.2f}&quot;)
+
+# ------------------------------------------------------------------
+# 2. Gillespie SSA (una realizacion)
+# ------------------------------------------------------------------
+def gillespie_sir(N, I0, beta, gamma, rng, t_max=200.0):
+    S, I, R = N - I0, I0, 0
+    t = 0.0
+    ts, Is, Ss = [t], [I], [S]
+    while I &gt; 0 and t &lt; t_max:
+        a_inf = beta * S * I / N        # propension de infeccion
+        a_rec = gamma * I               # propension de recuperacion
+        a0 = a_inf + a_rec
+        if a0 &lt;= 0:
+            break
+        t += rng.exponential(1.0 / a0)  # tiempo al siguiente evento ~ Exp(a0)
+        if rng.random() &lt; a_inf / a0:   # cual evento ocurre
+            S -= 1; I += 1
+        else:
+            I -= 1; R += 1
+        ts.append(t); Is.append(I); Ss.append(S)
+    tamano_final = N - S                # total de individuos que se infectaron
+    return np.array(ts), np.array(Ss), np.array(Is), tamano_final
+
+# ------------------------------------------------------------------
+# 3. EDO determinista (campo medio)
+# ------------------------------------------------------------------
+def sir_ode(t, y):
+    S, I, R = y
+    dS = -beta * S * I / N
+    dI = beta * S * I / N - gamma * I
+    dR = gamma * I
+    return [dS, dI, dR]
+sol = solve_ivp(sir_ode, [0, 120], [N - I0, I0, 0],
+                t_eval=np.linspace(0, 120, 600), rtol=1e-8, atol=1e-8)
+I_peak_det = sol.y[1].max()
+t_peak_det = sol.t[np.argmax(sol.y[1])]
+final_det = N - sol.y[0, -1]
+
+# ------------------------------------------------------------------
+# 4. Ensemble estocastico: distribucion del tamano final
+# ------------------------------------------------------------------
+M = 3000
+tamanos = np.empty(M)
+trayectorias = []
+for m in range(M):
+    ts, Ss, Is, tf = gillespie_sir(N, I0, beta, gamma, rng)
+    tamanos[m] = tf
+    if m &lt; 30:                          # guardar algunas para graficar
+        trayectorias.append((ts, Is))
+
+# clasificacion brote menor vs mayor (umbral en 5% de la poblacion)
+umbral = 0.05 * N
+p_mayor_emp = (tamanos &gt; umbral).mean()
+p_mayor_teo = 1.0 - (1.0 / R0) ** I0    # prob. de brote mayor (proc. de ramificacion)
+tam_mayores = tamanos[tamanos &gt; umbral]
+print(f&quot;Pico determinista I_max = {I_peak_det:.1f} en t={t_peak_det:.1f} d&quot;)
+print(f&quot;Tamano final determinista = {final_det:.1f} ({final_det/N*100:.1f}% de N)&quot;)
+print(f&quot;P(brote mayor) empirica = {p_mayor_emp:.3f}&quot;)
+print(f&quot;P(brote mayor) teorica 1-(1/R0)^I0 = {p_mayor_teo:.3f}&quot;)
+print(f&quot;Tamano final medio (brotes mayores) = {tam_mayores.mean():.1f} &quot;
+      f&quot;({tam_mayores.mean()/N*100:.1f}% de N)&quot;)
+
+# ------------------------------------------------------------------
+# 5. Barrido de R0: prob. de brote mayor vs teoria
+# ------------------------------------------------------------------
+R0_vec = np.linspace(0.6, 3.0, 13)
+p_mayor_vec = np.empty_like(R0_vec)
+for k, R0k in enumerate(R0_vec):
+    bk = R0k * gamma
+    cnt = 0; Mk = 800
+    for _ in range(Mk):
+        _, _, _, tf = gillespie_sir(N, I0, bk, gamma, rng)
+        cnt += (tf &gt; umbral)
+    p_mayor_vec[k] = cnt / Mk
+p_teo_vec = np.where(R0_vec &gt; 1, 1.0 - (1.0 / np.maximum(R0_vec, 1e-9)) ** I0, 0.0)
+
+# ------------------------------------------------------------------
+# 6. Figura de 4 paneles
+# ------------------------------------------------------------------
+fig, ax = plt.subplots(2, 2, figsize=(11, 8))
+
+# Panel 1: trayectorias estocasticas I(t) + determinista
+for (ts, Is) in trayectorias:
+    ax[0, 0].plot(ts, Is, color=&#x27;C0&#x27;, alpha=0.25, lw=0.8)
+ax[0, 0].plot(sol.t, sol.y[1], &#x27;C3&#x27;, lw=2.5, label=&#x27;EDO determinista&#x27;)
+ax[0, 0].set_xlabel(&#x27;tiempo [dias]&#x27;); ax[0, 0].set_ylabel(&#x27;infectados $I(t)$&#x27;)
+ax[0, 0].set_title(f&#x27;Trayectorias (CTMC) vs campo medio  ($R_0={R0:.1f}$)&#x27;)
+ax[0, 0].legend(fontsize=8); ax[0, 0].set_xlim(0, 120)
+
+# Panel 2: distribucion del tamano final (bimodal)
+ax[0, 1].hist(tamanos, bins=50, density=True, color=&#x27;C0&#x27;, alpha=0.75)
+ax[0, 1].axvline(final_det, color=&#x27;C3&#x27;, ls=&#x27;--&#x27;, lw=2,
+                 label=f&#x27;final EDO = {final_det:.0f}&#x27;)
+ax[0, 1].set_xlabel(&#x27;tamano final del brote&#x27;); ax[0, 1].set_ylabel(&#x27;densidad&#x27;)
+ax[0, 1].set_title(f&#x27;Bimodalidad: extincion vs brote mayor (M={M})&#x27;)
+ax[0, 1].legend(fontsize=8)
+
+# Panel 3: retrato de fase S-I (sistema dinamico)
+ax[1, 0].plot(sol.y[0], sol.y[1], &#x27;C3&#x27;, lw=2.5, label=&#x27;EDO&#x27;)
+for (ts, Is) in trayectorias[:15]:
+    # reconstruir S a partir de la trayectoria no es directo; graficar I vs t-rango
+    pass
+ax[1, 0].axvline(N / R0, color=&#x27;k&#x27;, ls=&#x27;:&#x27;, alpha=0.7,
+                 label=r&#x27;$S^*=N/R_0$ (umbral)&#x27;)
+ax[1, 0].set_xlabel(&#x27;susceptibles $S$&#x27;); ax[1, 0].set_ylabel(&#x27;infectados $I$&#x27;)
+ax[1, 0].set_title(&#x27;Retrato de fase del sistema dinamico&#x27;)
+ax[1, 0].legend(fontsize=8)
+
+# Panel 4: prob. de brote mayor vs R0
+ax[1, 1].plot(R0_vec, p_mayor_vec, &#x27;o-&#x27;, ms=5, label=&#x27;SSA (empirica)&#x27;)
+ax[1, 1].plot(R0_vec, p_teo_vec, &#x27;--&#x27;, color=&#x27;C3&#x27;,
+              label=r&#x27;$1-(1/R_0)^{I_0}$&#x27;)
+ax[1, 1].axvline(1.0, color=&#x27;k&#x27;, ls=&#x27;:&#x27;, alpha=0.6, label=&#x27;$R_0=1$&#x27;)
+ax[1, 1].set_xlabel(&#x27;$R_0$&#x27;); ax[1, 1].set_ylabel(&#x27;P(brote mayor)&#x27;)
+ax[1, 1].set_title(&#x27;Umbral epidemico y extincion estocastica&#x27;)
+ax[1, 1].legend(fontsize=8)
+
+fig.suptitle(&#x27;Ejemplo 5 - SIR estocastico (Gillespie) y su limite determinista&#x27;,
+             fontsize=12, y=1.00)
+fig.tight_layout()
+fig.savefig(&#x27;Figuras/fig_s7_ej5_sir_estocastico.png&#x27;, bbox_inches=&#x27;tight&#x27;)
+# plt.show()
+print(&quot;\nFigura guardada: Figuras/fig_s7_ej5_sir_estocastico.png&quot;)
+
+&quot;&quot;&quot;
+Semana 7 - Ejemplo 6: Ranking por caminata aleatoria (PageRank) para
+recuperacion de documentos en un sistema RAG.
+
+Un sistema RAG (Retrieval-Augmented Generation) ordena documentos por
+relevancia. Cuando los documentos forman un grafo dirigido (citas, enlaces o
+similitud semantica umbralizada), su importancia puede medirse con la
+distribucion estacionaria de una caminata aleatoria: PageRank.
+
+Cadena de Markov del &quot;navegante aleatorio&quot;:
+    - Con probabilidad alpha (damping) sigue un enlace saliente uniforme.
+    - Con probabilidad (1-alpha) &quot;teletransporta&quot; a un documento al azar.
+    - Nodos sin enlaces (dangling) se tratan como teletransporte total.
+Matriz de Google:  G = alpha * (S) + (1-alpha) * (1/n) * 1 1^T,
+con S la matriz de transicion estocastica por filas (incluye correccion de
+nodos colgantes). El vector PageRank es el autovector izquierdo de G con
+autovalor 1 (Perron-Frobenius), calculado por iteracion de potencias.
+
+La brecha espectral de G es 1 - alpha, lo que fija la tasa de convergencia
+~ alpha^k de la iteracion de potencias (independiente del grafo).
+&quot;&quot;&quot;
+</textarea>
+  <div class="code-output-wrap" hidden>
+    <div class="code-output-console"></div>
+    <div class="code-output-figures"></div>
+  </div>
+  <div class="code-status"></div>
+</div>
+<div class="code-cell">
+  <div class="code-cell-header">
+    <span class="code-cell-title">Código 6</span>
+    <span class="code-cell-caption">Semana 7 – Código 6: PageRank (caminata aleatoria) para RAG. Ejecutar en Google Colab.</span>
+    <button class="run-btn" type="button">&#9654; Ejecutar</button>
+  </div>
+  
+  <textarea class="code-input" spellcheck="false" rows="14">import numpy as np
+import networkx as nx
+import matplotlib
+matplotlib.use(&#x27;Agg&#x27;)
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+import os
+
+mpl.rcParams.update({
+    &#x27;font.size&#x27;: 10, &#x27;axes.titlesize&#x27;: 11, &#x27;axes.labelsize&#x27;: 10,
+    &#x27;figure.dpi&#x27;: 110, &#x27;savefig.dpi&#x27;: 300, &#x27;mathtext.fontset&#x27;: &#x27;cm&#x27;,
+})
+os.makedirs(&#x27;Figuras&#x27;, exist_ok=True)
+rng = np.random.default_rng(20260211)
+
+# ------------------------------------------------------------------
+# 1. Grafo dirigido de documentos (n nodos). Aristas i-&gt;j: &quot;i referencia a j&quot;
+# ------------------------------------------------------------------
+n = 14
+G = nx.gnp_random_graph(n, 0.22, seed=42, directed=True)
+# garantizar al menos un nodo colgante (sin salida) para ilustrar la correccion
+G.remove_edges_from(list(G.out_edges(7)))
+A = nx.to_numpy_array(G, nodelist=range(n))     # A[i,j]=1 si i-&gt;j
+
+# ------------------------------------------------------------------
+# 2. Matriz de transicion S con correccion de nodos colgantes
+# ------------------------------------------------------------------
+out_deg = A.sum(axis=1)
+S = np.zeros((n, n))
+for i in range(n):
+    if out_deg[i] &gt; 0:
+        S[i] = A[i] / out_deg[i]                 # enlace uniforme
+    else:
+        S[i] = np.ones(n) / n                    # dangling -&gt; teletransporte
+alpha = 0.85
+G_mat = alpha * S + (1 - alpha) * np.ones((n, n)) / n
+assert np.allclose(G_mat.sum(axis=1), 1.0)
+
+# ------------------------------------------------------------------
+# 3. PageRank por iteracion de potencias (registrando convergencia)
+# ------------------------------------------------------------------
+pi = np.ones(n) / n
+hist = []
+pi_exact = None
+for k in range(100):
+    pi_new = pi @ G_mat
+    hist.append(np.abs(pi_new - pi).sum())       # ||pi_{k+1}-pi_k||_1
+    if hist[-1] &lt; 1e-15:
+        pi_exact = pi_new; break
+    pi = pi_new
+pr = pi / pi.sum()
+# distancia al limite para graficar tasa alpha^k
+pr_ref = pr.copy()
+pi2 = np.ones(n) / n
+dist_lim = []
+for k in range(60):
+    dist_lim.append(np.abs(pi2 - pr_ref).sum())
+    pi2 = pi2 @ G_mat
+
+# verificacion contra networkx
+pr_nx = np.array([nx.pagerank(G, alpha=alpha)[i] for i in range(n)])
+
+# ------------------------------------------------------------------
+# 4. Comparacion con grado de entrada (heuristica ingenua)
+# ------------------------------------------------------------------
+in_deg = A.sum(axis=0)
+in_deg_norm = in_deg / in_deg.sum() if in_deg.sum() &gt; 0 else in_deg
+orden_pr = np.argsort(pr)[::-1]
+orden_in = np.argsort(in_deg)[::-1]
+
+# brecha espectral teorica y observada
+gap_teo = 1 - alpha
+# segundo autovalor en magnitud
+ev = np.sort(np.abs(np.linalg.eigvals(G_mat.T)))[::-1]
+lam2 = ev[1]
+
+print(&quot;=== Ejemplo 6: PageRank (caminata aleatoria) para RAG ===&quot;)
+print(f&quot;n={n} documentos, alpha={alpha}, nodos colgantes={int((out_deg==0).sum())}&quot;)
+print(f&quot;PageRank (power iter) top-5 nodos: {orden_pr[:5]}&quot;)
+print(f&quot;Ranking por grado de entrada top-5: {orden_in[:5]}&quot;)
+print(f&quot;Max |PageRank - networkx| = {np.abs(pr - pr_nx).max():.2e}&quot;)
+print(f&quot;Iteraciones a tol 1e-15 = {len(hist)}&quot;)
+print(f&quot;|lambda_2(G)| = {lam2:.4f}   brecha espectral = {1-lam2:.4f}  (teorica 1-alpha={gap_teo:.2f})&quot;)
+print(f&quot;PageRank nodo top = {orden_pr[0]} con score {pr[orden_pr[0]]:.4f}&quot;)
+print(f&quot;Coincide top-1 PageRank vs grado entrada? {orden_pr[0]==orden_in[0]}&quot;)
+
+# ------------------------------------------------------------------
+# 5. Sensibilidad: iteraciones a convergencia vs alpha
+# ------------------------------------------------------------------
+def iters_converge(alpha_, tol=1e-10):
+    Gm = alpha_ * S + (1 - alpha_) * np.ones((n, n)) / n
+    p = np.ones(n) / n
+    for k in range(2000):
+        pn = p @ Gm
+        if np.abs(pn - p).sum() &lt; tol:
+            return k + 1
+        p = pn
+    return 2000
+alpha_vec = np.linspace(0.50, 0.97, 24)
+iters_vec = np.array([iters_converge(a) for a in alpha_vec])
+
+# ------------------------------------------------------------------
+# 6. Figura de 4 paneles
+# ------------------------------------------------------------------
+fig, ax = plt.subplots(2, 2, figsize=(11, 8))
+
+# Panel 1: grafo con tamano de nodo ~ PageRank
+pos = nx.spring_layout(G, seed=7)
+nx.draw_networkx_edges(G, pos, ax=ax[0, 0], alpha=0.3, arrowsize=8,
+                       edge_color=&#x27;gray&#x27;, width=0.8)
+nodes = nx.draw_networkx_nodes(G, pos, ax=ax[0, 0], node_size=pr * 9000 + 60,
+                               node_color=pr, cmap=&#x27;viridis&#x27;)
+nx.draw_networkx_labels(G, pos, ax=ax[0, 0], font_size=7, font_color=&#x27;white&#x27;)
+ax[0, 0].set_title(&#x27;Grafo de documentos (tamano $\\propto$ PageRank)&#x27;)
+ax[0, 0].axis(&#x27;off&#x27;)
+plt.colorbar(nodes, ax=ax[0, 0], fraction=0.046, pad=0.04)
+
+# Panel 2: convergencia de la iteracion de potencias (escala log)
+kk = np.arange(len(dist_lim))
+ax[0, 1].semilogy(kk, np.array(dist_lim) + 1e-18, &#x27;o-&#x27;, ms=3,
+                  label=r&#x27;$\|\pi_k-\pi^*\|_1$&#x27;)
+ax[0, 1].semilogy(kk, alpha ** kk * dist_lim[0], &#x27;--&#x27;,
+                  label=r&#x27;tasa $\alpha^k$&#x27;)
+ax[0, 1].set_xlabel(&#x27;iteracion $k$&#x27;); ax[0, 1].set_ylabel(&#x27;error&#x27;)
+ax[0, 1].set_title(f&#x27;Convergencia geometrica (brecha $1-\\alpha={1-alpha:.2f}$)&#x27;)
+ax[0, 1].grid(alpha=0.3); ax[0, 1].legend(fontsize=8)
+
+# Panel 3: PageRank vs grado de entrada normalizado
+x = np.arange(n); width = 0.4
+ax[1, 0].bar(x - width / 2, pr, width, label=&#x27;PageRank&#x27;, color=&#x27;C0&#x27;, alpha=0.85)
+ax[1, 0].bar(x + width / 2, in_deg_norm, width, label=&#x27;grado entrada (norm.)&#x27;,
+             color=&#x27;C1&#x27;, alpha=0.85)
+ax[1, 0].set_xlabel(&#x27;documento&#x27;); ax[1, 0].set_ylabel(&#x27;puntaje&#x27;)
+ax[1, 0].set_title(&#x27;PageRank vs heuristica de grado de entrada&#x27;)
+ax[1, 0].set_xticks(x); ax[1, 0].grid(alpha=0.3, axis=&#x27;y&#x27;)
+ax[1, 0].legend(fontsize=8)
+
+# Panel 4: iteraciones a convergencia vs damping alpha
+ax[1, 1].plot(alpha_vec, iters_vec, &#x27;o-&#x27;, ms=4, color=&#x27;C3&#x27;)
+ax[1, 1].axvline(alpha, color=&#x27;C0&#x27;, ls=&#x27;--&#x27;, alpha=0.7, label=f&#x27;$\\alpha={alpha}$&#x27;)
+ax[1, 1].set_xlabel(r&#x27;damping $\alpha$&#x27;)
+ax[1, 1].set_ylabel(&#x27;iteraciones a tol $10^{-10}$&#x27;)
+ax[1, 1].set_title(&#x27;Costo de convergencia vs damping&#x27;)
+ax[1, 1].grid(alpha=0.3); ax[1, 1].legend(fontsize=8)
+
+fig.suptitle(&#x27;Ejemplo 6 - PageRank: caminata aleatoria para ranking en RAG&#x27;,
+             fontsize=12, y=1.00)
+fig.tight_layout()
+fig.savefig(&#x27;Figuras/fig_s7_ej6_pagerank_rag.png&#x27;, bbox_inches=&#x27;tight&#x27;)
+# plt.show()
+print(&quot;\nFigura guardada: Figuras/fig_s7_ej6_pagerank_rag.png&quot;)</textarea>
+  <div class="code-output-wrap" hidden>
+    <div class="code-output-console"></div>
+    <div class="code-output-figures"></div>
+  </div>
+  <div class="code-status"></div>
+</div>
+
+    <h2 class="section-heading" style="margin-top:44px">Desarrollo teórico completo</h2>
+    <p class="section-intro">Ecuaciones, demostraciones, tablas y discusión de esta semana, tal como están
+      en los apuntes del curso — mismo documento fuente que el PDF completo, recortado a esta semana.</p>
+    <div class="theory-pdf-wrap">
+      <iframe src="../../assets/apuntes/semana-07.pdf" title="Desarrollo teórico — Semana 7. Cadenas de Markov y Sistemas Dinámicos" loading="lazy"></iframe>
+    </div>
+    <p class="theory-pdf-fallback">
+      ¿No se ve el documento arriba? <a href="../../assets/apuntes/semana-07.pdf" download>Descarga el PDF de esta semana</a>
+      o <a href="../../assets/apuntes/semana-07.pdf" target="_blank" rel="noopener">ábrelo en una pestaña nueva</a>.
+    </p>
+
+    <div class="week-nav">
+      <a href="../semana-06/index.html">&larr; Semana 06</a>
+      <span class="to-index"><a href="../../index.html">&uarr; Volver al índice del curso</a></span>
+      <a href="../semana-08/index.html">Semana 08 &rarr;</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div>Doctorado en Ingeniería y Tecnología Aplicada &middot; Universidad La Salle Bajío</div>
+    <div>Dr. Jorge Ramón Parra Michel &middot; Prototipado y Simulación</div>
+  </div>
+</footer>
+
+<script src="../../assets/js/main.js"></script>
+<script src="../../assets/js/pyodide-runner.js"></script>
+
+<script>
+window.addEventListener("load", function () {
+  if (window.renderMathInElement) {
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left: "$$", right: "$$", display: true},
+        {left: "$", right: "$", display: false}
+      ],
+      throwOnError: false
+    });
+  }
+});
+</script>
+
+</body>
+</html>
